@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -59,24 +60,68 @@ func (str *SSID) isEduroam() bool {
 	return false
 }
 
-func (slot *TimeSlot) GetCurrentTimeSlot(ch int) {
-	if ch >= 7 && ch < 9 {
-		*slot = 0
-	} else if ch >= 9 && ch < 11 {
-		*slot = 1
-	} else if ch >= 11 && ch < 13 {
-		*slot = 2
-	} else if ch >= 13 && ch < 15 {
-		*slot = 3
-	} else if ch >= 15 && ch < 17 {
-		*slot = 4
-	} else if ch >= 17 && ch < 19 {
-		*slot = 5
-	} else if ch > 19 && ch < 25 || ch >= 0 && ch < 6 {
-		*slot = 6
-	} else {
-		*slot = -1
+func makeRange(min, max int) []int {
+	a := make([]int, max-min+1)
+	for i := range a {
+		a[i] = min + i
 	}
+	return a
+}
+
+func contains(s []int, e int) bool {
+	fmt.Println("s", s)
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
+func (slot *TimeSlot) GetCurrentTimeSlot(ch int) {
+	switch ch {
+	case 7, 8:
+		*slot = 0
+		break
+	case 9, 10:
+		*slot = 1
+		break
+	case 11, 12:
+		*slot = 2
+		break
+	case 13, 14:
+		*slot = 3
+		break
+	case 15, 16:
+		*slot = 4
+		break
+	case 17, 18:
+		*slot = 5
+		break
+	case 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6:
+		*slot = 6
+		break
+	default:
+		*slot = -1
+		break
+	}
+	// if ch >= 7 && ch < 9 {
+	// 	*slot = 0
+	// } else if ch >= 9 && ch < 11 {
+	// 	*slot = 1
+	// } else if ch >= 11 && ch < 13 {
+	// 	*slot = 2
+	// } else if ch >= 13 && ch < 15 {
+	// 	*slot = 3
+	// } else if ch >= 15 && ch < 17 {
+	// 	*slot = 4
+	// } else if ch >= 17 && ch < 19 {
+	// 	*slot = 5
+	// } else if ch > 19 && ch < 25 || ch >= 0 && ch < 6 {
+	// 	*slot = 6
+	// } else {
+	// 	*slot = -1
+	// }
 }
 
 func (day Weekday) String() string {

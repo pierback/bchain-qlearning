@@ -55,6 +55,8 @@ func TestTimeSlot(t *testing.T) {
 		input    int
 		expected TimeSlot
 	}{
+		{7, 0},
+		{9, 1},
 		{8, 0},
 		{10, 1},
 		{12, 2},
