@@ -8,7 +8,10 @@ import (
 func TestDrinksCount(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestDrinksCount start")
-	DrinksCountString(DrinksCount{Coffee: 1, Mate: 21, Water: 1})
+	dc := DrinksCount{Coffee: 11, Mate: 21, Water: 1}
+	// ds := dc.DrinksCountString()
+	fmt.Println("	", dc.DrinksCountString())
+	fmt.Println("	")
 }
 func TestSSID(t *testing.T) {
 	t.Parallel()

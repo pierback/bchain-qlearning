@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -39,7 +38,7 @@ const (
 
 type DrinksCount map[Drink]int
 
-func DrinksCountString(dc DrinksCount) {
+func (dc DrinksCount) DrinksCountString() string {
 	drinks := [...]string{
 		"Coffee",
 		"Mate",
@@ -50,7 +49,7 @@ func DrinksCountString(dc DrinksCount) {
 	for i := 0; i < len(drinks); i++ {
 		drinkStr += drinks[i] + ": " + strconv.Itoa(dc[Drink(i)]) + " "
 	}
-	fmt.Println(drinkStr)
+	return drinkStr
 }
 
 func (str *SSID) isEduroam() bool {
