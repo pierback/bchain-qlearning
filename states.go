@@ -2,18 +2,17 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
 type TimeSlot int
 type Weekday int8
 type SSID string
-type Drink int8
 
+//Drink Enum
 const (
-	Coffee Drink = 0
-	Mate   Drink = 1
-	Water  Drink = 2
+	CoffeeCount int8 = iota
+	MateCount
+	WaterCount
 )
 
 //timeslot
@@ -27,6 +26,8 @@ const (
 	Slot6 TimeSlot = 6
 	Slot7 TimeSlot = -1
 )
+
+//days
 const (
 	Sunday    Weekday = 0
 	Monday    Weekday = 1
@@ -37,21 +38,73 @@ const (
 	Saturday  Weekday = 6
 )
 
-type DrinksCount map[Drink]int
+// type DrinksCount map[DrinkCount]int
 
-func (dc DrinksCount) DrinksCountString() string {
-	drinks := [...]string{
-		"Coffee",
-		"Mate",
-		"Water",
-	}
-
-	var drinkStr string
-	for i := 0; i < len(drinks); i++ {
-		drinkStr += drinks[i] + ": " + strconv.Itoa(dc[Drink(i)]) + " "
-	}
-	return drinkStr
+type DrinkCount struct {
+	coffee int
+	water  int
+	mate   int
 }
+type StateSpace map[string]int
+
+type State struct {
+	weekday     Weekday
+	timeslot    TimeSlot
+	drinkscount DrinkCount
+}
+
+func InitDrinksCountStates() []DrinkCount {
+	drinksStates := []DrinkCount{}
+	var j, k int
+	for i := 0; i < 8; i++ {
+		j = i
+		if i > 3 {
+			j = 3
+		}
+		if i > 4 {
+			j = 4
+		}
+		dd := DrinkCount{coffee: i, water: j, mate: k}
+		drinksStates = append(drinksStates, dd)
+	}
+	return drinksStates
+}
+
+func InitStateSpace(q *QLearning) StateSpace {
+	workdays := []Weekday{Monday, Tuesday, Wednesday, Thursday, Friday}
+	slots := []TimeSlot{Slot0, Slot1, Slot2, Slot3, Slot4, Slot5, Slot6}
+	drinksStates := InitDrinksCountStates()
+
+	var t, w int
+	statemap := make(StateSpace)
+	for i := 0; i < len(drinksStates); i++ {
+		if i > 7 {
+			t = 7
+		}
+		if i > 5 {
+			w = 5
+		}
+		tmpState := State{drinkscount: drinksStates[i], timeslot: slots[t], weekday: workdays[w]}
+		stateString := fmt.Sprintf("%v", tmpState)
+		statemap[stateString] = i
+	}
+	return statemap
+}
+
+// Returns Count of all Drinks  as string
+// func (dc DrinksCount) DrinksCountString() string {
+// 	drinks := [...]string{
+// 		"CoffeeCount",
+// 		"MateCount",
+// 		"WaterCount",
+// 	}
+
+// 	var drinkStr string
+// 	for i := 0; i < len(drinks); i++ {
+// 		drinkStr += drinks[i] + ": " + strconv.Itoa(dc[DrinkCount(i)]) + " "
+// 	}
+// 	return drinkStr
+// }
 
 func (str *SSID) isEduroam() bool {
 	if *str == "eduroam" {
@@ -141,6 +194,7 @@ func (day Weekday) String() string {
 	return names[day]
 }
 
+// TimeSlotString
 func (curTime TimeSlot) TimeSlotString() string {
 	slots := [...]string{
 		"Slot0",

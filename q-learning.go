@@ -6,63 +6,68 @@ import (
 	"time"
 )
 
-type QLearningTD struct {
+type Action int8
+
+const (
+	Nothing Action = iota
+	Coffee
+	Mate
+	Water
+)
+
+type QLearning struct {
 	Q [][]float64
 
-	Qn int
-	Qm int
+	st    State
+	actns int
 
-	Sn int
-	Sm int
+	workdays       int
+	slots          int
+	maxCoffeeCount int
+	maxMateCount   int
+	maxWaterCount  int
 
-	ter_n int
-	ter_m int
-
-	ini_n int
-	ini_m int
-
-	α float64
-	ε float64
-	γ float64
+	learningRate float64
+	epsilon      float64
+	gamma        float64
 }
 
-func (q *QLearningTD) Initialize() {
+func (q *QLearning) Initialize() {
 
-	q.α = 0.5
-	q.ε = 0.1
-	q.γ = 1
+	q.learningRate = 0.5
+	q.epsilon = 0.1
+	q.gamma = 1
 
-	q.Sn = 4
-	q.Sm = 12
+	Actions := 4
 
-	Actions := 4 // up, down, left, right
+	var ts TimeSlot
+	ts.GetCurrentTimeSlot(time.Now().Hour())
+	wd := time.Now().Weekday()
+	dc := DrinkCount{coffee: 0, mate: 0, water: 0}
+	q.st = State{weekday: Weekday(wd), timeslot: ts, drinkscount: dc}
 
-	q.ini_n = 0 //Start
-	q.ini_m = 0
-
-	q.ter_n = 0 //Goal
-	q.ter_m = 11
-
-	q.Qn = Actions
-	q.Qm = q.Sn * q.Sm
+	q.actns = Actions
+	q.maxCoffeeCount = 7
+	q.maxMateCount = 4
+	q.maxWaterCount = 4
+	q.slots = 7
+	q.workdays = 5
 
 	q.Q = make([][]float64, Actions)
 
-	for i := 0; i < Actions; i++ {
-		q.Q[i] = make([]float64, q.Sn*q.Sm)
-	}
+	stateSpaceLength := q.maxCoffeeCount * q.maxMateCount * q.maxWaterCount * q.slots * q.workdays
 
-	for i := 0; i < Actions; i++ {
-		for j := 0; j < q.Sn*q.Sm; j++ {
-			q.Q[i][j] = rand.Float64()
+	for i := 0; i < stateSpaceLength; i++ {
+		for j := 0; j < Actions; j++ {
+			q.Q[i][j] = 0
 		}
 	}
 
-	q.SetQAll(q.ter_n, q.ter_m, 0)
+	// q.SetQAll(q.ter_n, q.ter_m, 0)
 
 }
 
-// func (q *QLearningTD) Pi() {
+// func (q *QLearning) Pi() {
 // 	for i := q.Sn - 1; i >= 0; i-- {
 // 		for j := 0; j < q.Sm; j++ {
 // 			if i == q.ter_n && j == q.ter_m {
@@ -97,7 +102,7 @@ func initLearner() {
 	fmt.Println(t.Weekday())
 
 	rand.Seed(time.Now().Unix())
-	Q := QLearningTD{}
+	Q := QLearning{}
 	Q.Initialize()
 	// Q.Start()
 	// Q.Pi()
@@ -116,67 +121,62 @@ func initLearner() {
 // 	}
 // }
 
-func (q *QLearningTD) Start() {
+// func (q *QLearning) Start() {
 
-	episodes := 1000
-	for i := 0; i < episodes; i++ {
-		Sn := q.ini_n
-		Sm := q.ini_m
+// 	episodes := 1000
+// 	for i := 0; i < episodes; i++ {
+// 		Sn := q.ini_n
+// 		Sm := q.ini_m
 
-		ep := 0
+// 		ep := 0
 
-		for Sn != q.ter_n || Sm != q.ter_m {
-			ep++
-			// Action := q.ε_greedy(Sn, Sm)
-			// r, _Sn, _Sm := q.TakeAction(Action, Sn, Sm)
-			// QSA := q.GetQ(Sn, Sm, Action)
-			// MaxAction := q.GetAction(_Sn, _Sm)
-			// _QSA := q.GetQ(_Sn, _Sm, MaxAction)
+// 		for Sn != q.ter_n || Sm != q.ter_m {
+// 			ep++
+// Action := q.epsilon_greedy(Sn, Sm)
+// r, _Sn, _Sm := q.TakeAction(Action, Sn, Sm)
+// QSA := q.GetQ(Sn, Sm, Action)
+// MaxAction := q.GetAction(_Sn, _Sm)
+// _QSA := q.GetQ(_Sn, _Sm, MaxAction)
 
-			// Q := QSA + q.α*(r+q.γ*_QSA-QSA)
-			// q.SetQ(Sn, Sm, Action, Q)
+// Q := QSA + q.learningRate*(r+q.gamma*_QSA-QSA)
+// q.SetQ(Sn, Sm, Action, Q)
 
-			// Sn = _Sn
-			// Sm = _Sm
-		}
-	}
+// Sn = _Sn
+// Sm = _Sm
+// 		}
+// 	}
+
+// }
+
+func (q *QLearning) GetAction(n, m int) int {
+
+	// Idx := q.GetIdx(n, m)
+	// max := q.Q[0][Idx]
+	// Action := 0
+	// for i := 1; i < q.Qn; i++ {
+	// 	if max < q.Q[i][Idx] {
+	// 		max = q.Q[i][Idx]
+	// 		Action = i
+	// 	}
+	// }
+	return 0
+	// return Action
 
 }
 
-func (q *QLearningTD) SetQAll(n, m int, f float64) {
-	for a := 0; a < q.Qn; a++ {
-		q.Q[a][n*q.Sn+m] = f
-	}
-}
-
-func (q *QLearningTD) GetAction(n, m int) int {
-
-	Idx := q.GetIdx(n, m)
-	max := q.Q[0][Idx]
-	Action := 0
-	for i := 1; i < q.Qn; i++ {
-		if max < q.Q[i][Idx] {
-			max = q.Q[i][Idx]
-			Action = i
-		}
-	}
-
-	return Action
-}
-
-func (q *QLearningTD) ε_greedy(n, m int) int {
+func (q *QLearning) epsilon_greedy(n, m int) int {
 
 	Action := q.GetAction(n, m)
 
-	if rand.Float64() < 1-q.ε {
+	if rand.Float64() < 1-q.epsilon {
 		return Action
 	}
-
-	return rand.Intn(q.Qn)
+	return 0
+	// return rand.Intn(q.Qn)
 
 }
 
-// func (q *QLearningTD) TakeAction(a, n, m int) (float64, int, int) {
+// func (q *QLearning) TakeAction(a, n, m int) (float64, int, int) {
 
 // 	_n := n
 // 	_m := m
@@ -209,14 +209,14 @@ func (q *QLearningTD) ε_greedy(n, m int) int {
 // 	return -1.0, _n, _m
 // }
 
-func (q *QLearningTD) GetQ(n, m, a int) float64 {
+func (q *QLearning) GetQ(n, m, a int) float64 {
 
 	return q.Q[a][q.GetIdx(n, m)]
 }
-func (q *QLearningTD) SetQ(n, m, a int, f float64) {
+func (q *QLearning) SetQ(n, m, a int, f float64) {
 	q.Q[a][q.GetIdx(n, m)] = f
 }
 
-func (q *QLearningTD) GetIdx(n, m int) int {
-	return n*q.Sm + m
+func (q *QLearning) GetIdx(n, m int) int {
+	return 0
 }
