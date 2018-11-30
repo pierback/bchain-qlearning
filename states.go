@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
 type timeslot int
@@ -47,9 +46,9 @@ type drinkcount struct {
 type StateSpace map[string]int
 
 type State struct {
-	Weekday    weekday    `json: weekday`
-	Timeslot   timeslot   `json: timeslot`
-	Drinkcount drinkcount `json:drinkcount`
+	Weekday    weekday
+	Timeslot   timeslot
+	Drinkcount drinkcount
 }
 
 func InitDrinksCountStates() []drinkcount {
@@ -86,41 +85,23 @@ func InitStateSpace() StateSpace {
 }
 
 // Returns Count of all Drinks  as string
-func (dc DrinksCount) DrinksCountString() string {
-	drinks := [...]string{
-		"CoffeeCount",
-		"MateCount",
-		"WaterCount",
-	}
+// func (dc drinkcount) DrinksCountString() string {
+// 	drinks := [...]string{
+// 		"CoffeeCount",
+// 		"MateCount",
+// 		"WaterCount",
+// 	}
 
-	var drinkStr string
-	for i := 0; i < len(drinks); i++ {
-		drinkStr += drinks[i] + ": " + strconv.Itoa(dc[drinkcount(i)]) + " "
-	}
-	return drinkStr
-}
+// 	var drinkStr string
+// 	for i := 0; i < len(drinks); i++ {
+// 		drinkStr += drinks[i] + ": " + strconv.Itoa(dc[drinkcount(i)]) + " "
+// 	}
+// 	return drinkStr
+// }
 
 func (str *SSID) isEduroam() bool {
 	if *str == "eduroam" {
 		return true
-	}
-	return false
-}
-
-func makeRange(min, max int) []int {
-	a := make([]int, max-min+1)
-	for i := range a {
-		a[i] = min + i
-	}
-	return a
-}
-
-func contains(s []int, e int) bool {
-	fmt.Println("s", s)
-	for _, a := range s {
-		if a == e {
-			return true
-		}
 	}
 	return false
 }
@@ -180,9 +161,9 @@ func (day weekday) String() string {
 		"Friday",
 	}
 
-	// if day < Sunday || day > Saturday {
-	// 	return "Unknown"
-	// }
+	if day < Monday || day > Friday {
+		return "Unknown"
+	}
 	return names[day]
 }
 
