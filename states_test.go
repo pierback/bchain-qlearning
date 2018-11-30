@@ -8,9 +8,8 @@ import (
 func TestDrinksCount(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestDrinksCount start")
-	dc := DrinkCount{coffee: 11, mate: 21, water: 1}
-	dcs := fmt.Sprintf("%v", dc)
-	fmt.Println("	", dcs)
+	InitStateSpace()
+
 	fmt.Println("	")
 }
 func TestSSID(t *testing.T) {
@@ -38,7 +37,7 @@ func TestTimeSlot(t *testing.T) {
 	fmt.Println("TestTimeSlot start")
 
 	var slotStrings = []struct {
-		input    TimeSlot
+		input    timeslot
 		expected string
 	}{
 		{0, "Slot0"},
@@ -53,7 +52,7 @@ func TestTimeSlot(t *testing.T) {
 
 	var slotIds = []struct {
 		input    int
-		expected TimeSlot
+		expected timeslot
 	}{
 		{7, 0},
 		{9, 1},
@@ -66,7 +65,7 @@ func TestTimeSlot(t *testing.T) {
 		{22, 6},
 		{26, -1},
 	}
-	var ts TimeSlot
+	var ts timeslot
 
 	for _, slot := range slotStrings {
 		if output := slot.input.TimeSlotString(); output != slot.expected {
@@ -86,7 +85,7 @@ func TestWeekdayString(t *testing.T) {
 	fmt.Println("TestWeekdayString start")
 
 	var weekdays = []struct {
-		input    Weekday
+		input    weekday
 		expected string
 	}{
 		{0, "Sunday"},

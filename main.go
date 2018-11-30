@@ -9,7 +9,7 @@ import (
 func main() {
 	// handleRequests()
 	// initLearner()
-	var ts TimeSlot = 9
+	var ts timeslot = 9
 	h := time.Now().Hour()
 	ts.GetCurrentTimeSlot(h)
 	fmt.Println("&slot", ts)

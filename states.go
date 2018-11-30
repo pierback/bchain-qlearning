@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
-type TimeSlot int
-type Weekday int8
+type timeslot int
+
 type SSID string
 
 //Drink Enum
@@ -17,94 +18,87 @@ const (
 
 //timeslot
 const (
-	Slot0 TimeSlot = 0
-	Slot1 TimeSlot = 1
-	Slot2 TimeSlot = 2
-	Slot3 TimeSlot = 3
-	Slot4 TimeSlot = 4
-	Slot5 TimeSlot = 5
-	Slot6 TimeSlot = 6
-	Slot7 TimeSlot = -1
+	Slot0 timeslot = 0
+	Slot1 timeslot = 1
+	Slot2 timeslot = 2
+	Slot3 timeslot = 3
+	Slot4 timeslot = 4
+	Slot5 timeslot = 5
+	Slot6 timeslot = 6
+	Slot7 timeslot = -1
 )
+
+type weekday int8
 
 //days
 const (
-	Sunday    Weekday = 0
-	Monday    Weekday = 1
-	Tuesday   Weekday = 2
-	Wednesday Weekday = 3
-	Thursday  Weekday = 4
-	Friday    Weekday = 5
-	Saturday  Weekday = 6
+	Monday weekday = iota
+	Tuesday
+	Wednesday
+	Thursday
+	Friday
 )
 
-// type DrinksCount map[DrinkCount]int
-
-type DrinkCount struct {
-	coffee int
-	water  int
-	mate   int
+type drinkcount struct {
+	Coffee int
+	Water  int
+	Mate   int
 }
 type StateSpace map[string]int
 
 type State struct {
-	weekday     Weekday
-	timeslot    TimeSlot
-	drinkscount DrinkCount
+	Weekday    weekday    `json: weekday`
+	Timeslot   timeslot   `json: timeslot`
+	Drinkcount drinkcount `json:drinkcount`
 }
 
-func InitDrinksCountStates() []DrinkCount {
-	drinksStates := []DrinkCount{}
-	var j, k int
+func InitDrinksCountStates() []drinkcount {
+	drinksStates := []drinkcount{}
 	for i := 0; i < 8; i++ {
-		j = i
-		if i > 3 {
-			j = 3
-		}
-		if i > 4 {
-			j = 4
-		}
-		dd := DrinkCount{coffee: i, water: j, mate: k}
-		drinksStates = append(drinksStates, dd)
+		// for j := 0; j < 4; j++ {
+		// 	for k := 0; k < 5; k++ {
+		// 		drinksStates = append(drinksStates, drinkcount{Coffee: i, Water: j, Mate: k})
+		// 	}
+		// }
+		drinksStates = append(drinksStates, drinkcount{Coffee: i, Water: 0, Mate: 0})
 	}
 	return drinksStates
 }
 
-func InitStateSpace(q *QLearning) StateSpace {
-	workdays := []Weekday{Monday, Tuesday, Wednesday, Thursday, Friday}
-	slots := []TimeSlot{Slot0, Slot1, Slot2, Slot3, Slot4, Slot5, Slot6}
+func InitStateSpace() StateSpace {
 	drinksStates := InitDrinksCountStates()
+	workdays := []weekday{Monday, Tuesday, Wednesday, Thursday, Friday}
+	slots := []timeslot{Slot0, Slot1, Slot2, Slot3, Slot4, Slot5, Slot6}
 
-	var t, w int
+	var index int
 	statemap := make(StateSpace)
-	for i := 0; i < len(drinksStates); i++ {
-		if i > 7 {
-			t = 7
+
+	for _, ds := range drinksStates {
+		for _, sl := range slots {
+			for _, wd := range workdays {
+				statemap[(&State{wd, sl, ds}).String()] = index
+				index++
+			}
 		}
-		if i > 5 {
-			w = 5
-		}
-		tmpState := State{drinkscount: drinksStates[i], timeslot: slots[t], weekday: workdays[w]}
-		stateString := fmt.Sprintf("%v", tmpState)
-		statemap[stateString] = i
 	}
+	fmt.Println("statemap: ", statemap, len(statemap))
 	return statemap
 }
 
 // Returns Count of all Drinks  as string
-// func (dc DrinksCount) DrinksCountString() string {
-// 	drinks := [...]string{
-// 		"CoffeeCount",
-// 		"MateCount",
-// 		"WaterCount",
-// 	}
+func (dc DrinksCount) DrinksCountString() string {
+	drinks := [...]string{
+		"CoffeeCount",
+		"MateCount",
+		"WaterCount",
+	}
 
-// 	var drinkStr string
-// 	for i := 0; i < len(drinks); i++ {
-// 		drinkStr += drinks[i] + ": " + strconv.Itoa(dc[DrinkCount(i)]) + " "
-// 	}
-// 	return drinkStr
-// }
+	var drinkStr string
+	for i := 0; i < len(drinks); i++ {
+		drinkStr += drinks[i] + ": " + strconv.Itoa(dc[drinkcount(i)]) + " "
+	}
+	return drinkStr
+}
 
 func (str *SSID) isEduroam() bool {
 	if *str == "eduroam" {
@@ -131,7 +125,7 @@ func contains(s []int, e int) bool {
 	return false
 }
 
-func (slot *TimeSlot) GetCurrentTimeSlot(ch int) {
+func (slot *timeslot) GetCurrentTimeSlot(ch int) {
 	switch ch {
 	case 7, 8:
 		*slot = 0
@@ -177,25 +171,23 @@ func (slot *TimeSlot) GetCurrentTimeSlot(ch int) {
 	// }
 }
 
-func (day Weekday) String() string {
+func (day weekday) String() string {
 	names := [...]string{
-		"Sunday",
 		"Monday",
 		"Tuesday",
 		"Wednesday",
 		"Thursday",
 		"Friday",
-		"Saturday",
 	}
 
-	if day < Sunday || day > Saturday {
-		return "Unknown"
-	}
+	// if day < Sunday || day > Saturday {
+	// 	return "Unknown"
+	// }
 	return names[day]
 }
 
 // TimeSlotString
-func (curTime TimeSlot) TimeSlotString() string {
+func (curTime timeslot) TimeSlotString() string {
 	slots := [...]string{
 		"Slot0",
 		"Slot1",
