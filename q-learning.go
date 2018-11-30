@@ -42,9 +42,10 @@ func (q *QLearning) Initialize() {
 
 	var ts timeslot
 	ts.GetCurrentTimeSlot(time.Now().Hour())
-	// wd := time.Now().Weekday()
-	// dc := drinkcount{coffee: 0, mate: 0, water: 0}
-	// q.st = State{Weekday: weekday(wd), Timeslot: ts, Drinkcount: dc}
+	wd := time.Now().Weekday()
+	dc := drinkcount{Coffee: 0, Mate: 0, Water: 0}
+	q.st = State{Weekday: weekday(wd), Timeslot: ts, Drinkcount: dc}
+	fmt.Println("q.st: ", q.st.String())
 
 	q.actns = Actions
 	q.maxCoffeeCount = 7

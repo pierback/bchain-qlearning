@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// handleRequests()
-	// initLearner()
+	initLearner()
 	var ts timeslot = 9
 	h := time.Now().Hour()
 	ts.GetCurrentTimeSlot(h)
