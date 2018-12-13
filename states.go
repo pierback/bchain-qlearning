@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 type timeslot int
@@ -39,65 +40,109 @@ const (
 )
 
 type drinkcount struct {
-	Coffee int
-	Water  int
-	Mate   int
+	CoffeeCount int `json: "coffeecount"`
+	WaterCount  int `json: "watercount"`
+	MateCount   int `json: "matecount"`
 }
 type StateSpace map[string]int
 
 type State struct {
-	Weekday    weekday
-	Timeslot   timeslot
-	Drinkcount drinkcount
+	Weekday    weekday    `json: "weekday"`
+	Timeslot   timeslot   `json: "timeslot"`
+	Drinkcount drinkcount `json: "drinkcount"`
 }
 
 func InitDrinksCountStates() []drinkcount {
-	drinksStates := []drinkcount{}
+	var drinksStates []drinkcount
 	for i := 0; i < 8; i++ {
 		// for j := 0; j < 4; j++ {
 		// 	for k := 0; k < 5; k++ {
 		// 		drinksStates = append(drinksStates, drinkcount{Coffee: i, Water: j, Mate: k})
 		// 	}
 		// }
-		drinksStates = append(drinksStates, drinkcount{Coffee: i, Water: 0, Mate: 0})
+		drinksStates = append(drinksStates, drinkcount{CoffeeCount: i, WaterCount: 0, MateCount: 0})
 	}
 	return drinksStates
 }
 
-func InitStateSpace() StateSpace {
+func (q *QLearning) GetStateId() int {
+	var stateString string
+	if q.train {
+		stateString = q.tr.vs.String()
+	} else {
+		stateString = q.state.String()
+	}
+	return q.statemap[stateString]
+}
+
+func (q *QLearning) InitStateSpace() {
 	drinksStates := InitDrinksCountStates()
 	workdays := []weekday{Monday, Tuesday, Wednesday, Thursday, Friday}
 	slots := []timeslot{Slot0, Slot1, Slot2, Slot3, Slot4, Slot5, Slot6}
 
 	var index int
+	var virtStates []State
 	statemap := make(StateSpace)
 
-	for _, ds := range drinksStates {
+	for _, wd := range workdays {
 		for _, sl := range slots {
-			for _, wd := range workdays {
-				statemap[(&State{wd, sl, ds}).String()] = index
+			for _, ds := range drinksStates {
+				st := (State{wd, sl, ds})
+				virtStates = append(virtStates, st)
+				statemap[st.String()] = index
 				index++
 			}
 		}
 	}
-	fmt.Println("statemap: ", statemap, len(statemap))
-	return statemap
+	q.statemap = statemap
+	q.tr.vsm = virtStates
 }
 
-// Returns Count of all Drinks  as string
-// func (dc drinkcount) DrinksCountString() string {
-// 	drinks := [...]string{
-// 		"CoffeeCount",
-// 		"MateCount",
-// 		"WaterCount",
-// 	}
+func (q *QLearning) GetState() State {
+	if q.train {
+		return q.tr.vs
+	}
 
-// 	var drinkStr string
-// 	for i := 0; i < len(drinks); i++ {
-// 		drinkStr += drinks[i] + ": " + strconv.Itoa(dc[drinkcount(i)]) + " "
-// 	}
-// 	return drinkStr
-// }
+	ts := GetCurrentTimeSlot(time.Now().Hour())
+	wd := time.Now().Weekday()
+	return State{Weekday: weekday(wd), Timeslot: ts, Drinkcount: q.dc}
+}
+
+func (q *QLearning) UpdateState(a Action) State {
+	var ts timeslot
+	var wd weekday
+
+	if q.train {
+		ts = q.tr.vs.Timeslot
+		wd = q.tr.vs.Weekday
+	} else {
+		ts = GetCurrentTimeSlot(time.Now().Hour())
+		wd = weekday(time.Now().Weekday())
+	}
+
+	cc := q.state.Drinkcount.CoffeeCount
+	wc := q.state.Drinkcount.WaterCount
+	mc := q.state.Drinkcount.MateCount
+
+	if a == Coffee {
+		cc++
+	} else if a == Water {
+		wc++
+	} else if a == Mate {
+		mc++
+	}
+
+	return State{
+		Weekday:  wd,
+		Timeslot: ts,
+		Drinkcount: drinkcount{
+			CoffeeCount: cc,
+			WaterCount:  wc,
+			MateCount:   mc,
+		},
+	}
+
+}
 
 func (str *SSID) isEduroam() bool {
 	if *str == "eduroam" {
@@ -106,50 +151,25 @@ func (str *SSID) isEduroam() bool {
 	return false
 }
 
-func (slot *timeslot) GetCurrentTimeSlot(ch int) {
+func GetCurrentTimeSlot(ch int) timeslot {
 	switch ch {
 	case 7, 8:
-		*slot = 0
-		break
+		return 0
 	case 9, 10:
-		*slot = 1
-		break
+		return 1
 	case 11, 12:
-		*slot = 2
-		break
+		return 2
 	case 13, 14:
-		*slot = 3
-		break
+		return 3
 	case 15, 16:
-		*slot = 4
-		break
+		return 4
 	case 17, 18:
-		*slot = 5
-		break
+		return 5
 	case 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6:
-		*slot = 6
-		break
+		return 6
 	default:
-		*slot = -1
-		break
+		return -1
 	}
-	// if ch >= 7 && ch < 9 {
-	// 	*slot = 0
-	// } else if ch >= 9 && ch < 11 {
-	// 	*slot = 1
-	// } else if ch >= 11 && ch < 13 {
-	// 	*slot = 2
-	// } else if ch >= 13 && ch < 15 {
-	// 	*slot = 3
-	// } else if ch >= 15 && ch < 17 {
-	// 	*slot = 4
-	// } else if ch >= 17 && ch < 19 {
-	// 	*slot = 5
-	// } else if ch > 19 && ch < 25 || ch >= 0 && ch < 6 {
-	// 	*slot = 6
-	// } else {
-	// 	*slot = -1
-	// }
 }
 
 func (day weekday) String() string {
@@ -182,4 +202,32 @@ func (curTime timeslot) TimeSlotString() string {
 		return "Unknown"
 	}
 	return slots[curTime]
+}
+
+func StateFactory(dc drinkcount, _wd int, _ct float64) State {
+	var wd weekday
+	var ct timeslot
+
+	if _wd == -1 {
+		wd = weekday(time.Now().Weekday())
+		fmt.Println("wd: ", wd)
+	} else {
+		wd = weekday(_wd)
+	}
+
+	if _ct == -1 {
+		ct = GetCurrentTimeSlot(time.Now().Hour())
+	} else {
+		ct = GetCurrentTimeSlot(int(_ct))
+	}
+
+	return State{
+		Weekday:  wd,
+		Timeslot: ct,
+		Drinkcount: drinkcount{
+			CoffeeCount: dc.CoffeeCount,
+			WaterCount:  dc.WaterCount,
+			MateCount:   dc.MateCount,
+		},
+	}
 }

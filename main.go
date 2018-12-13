@@ -11,7 +11,7 @@ func main() {
 	initLearner()
 	var ts timeslot = 9
 	h := time.Now().Hour()
-	ts.GetCurrentTimeSlot(h)
+	ts = GetCurrentTimeSlot(h)
 	fmt.Println("&slot", ts)
 
 	fmt.Printf("Which day it is? %s\n", time.Now().Weekday())
