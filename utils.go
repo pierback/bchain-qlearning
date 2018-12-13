@@ -5,6 +5,17 @@ import (
 	"fmt"
 )
 
+func FilterSlice(dayArr []float64, sl timeslot) int {
+	var stateCount int //per slot
+	for _, t := range dayArr {
+		if GetCurrentTimeSlot(int(t)) == sl {
+			stateCount++
+		}
+	}
+
+	return stateCount
+}
+
 func (state *State) String() string {
 	out, err := json.Marshal(*state)
 	if err != nil {
