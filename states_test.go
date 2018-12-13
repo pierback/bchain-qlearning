@@ -3,14 +3,21 @@ package main
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestDrinksCount(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestDrinksCount start")
-	InitStateSpace()
+	Q := QLearning{}
+	Q.InitStateSpace()
 
+	// fmt.Println(Q.statemap)
 	fmt.Println("	")
+}
+
+func TestGenerateTrainingSet(t *testing.T) {
+	GenerateTrainingSet()
 }
 func TestSSID(t *testing.T) {
 	t.Parallel()
@@ -27,6 +34,54 @@ func TestSSID(t *testing.T) {
 	for _, ssid := range ssids {
 		if output := ssid.input.isEduroam(); output != ssid.expected {
 			t.Error("Wrong wifi", ssid.input, ssid.expected, ssid)
+		}
+	}
+
+}
+
+func TestStateFactory(t *testing.T) {
+	t.Parallel()
+	fmt.Println("TestStateFactory start")
+
+	type Input struct {
+		dc drinkcount
+		wd int
+		ct float64
+	}
+
+	var stfs = []struct {
+		input    Input
+		expected State
+	}{
+		{
+			input: Input{dc: drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: -1, ct: -1},
+			expected: State{
+				Weekday:  weekday(time.Now().Weekday()),
+				Timeslot: GetCurrentTimeSlot(time.Now().Hour()),
+				Drinkcount: drinkcount{
+					CoffeeCount: 4,
+					WaterCount:  0,
+					MateCount:   0,
+				},
+			},
+		},
+		{
+			input: Input{dc: drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: 3, ct: 3},
+			expected: State{
+				Weekday:  weekday(3),
+				Timeslot: GetCurrentTimeSlot(int(3)),
+				Drinkcount: drinkcount{
+					CoffeeCount: 4,
+					WaterCount:  0,
+					MateCount:   0,
+				},
+			},
+		},
+	}
+
+	for _, s := range stfs {
+		if output := StateFactory(s.input.dc, s.input.wd, s.input.ct); output != s.expected {
+			t.Error("StateFactory not working properly", s.input, s.expected, output)
 		}
 	}
 
@@ -74,7 +129,7 @@ func TestTimeSlot(t *testing.T) {
 	}
 
 	for _, slot := range slotIds {
-		if ts.GetCurrentTimeSlot(slot.input); ts != slot.expected {
+		if out := GetCurrentTimeSlot(slot.input); out != slot.expected {
 			t.Error("Input Hour", slot.input, slot.expected, ts)
 		}
 	}
