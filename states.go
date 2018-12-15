@@ -46,6 +46,8 @@ type drinkcount struct {
 }
 type StateSpace map[string]int
 
+type QTable map[State][]float64
+
 type State struct {
 	Weekday    weekday    `json: "weekday"`
 	Timeslot   timeslot   `json: "timeslot"`
@@ -65,50 +67,32 @@ func InitDrinksCountStates() []drinkcount {
 	return drinksStates
 }
 
-func (q *QLearning) GetStateId() int {
-	var stateString string
-	if q.train {
-		stateString = q.tr.vs.String()
-	} else {
-		stateString = q.state.String()
-	}
-	return q.statemap[stateString]
-}
-
-func (q *QLearning) InitStateSpace() {
-	drinksStates := InitDrinksCountStates()
-	workdays := []weekday{Monday, Tuesday, Wednesday, Thursday, Friday}
-	slots := []timeslot{Slot0, Slot1, Slot2, Slot3, Slot4, Slot5, Slot6}
-
-	var index int
-	var virtStates []State
-	statemap := make(StateSpace)
-
-	for _, wd := range workdays {
-		for _, sl := range slots {
-			for _, ds := range drinksStates {
-				st := (State{wd, sl, ds})
-				virtStates = append(virtStates, st)
-				statemap[st.String()] = index
-				index++
-			}
-		}
-	}
-	q.statemap = statemap
-	q.tr.vsm = virtStates
-}
+// func (q *QLearning) GetState() State {
+// 	if q.train {
+// 		return q.tr.vs
+// 	}
+// 	return q.state
+// }
 
 func (q *QLearning) GetState() State {
 	if q.train {
 		return q.tr.vs
 	}
 
-	ts := GetCurrentTimeSlot(time.Now().Hour())
+	var dc drinkcount
 	wd := time.Now().Weekday()
-	return State{Weekday: weekday(wd), Timeslot: ts, Drinkcount: q.dc}
+	ts := GetCurrentTimeSlot(time.Now().Hour())
+
+	if q.state.Weekday != weekday(wd) {
+		dc = drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}
+	} else {
+		dc = q.dc
+	}
+
+	return State{Weekday: weekday(wd), Timeslot: ts, Drinkcount: dc}
 }
 
-func (q *QLearning) UpdateState(a Action) State {
+func (q *QLearning) UpdateState(a Action) *State {
 	var ts timeslot
 	var wd weekday
 
@@ -132,7 +116,7 @@ func (q *QLearning) UpdateState(a Action) State {
 		mc++
 	}
 
-	return State{
+	return &State{
 		Weekday:  wd,
 		Timeslot: ts,
 		Drinkcount: drinkcount{
@@ -172,6 +156,11 @@ func GetCurrentTimeSlot(ch int) timeslot {
 	}
 }
 
+func (q *QLearning) SetState(ns State) {
+	q.state = ns
+	q.tr.vs = ns
+}
+
 func (day weekday) String() string {
 	names := [...]string{
 		"Monday",
@@ -204,7 +193,7 @@ func (curTime timeslot) TimeSlotString() string {
 	return slots[curTime]
 }
 
-func StateFactory(dc drinkcount, _wd int, _ct float64) State {
+func NewState(dc drinkcount, _wd int, _ct float64) State {
 	var wd weekday
 	var ct timeslot
 
