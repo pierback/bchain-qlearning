@@ -3,15 +3,21 @@ package main
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestDrinksCount(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestDrinksCount start")
-	dc := DrinkCount{coffee: 11, mate: 21, water: 1}
-	dcs := fmt.Sprintf("%v", dc)
-	fmt.Println("	", dcs)
+	Q := QLearning{}
+	Q.InitStateSpace()
+
+	// fmt.Println(Q.statemap)
 	fmt.Println("	")
+}
+
+func TestGenerateTrainingSet(t *testing.T) {
+	GenerateTrainingSet()
 }
 func TestSSID(t *testing.T) {
 	t.Parallel()
@@ -33,12 +39,60 @@ func TestSSID(t *testing.T) {
 
 }
 
+func TestStateFactory(t *testing.T) {
+	t.Parallel()
+	fmt.Println("TestStateFactory start")
+
+	type Input struct {
+		dc drinkcount
+		wd int
+		ct float64
+	}
+
+	var stfs = []struct {
+		input    Input
+		expected State
+	}{
+		{
+			input: Input{dc: drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: -1, ct: -1},
+			expected: State{
+				Weekday:  weekday(time.Now().Weekday()),
+				Timeslot: GetCurrentTimeSlot(time.Now().Hour()),
+				Drinkcount: drinkcount{
+					CoffeeCount: 4,
+					WaterCount:  0,
+					MateCount:   0,
+				},
+			},
+		},
+		{
+			input: Input{dc: drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: 3, ct: 3},
+			expected: State{
+				Weekday:  weekday(3),
+				Timeslot: GetCurrentTimeSlot(int(3)),
+				Drinkcount: drinkcount{
+					CoffeeCount: 4,
+					WaterCount:  0,
+					MateCount:   0,
+				},
+			},
+		},
+	}
+
+	for _, s := range stfs {
+		if output := StateFactory(s.input.dc, s.input.wd, s.input.ct); output != s.expected {
+			t.Error("StateFactory not working properly", s.input, s.expected, output)
+		}
+	}
+
+}
+
 func TestTimeSlot(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestTimeSlot start")
 
 	var slotStrings = []struct {
-		input    TimeSlot
+		input    timeslot
 		expected string
 	}{
 		{0, "Slot0"},
@@ -53,7 +107,7 @@ func TestTimeSlot(t *testing.T) {
 
 	var slotIds = []struct {
 		input    int
-		expected TimeSlot
+		expected timeslot
 	}{
 		{7, 0},
 		{9, 1},
@@ -66,7 +120,7 @@ func TestTimeSlot(t *testing.T) {
 		{22, 6},
 		{26, -1},
 	}
-	var ts TimeSlot
+	var ts timeslot
 
 	for _, slot := range slotStrings {
 		if output := slot.input.TimeSlotString(); output != slot.expected {
@@ -75,7 +129,7 @@ func TestTimeSlot(t *testing.T) {
 	}
 
 	for _, slot := range slotIds {
-		if ts.GetCurrentTimeSlot(slot.input); ts != slot.expected {
+		if out := GetCurrentTimeSlot(slot.input); out != slot.expected {
 			t.Error("Input Hour", slot.input, slot.expected, ts)
 		}
 	}
@@ -86,16 +140,14 @@ func TestWeekdayString(t *testing.T) {
 	fmt.Println("TestWeekdayString start")
 
 	var weekdays = []struct {
-		input    Weekday
+		input    weekday
 		expected string
 	}{
-		{0, "Sunday"},
-		{1, "Monday"},
-		{2, "Tuesday"},
-		{3, "Wednesday"},
-		{4, "Thursday"},
-		{5, "Friday"},
-		{6, "Saturday"},
+		{0, "Monday"},
+		{1, "Tuesday"},
+		{2, "Wednesday"},
+		{3, "Thursday"},
+		{4, "Friday"},
 	}
 
 	for _, weekday := range weekdays {
