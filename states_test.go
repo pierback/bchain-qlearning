@@ -9,8 +9,6 @@ import (
 func TestDrinksCount(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestDrinksCount start")
-	Q := QLearning{}
-	Q.InitStateSpace()
 
 	// fmt.Println(Q.statemap)
 	fmt.Println("	")
@@ -39,9 +37,9 @@ func TestSSID(t *testing.T) {
 
 }
 
-func TestStateFactory(t *testing.T) {
+func TestNewState(t *testing.T) {
 	t.Parallel()
-	fmt.Println("TestStateFactory start")
+	fmt.Println("TestNewState start")
 
 	type Input struct {
 		dc drinkcount
@@ -80,8 +78,8 @@ func TestStateFactory(t *testing.T) {
 	}
 
 	for _, s := range stfs {
-		if output := StateFactory(s.input.dc, s.input.wd, s.input.ct); output != s.expected {
-			t.Error("StateFactory not working properly", s.input, s.expected, output)
+		if output := NewState(s.input.dc, s.input.wd, s.input.ct); output != s.expected {
+			t.Error("NewState not working properly", s.input, s.expected, output)
 		}
 	}
 

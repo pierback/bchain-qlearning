@@ -13,33 +13,40 @@ func TestStartLearn(t *testing.T) {
 	fmt.Println("	")
 }
 
-func TestGetStateId(t *testing.T) {
+func TestSetQ(t *testing.T) {
 	t.Parallel()
-	fmt.Println("TestGetStateId start")
-	Q := QLearning{}
-	// Q.InitStateSpace()
-	Q.statemap = make(StateSpace)
-	for index := 0; index < 16; index++ {
-		sampleState := State{
-			Weekday:  weekday(1),
-			Timeslot: 1,
-			Drinkcount: drinkcount{
-				CoffeeCount: index,
-				WaterCount:  0,
-				MateCount:   0,
-			},
-		}
-		Q.statemap[sampleState.String()] = index
+	fmt.Println("TestSetQ start")
+	q := QLearning{}
+	ss := NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(Monday), 8.45)
+	q.train = true
+	q.qt = make(QTable)
+
+	type Input struct {
+		a Action
+		v float64
+		s State
 	}
 
-	for state, id := range Q.statemap {
-		if Q.statemap[state] != id {
-			t.Error("wrong id, check string function")
-		} else {
-			fmt.Println("Correct ID is", Q.statemap[state])
-		}
+	var qavs = []struct {
+		input    Input
+		expected float64
+	}{
+		{input: Input{a: Coffee, v: -0.345, s: ss}, expected: -0.345},
+		{input: Input{a: Nothing, v: -0.543, s: ss}, expected: -0.543},
+		{input: Input{a: Nothing, v: -0.543, s: ss}, expected: -0.543},
 	}
 
+	fmt.Println("q.qt: ", q.qt)
+	q.AddState(ss)
+
+	for _, qav := range qavs {
+		q.SetQ(qav.input.a, qav.input.v)
+
+		if q.qt[ss][qav.input.a] != qav.expected {
+			t.Error("Value does not match input val")
+		}
+	}
+	fmt.Println("q.qt: ", q.qt)
 }
 
 func TestFilterSlice(t *testing.T) {
@@ -99,17 +106,17 @@ func TestUpdateState(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestUpdateState start")
 	tq := QLearning{}
-	sampleState := StateFactory(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)
+	sampleState := NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)
 
 	var execActns = []struct {
 		input    Action
 		expected State
 	}{
-		{Coffee, StateFactory(drinkcount{CoffeeCount: 1, WaterCount: 0, MateCount: 0}, -1, -1)},
-		{Nothing, StateFactory(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
-		{Mate, StateFactory(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 1}, -1, -1)},
-		{Water, StateFactory(drinkcount{CoffeeCount: 0, WaterCount: 1, MateCount: 0}, -1, -1)},
-		{4, StateFactory(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
+		{Coffee, NewState(drinkcount{CoffeeCount: 1, WaterCount: 0, MateCount: 0}, -1, -1)},
+		{Nothing, NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
+		{Mate, NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 1}, -1, -1)},
+		{Water, NewState(drinkcount{CoffeeCount: 0, WaterCount: 1, MateCount: 0}, -1, -1)},
+		{4, NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
 	}
 
 	for _, ea := range execActns {
