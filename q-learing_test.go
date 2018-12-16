@@ -49,35 +49,6 @@ func TestSetQ(t *testing.T) {
 	fmt.Println("q.qt: ", q.qt)
 }
 
-/* func TestGetStateId(t *testing.T) {
-	t.Parallel()
-	fmt.Println("TestGetStateId start")
-	Q := QLearning{}
-	// Q.InitStateSpace()
-	Q.statemap = make(StateSpace)
-	for index := 0; index < 16; index++ {
-		sampleState := State{
-			Weekday:  weekday(1),
-			Timeslot: 1,
-			Drinkcount: drinkcount{
-				CoffeeCount: index,
-				WaterCount:  0,
-				MateCount:   0,
-			},
-		}
-		Q.statemap[sampleState.String()] = index
-	}
-
-	for state, id := range Q.statemap {
-		if Q.statemap[state] != id {
-			t.Error("wrong id, check string function")
-		} else {
-			fmt.Println("Correct ID is", Q.statemap[state])
-		}
-	}
-
-} */
-
 func TestFilterSlice(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestFilterSlice start")

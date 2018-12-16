@@ -20,31 +20,22 @@ type Training struct {
 }
 
 type QLearning struct {
-	Q [][]float64
-
 	qt QTable
 
-	state    State
-	actns    int
-	statemap map[string]float64
+	state State
+	actns int
 
 	workdays int
-	slots    int
 	dc       drinkcount
-
-	stateSpaceLength int
 
 	learningRate float64
 	epsilon      float64
 	gamma        float64
 
-	reward      float64
-	prevstate   State
-	preveaction Action
+	reward float64
 
 	train bool
-
-	tr Training
+	tr    Training
 
 	sr successratio
 }
@@ -57,36 +48,14 @@ type successratio struct {
 	greedy int
 }
 
-var sr successratio
-
-var wts [][]float64
-
-func GenerateTrainingSet() trainingsdata {
-	mondayTimes := []float64{8.33, 10, 15}
-	tuesdayTimes := []float64{8.49, 10.30, 12.30}
-	wednesdayTimes := []float64{8.15, 10, 14.37}
-	thursdayTimes := []float64{8.30, 9.30, 13, 15.20}
-	fridayTimes := []float64{8.37, 10.15, 13.23, 15.57}
-
-	wts = [][]float64{mondayTimes, tuesdayTimes, wednesdayTimes, thursdayTimes, fridayTimes}
-	trs := map[State]Action{}
-
-	for day, wt := range wts {
-		for slot, time := range wt {
-			s := NewState(drinkcount{CoffeeCount: slot, WaterCount: 0, MateCount: 0}, day, time)
-			trs[s] = Coffee
-		}
-	}
-
-	return trs
-}
-
+//initLearner
 func initLearner() {
 	q := QLearning{}
 	q.Initialize(true)
 	q.Start()
 }
 
+// Initialize set init vals of qlearning object
 func (q *QLearning) Initialize(training bool) {
 	q.train = training
 
@@ -95,48 +64,40 @@ func (q *QLearning) Initialize(training bool) {
 	q.gamma = 1
 
 	q.actns = 2
-	q.slots = 7
 	q.workdays = 5
 
-	q.preveaction = 0
-
-	q.state = q.GetState()
-
 	q.qt = make(QTable)
-
-	// q.InitStateSpace()
-
-	if training {
-		q.tr.stateActns = GenerateTrainingSet()
-	}
 }
 
+//Start kicks of qlearning proccess
 func (q *QLearning) Start() {
-	q.train = true
-	var tdc int
+	if q.train {
+		var tdc int
+		wts := GenerateTrainingSet()
 
-	for reps := 0; reps < 3; reps++ {
-		for d := 0; d < q.workdays; d++ {
-			//drinkcount reset
-			tdc = 0
-			for sl := 7; sl < 19; sl += 2 {
-				//filter all from trainingsset equals day and slot
-				fsc := FilterSlice(wts[d], GetCurrentTimeSlot(sl))
-				for st := 0; st < fsc+1; st++ {
-					tdc += st
-					q.tr.vs = NewState(drinkcount{CoffeeCount: tdc, WaterCount: 0, MateCount: 0}, d, float64(sl))
-					fmt.Println(q.tr.vs)
-					q.learn()
+		for reps := 0; reps < 3; reps++ {
+			for d := 0; d < q.workdays; d++ {
+				//drinkcount reset
+				tdc = 0
+				for sl := 7; sl < 19; sl += 2 {
+					//filter all from trainingsset equals day and slot
+					fsc := FilterSlice(wts[d], GetCurrentTimeSlot(sl))
+					for st := 0; st < fsc+1; st++ {
+						tdc += st
+						q.tr.vs = NewState(drinkcount{CoffeeCount: tdc, WaterCount: 0, MateCount: 0}, d, float64(sl))
+						fmt.Println(q.tr.vs)
+						q.learn()
+					}
 				}
 			}
 		}
 	}
 
-	fmt.Println("len(q.statemap)", q.qt)
+	fmt.Println("Q-Table \n", q.qt)
 	fmt.Println("successratio", q.sr)
-	// fmt.Println("q.tr.stateActns", q.tr.stateActns)
 }
 
+//learn one iteration of qlearning proccess
 func (q *QLearning) learn() {
 
 	s := q.AddState(q.GetState())
@@ -159,6 +120,7 @@ func (q *QLearning) learn() {
 	fmt.Println(" ")
 }
 
+//GetAction returns action with highest qval on given state
 func (q *QLearning) GetAction(s State) Action {
 	action := Action(0)
 	max := q.qt[s][0]
@@ -172,10 +134,12 @@ func (q *QLearning) GetAction(s State) Action {
 	return action
 }
 
+//UserMock mocks user behavior
 func (q *QLearning) UserMock() Action {
 	return q.tr.stateActns[q.tr.vs]
 }
 
+//TakeAction exec given action and gets reward based on user action
 func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, State) {
 
 	//socket connection: get which action user took
@@ -191,6 +155,7 @@ func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, State) {
 	return reward, newstate
 }
 
+//EpsilonGreedy greedy-policy
 func (q *QLearning) EpsilonGreedy(s State) Action {
 	ran := rand.Float64() < 1-q.epsilon
 	if ran {
@@ -205,6 +170,8 @@ func (q *QLearning) EpsilonGreedy(s State) Action {
 	return ra
 }
 
+//GetReward returns reward based on
+//calculated action and user feedback
 func GetReward(a Action, feedback Action) float64 {
 	if a == feedback {
 		if a == Coffee {
@@ -215,19 +182,34 @@ func GetReward(a Action, feedback Action) float64 {
 	return -1
 }
 
+// GetQ returns qval of given state action pair
 func (q *QLearning) GetQ(a Action, s State) float64 {
-
-	// if _, ok := q.qt[s]; !ok {
-	// 	fmt.Println("					Set State", s)
-	// 	q.qt[s] = []float64{0, 0}
-	// }
 	return q.qt[s][int(a)]
 }
 
-func (q *QLearning) SetQ(a Action, f float64) {
+// SetQ sets qval of given state action pair
+func (q *QLearning) SetQ(a Action, qv float64) {
 	s := q.GetState()
-	/* if _, ok := q.qt[s]; !ok {
-		q.qt[s] = []float64{0, 0}
-	} */
-	q.qt[s][a] = f
+	q.qt[s][a] = qv
+}
+
+//GenerateTrainingSet returns action state pairs for mocking user
+func GenerateTrainingSet() [][]float64 {
+	mondayTimes := []float64{8.33, 10, 15}
+	tuesdayTimes := []float64{8.49, 10.30, 12.30}
+	wednesdayTimes := []float64{8.15, 10, 14.37}
+	thursdayTimes := []float64{8.30, 9.30, 13, 15.20}
+	fridayTimes := []float64{8.37, 10.15, 13.23, 15.57}
+
+	return [][]float64{mondayTimes, tuesdayTimes, wednesdayTimes, thursdayTimes, fridayTimes}
+	/*trs := map[State]Action{}
+
+		for day, wt := range wts {
+			for slot, time := range wt {
+				s := NewState(drinkcount{CoffeeCount: slot, WaterCount: 0, MateCount: 0}, day, time)
+				trs[s] = Coffee
+			}
+		}
+
+	return trs*/
 }
