@@ -37,9 +37,9 @@ func TestSetQ(t *testing.T) {
 	}
 
 	fmt.Println("q.qt: ", q.qt)
+	q.AddState(ss)
 
 	for _, qav := range qavs {
-		q.tr.vs = ss
 		q.SetQ(qav.input.a, qav.input.v)
 
 		if q.qt[ss][qav.input.a] != qav.expected {
@@ -152,7 +152,7 @@ func TestUpdateState(t *testing.T) {
 		tq.state = sampleState
 		output := tq.UpdateState(ea.input)
 
-		if *output != ea.expected {
+		if output != ea.expected {
 			t.Error("Wrong reward given", ea.input, ea.expected, ea)
 		}
 		fmt.Println("output: ", output.String())

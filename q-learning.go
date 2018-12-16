@@ -81,10 +81,16 @@ func GenerateTrainingSet() trainingsdata {
 	return trs
 }
 
+func initLearner() {
+	q := QLearning{}
+	q.Initialize(true)
+	q.Start()
+}
+
 func (q *QLearning) Initialize(training bool) {
 	q.train = training
 
-	q.learningRate = 0.3
+	q.learningRate = 0.2
 	q.epsilon = 0.1
 	q.gamma = 1
 
@@ -98,22 +104,18 @@ func (q *QLearning) Initialize(training bool) {
 
 	q.qt = make(QTable)
 
+	// q.InitStateSpace()
+
 	if training {
 		q.tr.stateActns = GenerateTrainingSet()
 	}
-}
-
-func initLearner() {
-	q := QLearning{}
-	q.Initialize(true)
-	q.Start()
 }
 
 func (q *QLearning) Start() {
 	q.train = true
 	var tdc int
 
-	for reps := 0; reps < 12; reps++ {
+	for reps := 0; reps < 3; reps++ {
 		for d := 0; d < q.workdays; d++ {
 			//drinkcount reset
 			tdc = 0
@@ -137,31 +139,33 @@ func (q *QLearning) Start() {
 
 func (q *QLearning) learn() {
 
-	// q.learningRate = float64(1 / (1 + q.sr.steps))
+	s := q.AddState(q.GetState())
 
-	prevQ := q.GetQ(q.preveaction)
-
-	greedyAction := q.EpsilonGreedy()
+	greedyAction := q.EpsilonGreedy(s)
 	actionTook := q.UserMock()
 	reward, newstate := q.TakeAction(greedyAction, actionTook)
-	q.SetState(*newstate)
 
-	curQ := q.GetQ(greedyAction)
-	qval := curQ + q.learningRate*(reward+q.gamma*prevQ-curQ)
+	q.AddState(newstate)
+
+	QVal := q.GetQ(greedyAction, q.GetState())
+	MaxAction := q.GetAction(newstate)
+	_QVal := q.GetQ(MaxAction, newstate)
+
+	qval := QVal + q.learningRate*(reward+q.gamma*_QVal-QVal)
 	q.SetQ(greedyAction, qval)
 
-	q.preveaction = greedyAction
-	q.prevstate = q.state
+	q.state = newstate
+
+	fmt.Println(" ")
 }
 
-func (q *QLearning) GetAction() Action {
-	q.state = q.GetState()
+func (q *QLearning) GetAction(s State) Action {
 	action := Action(0)
-	max := q.qt[q.state][action]
+	max := q.qt[s][0]
 
 	for i := 1; i < q.actns; i++ {
-		if max < q.qt[q.state][Action(i)] {
-			max = q.qt[q.state][Action(i)]
+		if max < q.qt[s][Action(i)] {
+			max = q.qt[s][Action(i)]
 			action = Action(i)
 		}
 	}
@@ -169,12 +173,10 @@ func (q *QLearning) GetAction() Action {
 }
 
 func (q *QLearning) UserMock() Action {
-	ma := q.tr.stateActns[q.tr.vs]
-	fmt.Println("		UserMock:     ", ma)
-	return ma
+	return q.tr.stateActns[q.tr.vs]
 }
 
-func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, *State) {
+func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, State) {
 
 	//socket connection: get which action user took
 	reward := GetReward(a, actionTook)
@@ -183,21 +185,24 @@ func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, *State) {
 	q.sr.steps++
 	if reward >= 0 {
 		q.sr.posr++
-		fmt.Println("	Right Action Predicted", a, actionTook)
+		fmt.Println("	Right Action Predicted", a)
 	}
 
 	return reward, newstate
 }
 
-func (q *QLearning) EpsilonGreedy() Action {
-	if rand.Float64() < q.epsilon {
-		ra := Action(rand.Intn(q.actns))
-		return ra
+func (q *QLearning) EpsilonGreedy(s State) Action {
+	ran := rand.Float64() < 1-q.epsilon
+	if ran {
+		q.sr.greedy++
+		a := q.GetAction(s)
+		fmt.Println("		greedyAction: ", a)
+		return a
 	}
-	q.sr.greedy++
-	a := q.GetAction()
-	fmt.Println("		greedyAction: ", a)
-	return a
+
+	ra := Action(rand.Intn(q.actns))
+	fmt.Println("		randmom: ", ra)
+	return ra
 }
 
 func GetReward(a Action, feedback Action) float64 {
@@ -210,18 +215,19 @@ func GetReward(a Action, feedback Action) float64 {
 	return -1
 }
 
-func (q *QLearning) GetQ(a Action) float64 {
-	s := q.GetState()
-	if _, ok := q.qt[s]; !ok {
-		q.qt[s] = []float64{0, 0}
-	}
+func (q *QLearning) GetQ(a Action, s State) float64 {
+
+	// if _, ok := q.qt[s]; !ok {
+	// 	fmt.Println("					Set State", s)
+	// 	q.qt[s] = []float64{0, 0}
+	// }
 	return q.qt[s][int(a)]
 }
 
 func (q *QLearning) SetQ(a Action, f float64) {
 	s := q.GetState()
-	if _, ok := q.qt[s]; !ok {
+	/* if _, ok := q.qt[s]; !ok {
 		q.qt[s] = []float64{0, 0}
-	}
+	} */
 	q.qt[s][a] = f
 }
