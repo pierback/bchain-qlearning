@@ -33,11 +33,10 @@ func TestSetQ(t *testing.T) {
 	}{
 		{input: Input{a: Coffee, v: -0.345, s: ss}, expected: -0.345},
 		{input: Input{a: Nothing, v: -0.543, s: ss}, expected: -0.543},
-		{input: Input{a: Nothing, v: -0.543, s: ss}, expected: -0.543},
 	}
 
-	fmt.Println("q.qt: ", q.qt)
 	q.AddState(ss)
+	q.state = ss
 
 	for _, qav := range qavs {
 		q.SetQ(qav.input.a, qav.input.v)

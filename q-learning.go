@@ -193,6 +193,7 @@ func (q *QLearning) GetQ(a Action, s State) float64 {
 
 // SetQ sets qval of given state action pair
 func (q *QLearning) SetQ(a Action, qv float64) {
+	fmt.Println("state", q.state.Get())
 	q.qt[q.state.Get()][a] = qv
 }
 
