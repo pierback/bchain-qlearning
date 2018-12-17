@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -39,24 +38,32 @@ const (
 	Friday
 )
 
+//drinkcount of a user
 type drinkcount struct {
-	CoffeeCount int `json: "coffeecount"`
-	WaterCount  int `json: "watercount"`
-	MateCount   int `json: "matecount"`
-}
-type StateSpace map[string]int
-
-type QTable map[State][]float64
-
-type State struct {
-	Weekday    weekday    `json: "weekday"`
-	Timeslot   timeslot   `json: "timeslot"`
-	Drinkcount drinkcount `json: "drinkcount"`
+	CoffeeCount int `json:"coffeeCount"`
+	WaterCount  int `json:"waterCount"`
+	MateCount   int `json:"mateCount"`
 }
 
-//virtual state methods
-type VirtualState interface {
-	getState() State
+//StateStruct type definition of a state
+type StateStruct struct {
+	Weekday    weekday    `json:"weekday"`
+	Timeslot   timeslot   `json:"timeslot"`
+	Drinkcount drinkcount `json:"drinkcount"`
+}
+
+//UserState representing state of a user
+type UserState StateStruct
+
+//VirtualState representing state of dummy-user
+type VirtualState StateStruct
+
+//State interface methods
+type State interface {
+	Get() State
+	toString() string
+	Update(a Action) State
+	New(dc drinkcount, _wd int, _ct float64) State
 }
 
 func InitDrinksCountStates() []drinkcount {
@@ -81,7 +88,7 @@ func (q *QLearning) InitStateSpace() {
 	for _, wd := range workdays {
 		for _, sl := range slots {
 			for _, ds := range drinksStates {
-				st := (State{wd, sl, ds})
+				st := (&UserState{wd, sl, ds})
 				statemap[st] = []float64{0, 0}
 			}
 		}
@@ -89,31 +96,16 @@ func (q *QLearning) InitStateSpace() {
 	q.qt = statemap
 }
 
-// func (q *QLearning) GetState() State {
-// 	if q.train {
-// 		return q.tr.vs
-// 	}
-// 	return q.state
-// }
-
-func (q *QLearning) UpdateState(a Action) State {
+func (vs VirtualState) Update(a Action) State {
 	var ts timeslot
 	var wd weekday
 	var cc, wc, mc int
 
-	if q.train {
-		ts = q.tr.vs.Timeslot
-		wd = q.tr.vs.Weekday
-		cc = q.tr.vs.Drinkcount.CoffeeCount
-		wc = q.tr.vs.Drinkcount.WaterCount
-		mc = q.tr.vs.Drinkcount.MateCount
-	} else {
-		ts = GetCurrentTimeSlot(time.Now().Hour())
-		wd = weekday(time.Now().Weekday())
-		cc = q.state.Drinkcount.CoffeeCount
-		wc = q.state.Drinkcount.WaterCount
-		mc = q.state.Drinkcount.MateCount
-	}
+	ts = vs.Timeslot
+	wd = vs.Weekday
+	cc = vs.Drinkcount.CoffeeCount
+	wc = vs.Drinkcount.WaterCount
+	mc = vs.Drinkcount.MateCount
 
 	if a == Coffee {
 		cc++
@@ -123,7 +115,38 @@ func (q *QLearning) UpdateState(a Action) State {
 		mc++
 	}
 
-	return State{
+	return VirtualState{
+		Weekday:  wd,
+		Timeslot: ts,
+		Drinkcount: drinkcount{
+			CoffeeCount: cc,
+			WaterCount:  wc,
+			MateCount:   mc,
+		},
+	}
+
+}
+
+func (s UserState) Update(a Action) State {
+	var ts timeslot
+	var wd weekday
+	var cc, wc, mc int
+
+	ts = GetCurrentTimeSlot(time.Now().Hour())
+	wd = weekday(time.Now().Weekday())
+	cc = s.Drinkcount.CoffeeCount
+	wc = s.Drinkcount.WaterCount
+	mc = s.Drinkcount.MateCount
+
+	if a == Coffee {
+		cc++
+	} else if a == Water {
+		wc++
+	} else if a == Mate {
+		mc++
+	}
+
+	return UserState{
 		Weekday:  wd,
 		Timeslot: ts,
 		Drinkcount: drinkcount{
@@ -163,50 +186,34 @@ func GetCurrentTimeSlot(ch int) timeslot {
 	}
 }
 
-func (q *QLearning) AddState(s State) State {
+func (q *QLearning) AddState(s State) {
 	if _, ok := q.qt[s]; !ok {
-		fmt.Println("					Set State", s)
+		// fmt.Println("					Set State", s)
 		q.qt[s] = []float64{0, 0}
 	}
-	return s
 }
 
-/* func (q *QLearning) GetState() VirtualState {
-	if q.train {
-		return q.tr.vs
-	}
+//Get returns current Virtualstate
+func (vs VirtualState) Get() State {
+	return vs
+}
 
+//Get returns current UserState
+func (s UserState) Get() State {
 	var dc drinkcount
 	wd := time.Now().Weekday()
 	ts := GetCurrentTimeSlot(time.Now().Hour())
 
-	if q.state.Weekday != weekday(wd) {
+	if s.Weekday != weekday(wd) {
 		dc = drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}
 	} else {
-		dc = q.dc
+		dc = s.Drinkcount
 	}
 
-	return State{Weekday: weekday(wd), Timeslot: ts, Drinkcount: dc}
-} */
-
-func (q *QLearning) GetState() State {
-	if q.train {
-		return q.tr.vs
-	}
-
-	var dc drinkcount
-	wd := time.Now().Weekday()
-	ts := GetCurrentTimeSlot(time.Now().Hour())
-
-	if q.state.Weekday != weekday(wd) {
-		dc = drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}
-	} else {
-		dc = q.dc
-	}
-
-	return State{Weekday: weekday(wd), Timeslot: ts, Drinkcount: dc}
+	return UserState{Weekday: weekday(wd), Timeslot: ts, Drinkcount: dc}
 }
 
+//String converts weekday to string
 func (day weekday) String() string {
 	names := [...]string{
 		"Monday",
@@ -239,13 +246,13 @@ func (curTime timeslot) TimeSlotString() string {
 	return slots[curTime]
 }
 
-func NewState(dc drinkcount, _wd int, _ct float64) State {
+//New returns a new Userstate object
+func (s UserState) New(dc drinkcount, _wd int, _ct float64) State {
 	var wd weekday
 	var ct timeslot
 
 	if _wd == -1 {
 		wd = weekday(time.Now().Weekday())
-		fmt.Println("wd: ", wd)
 	} else {
 		wd = weekday(_wd)
 	}
@@ -256,7 +263,35 @@ func NewState(dc drinkcount, _wd int, _ct float64) State {
 		ct = GetCurrentTimeSlot(int(_ct))
 	}
 
-	return State{
+	return UserState{
+		Weekday:  wd,
+		Timeslot: ct,
+		Drinkcount: drinkcount{
+			CoffeeCount: dc.CoffeeCount,
+			WaterCount:  dc.WaterCount,
+			MateCount:   dc.MateCount,
+		},
+	}
+}
+
+//New returns a new VirtualState object
+func (vs VirtualState) New(dc drinkcount, _wd int, _ct float64) State {
+	var wd weekday
+	var ct timeslot
+
+	if _wd == -1 {
+		wd = weekday(time.Now().Weekday())
+	} else {
+		wd = weekday(_wd)
+	}
+
+	if _ct == -1 {
+		ct = GetCurrentTimeSlot(time.Now().Hour())
+	} else {
+		ct = GetCurrentTimeSlot(int(_ct))
+	}
+
+	return VirtualState{
 		Weekday:  wd,
 		Timeslot: ct,
 		Drinkcount: drinkcount{

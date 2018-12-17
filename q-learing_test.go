@@ -17,8 +17,8 @@ func TestSetQ(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestSetQ start")
 	q := QLearning{}
-	ss := NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(Monday), 8.45)
-	q.train = true
+	vs := VirtualState{}
+	ss := vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(Monday), 8.45)
 	q.qt = make(QTable)
 
 	type Input struct {
@@ -33,11 +33,10 @@ func TestSetQ(t *testing.T) {
 	}{
 		{input: Input{a: Coffee, v: -0.345, s: ss}, expected: -0.345},
 		{input: Input{a: Nothing, v: -0.543, s: ss}, expected: -0.543},
-		{input: Input{a: Nothing, v: -0.543, s: ss}, expected: -0.543},
 	}
 
-	fmt.Println("q.qt: ", q.qt)
 	q.AddState(ss)
+	q.state = ss
 
 	for _, qav := range qavs {
 		q.SetQ(qav.input.a, qav.input.v)
@@ -102,90 +101,32 @@ func TestGetReward(t *testing.T) {
 
 }
 
-func TestUpdateState(t *testing.T) {
+func TestUpdate(t *testing.T) {
 	t.Parallel()
-	fmt.Println("TestUpdateState start")
+	fmt.Println("TestUpdate start")
 	tq := QLearning{}
-	sampleState := NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)
+	vs := VirtualState{}
+	sampleState := vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)
 
 	var execActns = []struct {
 		input    Action
 		expected State
 	}{
-		{Coffee, NewState(drinkcount{CoffeeCount: 1, WaterCount: 0, MateCount: 0}, -1, -1)},
-		{Nothing, NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
-		{Mate, NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 1}, -1, -1)},
-		{Water, NewState(drinkcount{CoffeeCount: 0, WaterCount: 1, MateCount: 0}, -1, -1)},
-		{4, NewState(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
+		{Coffee, vs.New(drinkcount{CoffeeCount: 1, WaterCount: 0, MateCount: 0}, -1, -1)},
+		{Nothing, vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
+		{Mate, vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 1}, -1, -1)},
+		{Water, vs.New(drinkcount{CoffeeCount: 0, WaterCount: 1, MateCount: 0}, -1, -1)},
+		{4, vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
 	}
 
 	for _, ea := range execActns {
 		tq.state = sampleState
-		output := tq.UpdateState(ea.input)
+		output := tq.state.Update(ea.input)
 
 		if output != ea.expected {
 			t.Error("Wrong reward given", ea.input, ea.expected, ea)
 		}
-		fmt.Println("output: ", output.String())
+		fmt.Println("output: ", output)
 	}
 
 }
-
-// func TestTakeAction(t *testing.T) {
-// 	t.Parallel()
-// 	fmt.Println("TestGetStateId start")
-// 	var ssids = []struct {
-// 		input    SSID
-// 		expected [float64, State]
-// 	}{
-// 		{"eduroam", true},
-// 		{"ipsum", false},
-// 	}
-
-// 	Q := QLearning{}
-// 	// Q.InitStateSpace()
-// 	Q.statemap = make(StateSpace)
-// 	for index := 0; index < 6; index++ {
-// 		sampleState := State{
-// 			Weekday:  weekday(1),
-// 			Timeslot: 1,
-// 			Drinkcount: drinkcount{
-// 				CoffeeCount: index,
-// 				WaterCount:  0,
-// 				MateCount:   0,
-// 			},
-// 		}
-// 		Q.statemap[sampleState.String()] = index
-// 	}
-
-// }
-
-// func TestInitStateSpace(t *testing.T) {
-
-// }
-// func TestGetState(t *testing.T) {
-
-// }
-// func TestUpdateState(t *testing.T) {
-
-// }
-
-// func TestSSID(t *testing.T) {
-// 	t.Parallel()
-// 	fmt.Println("TestSSID start")
-
-// 	var ssids = []struct {
-// 		input    SSID
-// 		expected bool
-// 	}{
-// 		{"eduroam", true},
-// 		{"ipsum", false},
-// 	}
-
-// 	for _, ssid := range ssids {
-// 		if output := ssid.input.isEduroam(); output != ssid.expected {
-// 			t.Error("Wrong wifi", ssid.input, ssid.expected, ssid)
-// 		}
-// 	}
-
-// }
