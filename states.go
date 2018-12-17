@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -97,13 +96,6 @@ func (q *QLearning) InitStateSpace() {
 	q.qt = statemap
 }
 
-// func (q *QLearning) Get() State {
-// 	if q.train {
-// 		return q.tr.vs
-// 	}
-// 	return q.state
-// }
-
 func (vs VirtualState) Update(a Action) State {
 	var ts timeslot
 	var wd weekday
@@ -196,7 +188,7 @@ func GetCurrentTimeSlot(ch int) timeslot {
 
 func (q *QLearning) AddState(s State) {
 	if _, ok := q.qt[s]; !ok {
-		fmt.Println("					Set State", s)
+		// fmt.Println("					Set State", s)
 		q.qt[s] = []float64{0, 0}
 	}
 }
@@ -261,7 +253,6 @@ func (s UserState) New(dc drinkcount, _wd int, _ct float64) State {
 
 	if _wd == -1 {
 		wd = weekday(time.Now().Weekday())
-		fmt.Println("wd: ", wd)
 	} else {
 		wd = weekday(_wd)
 	}
@@ -290,7 +281,6 @@ func (vs VirtualState) New(dc drinkcount, _wd int, _ct float64) State {
 
 	if _wd == -1 {
 		wd = weekday(time.Now().Weekday())
-		fmt.Println("wd: ", wd)
 	} else {
 		wd = weekday(_wd)
 	}

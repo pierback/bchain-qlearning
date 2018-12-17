@@ -50,7 +50,7 @@ type VirtualStateActions map[State]Action
 
 type successratio struct {
 	steps  int
-	posr   int
+	neg    int
 	greedy int
 }
 
@@ -63,7 +63,7 @@ func initLearner() {
 
 // Initialize set init vals of qlearning object
 func (q *QLearning) Initialize() {
-	q.learningRate = 0.2
+	q.learningRate = 0.31
 	q.epsilon = 0.1
 	q.gamma = 1
 
@@ -80,7 +80,9 @@ func (q *QLearning) Start() {
 	wts, sa := GenerateTrainingSet()
 	q.vsa = sa
 
-	for reps := 0; reps < 3; reps++ {
+	var wa []int
+
+	for reps := 0; reps < 13; reps++ {
 		for d := 0; d < q.workdays; d++ {
 			//drinkcount reset
 			tdc = 0
@@ -90,15 +92,17 @@ func (q *QLearning) Start() {
 				for st := 0; st < fsc+1; st++ {
 					tdc += st
 					q.state = vs.New(drinkcount{CoffeeCount: tdc, WaterCount: 0, MateCount: 0}, d, float64(sl))
-					fmt.Println(q.state)
+					// fmt.Println(q.state)
 					q.learn()
 				}
 			}
 		}
+		wa = append(wa /* q.sr.steps- */, q.sr.neg)
+		q.sr.neg = 0
 	}
 
 	fmt.Println("Q-Table \n", q.qt)
-	fmt.Println("successratio", q.sr)
+	fmt.Println("successratio", wa)
 }
 
 //learn one iteration of qlearning proccess
@@ -121,7 +125,7 @@ func (q *QLearning) learn() {
 
 	q.state = newstate
 
-	fmt.Println(" ")
+	// fmt.Println(" ")
 }
 
 //GetAction returns action with highest qval on given state
@@ -152,8 +156,9 @@ func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, State) {
 
 	q.sr.steps++
 	if reward >= 0 {
-		q.sr.posr++
-		fmt.Println("	Right Action Predicted", a)
+		// fmt.Println("	Right Action Predicted", a)
+	} else {
+		q.sr.neg++
 	}
 
 	return reward, newstate
@@ -161,17 +166,16 @@ func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, State) {
 
 //EpsilonGreedy greedy-policy
 func (q *QLearning) EpsilonGreedy(s State) Action {
-	ran := rand.Float64() < 1-q.epsilon
-	if ran {
-		q.sr.greedy++
-		a := q.GetAction(s)
-		fmt.Println("		greedyAction: ", a)
-		return a
+
+	if rand.Float64() < q.epsilon {
+		return Action(rand.Intn(q.actns))
 	}
 
-	ra := Action(rand.Intn(q.actns))
-	fmt.Println("		randmom: ", ra)
-	return ra
+	q.sr.greedy++
+	a := q.GetAction(s)
+	// fmt.Println("		greedyAction: ", a)
+	return a
+
 }
 
 //GetReward returns reward based on
@@ -193,7 +197,6 @@ func (q *QLearning) GetQ(a Action, s State) float64 {
 
 // SetQ sets qval of given state action pair
 func (q *QLearning) SetQ(a Action, qv float64) {
-	fmt.Println("state", q.state.Get())
 	q.qt[q.state.Get()][a] = qv
 }
 
