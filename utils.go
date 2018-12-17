@@ -16,13 +16,21 @@ func FilterSlice(dayArr []float64, sl timeslot) int {
 	return stateCount
 }
 
-func (state *State) String() string {
-	out, err := json.Marshal(*state)
+func stateToString(state State) string {
+	out, err := json.Marshal(state)
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
 	}
 	return string(out)
+}
+
+func (us UserState) toString() string {
+	return stateToString(us)
+}
+
+func (vs VirtualState) toString() string {
+	return stateToString(vs)
 }
 
 func makeRange(min, max int) []int {

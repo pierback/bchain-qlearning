@@ -37,9 +37,9 @@ func TestSSID(t *testing.T) {
 
 }
 
-func TestNewState(t *testing.T) {
+func TestNew(t *testing.T) {
 	t.Parallel()
-	fmt.Println("TestNewState start")
+	fmt.Println("TestNew start")
 
 	type Input struct {
 		dc drinkcount
@@ -53,7 +53,7 @@ func TestNewState(t *testing.T) {
 	}{
 		{
 			input: Input{dc: drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: -1, ct: -1},
-			expected: State{
+			expected: VirtualState{
 				Weekday:  weekday(time.Now().Weekday()),
 				Timeslot: GetCurrentTimeSlot(time.Now().Hour()),
 				Drinkcount: drinkcount{
@@ -65,7 +65,7 @@ func TestNewState(t *testing.T) {
 		},
 		{
 			input: Input{dc: drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: 3, ct: 3},
-			expected: State{
+			expected: VirtualState{
 				Weekday:  weekday(3),
 				Timeslot: GetCurrentTimeSlot(int(3)),
 				Drinkcount: drinkcount{
@@ -77,9 +77,10 @@ func TestNewState(t *testing.T) {
 		},
 	}
 
+	vs := VirtualState{}
 	for _, s := range stfs {
-		if output := NewState(s.input.dc, s.input.wd, s.input.ct); output != s.expected {
-			t.Error("NewState not working properly", s.input, s.expected, output)
+		if output := vs.New(s.input.dc, s.input.wd, s.input.ct); output != s.expected {
+			t.Error("New not working properly", s.input, s.expected, output)
 		}
 	}
 
