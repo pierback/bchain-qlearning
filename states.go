@@ -201,10 +201,12 @@ func (q *QLearning) AddState(s State) {
 	}
 }
 
+//Get returns current Virtualstate
 func (vs VirtualState) Get() State {
 	return vs
 }
 
+//Get returns current UserState
 func (s UserState) Get() State {
 	var dc drinkcount
 	wd := time.Now().Weekday()
@@ -219,6 +221,7 @@ func (s UserState) Get() State {
 	return UserState{Weekday: weekday(wd), Timeslot: ts, Drinkcount: dc}
 }
 
+//String converts weekday to string
 func (day weekday) String() string {
 	names := [...]string{
 		"Monday",
@@ -251,6 +254,7 @@ func (curTime timeslot) TimeSlotString() string {
 	return slots[curTime]
 }
 
+//New returns a new Userstate object
 func (s UserState) New(dc drinkcount, _wd int, _ct float64) State {
 	var wd weekday
 	var ct timeslot
@@ -279,6 +283,7 @@ func (s UserState) New(dc drinkcount, _wd int, _ct float64) State {
 	}
 }
 
+//New returns a new VirtualState object
 func (vs VirtualState) New(dc drinkcount, _wd int, _ct float64) State {
 	var wd weekday
 	var ct timeslot
