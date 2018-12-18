@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	// bc "bchain-qlearning/internal/blockchain"
-	. "bchain-qlearning/internal/learning"
+	. "bchain-qlearning/pkg/learning"
 	// ws "bchain-qlearning/internal/websocket"
 )
 
