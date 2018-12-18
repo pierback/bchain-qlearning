@@ -1,4 +1,4 @@
-package main
+package learning
 
 import (
 	"fmt"
@@ -63,9 +63,8 @@ func initLearner() {
 
 // Initialize set init vals of qlearning object
 func (q *QLearning) Initialize() {
-	q.learningRate = 0.31
-	q.epsilon = 0.1
-	q.gamma = 1
+	q.learningRate = 0.7
+	q.epsilon = 0.3
 
 	q.actns = 2
 	q.workdays = 5
@@ -82,17 +81,17 @@ func (q *QLearning) Start() {
 
 	var wa []int
 
-	for reps := 0; reps < 13; reps++ {
+	for reps := 0; reps < 1000; reps++ {
 		for d := 0; d < q.workdays; d++ {
 			//drinkcount reset
 			tdc = 0
-			for sl := 7; sl < 19; sl += 2 {
+			for sl := 7; sl < 19; sl++ {
 				//filter all from trainingsset equals day and slot
 				fsc := FilterSlice(wts[d], GetCurrentTimeSlot(sl))
 				for st := 0; st < fsc+1; st++ {
 					tdc += st
 					q.state = vs.New(drinkcount{CoffeeCount: tdc, WaterCount: 0, MateCount: 0}, d, float64(sl))
-					// fmt.Println(q.state)
+					fmt.Println(q.state)
 					q.learn()
 				}
 			}
@@ -108,6 +107,9 @@ func (q *QLearning) Start() {
 //learn one iteration of qlearning proccess
 func (q *QLearning) learn() {
 
+	// q.learningRate = float64(1 / (q.sr.steps + 1))
+	// if q.learningRate
+
 	s := q.state.Get()
 	q.AddState(s)
 
@@ -116,11 +118,11 @@ func (q *QLearning) learn() {
 	reward, newstate := q.TakeAction(greedyAction, actionTook)
 	q.AddState(newstate)
 
-	maxAction := q.GetAction(newstate)
+	// maxAction := q.GetAction(newstate)
 	qsa := q.GetQ(greedyAction, s)
-	_qsa := q.GetQ(maxAction, newstate)
+	// _qsa := q.GetQ(maxAction, newstate)
 
-	qval := qsa + q.learningRate*(reward+q.gamma*_qsa-qsa)
+	qval := qsa + q.learningRate*(reward-qsa)
 	q.SetQ(greedyAction, qval)
 
 	q.state = newstate
@@ -156,7 +158,7 @@ func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, State) {
 
 	q.sr.steps++
 	if reward >= 0 {
-		// fmt.Println("	Right Action Predicted", a)
+		fmt.Println("	Right Action Predicted", a)
 	} else {
 		q.sr.neg++
 	}
@@ -167,13 +169,16 @@ func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, State) {
 //EpsilonGreedy greedy-policy
 func (q *QLearning) EpsilonGreedy(s State) Action {
 
+	fmt.Println("		random: ", rand.Float64(), q.epsilon)
 	if rand.Float64() < q.epsilon {
-		return Action(rand.Intn(q.actns))
+		act := rand.Intn(2)
+		fmt.Println("		act", act, Action(act))
+		return Action(act)
 	}
 
 	q.sr.greedy++
 	a := q.GetAction(s)
-	// fmt.Println("		greedyAction: ", a)
+	fmt.Println("		greedyAction: ", a)
 	return a
 
 }
@@ -182,10 +187,7 @@ func (q *QLearning) EpsilonGreedy(s State) Action {
 //calculated action and user feedback
 func GetReward(a Action, feedback Action) float64 {
 	if a == feedback {
-		if a == Coffee {
-			return 1
-		}
-		return 0
+		return 1
 	}
 	return -1
 }
