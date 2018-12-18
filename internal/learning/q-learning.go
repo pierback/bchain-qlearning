@@ -16,7 +16,7 @@ const (
 
 type Training struct {
 	vs         State
-	stateActns VirtualStateActions
+	stateActns SimulatedStateActions
 }
 
 type QLearning struct {
@@ -33,20 +33,25 @@ type QLearning struct {
 	gamma        float64
 
 	reward float64
-
-	vsa VirtualStateActions
-
-	sr successratio
+	sr     successratio
 }
 
 // QTable type
 type QTable map[State][]float64
 
 type QLearner interface {
-	initLearner()
+	InitLearner()
 }
 
-type VirtualStateActions map[State]Action
+type User struct {
+	QLearning
+}
+
+type SimulatedUser struct {
+	QLearning
+	vsa SimulatedStateActions
+}
+type SimulatedStateActions map[State]Action
 
 type successratio struct {
 	steps  int
@@ -55,10 +60,16 @@ type successratio struct {
 }
 
 //initLearner
-func initLearner() {
+func (su *SimulatedUser) InitLearner() {
 	q := QLearning{}
 	q.Initialize()
-	q.Start()
+	su.Start(&q)
+}
+
+func (u *User) InitLearner() {
+	q := QLearning{}
+	q.Initialize()
+	// q.Start()
 }
 
 // Initialize set init vals of qlearning object
@@ -73,15 +84,15 @@ func (q *QLearning) Initialize() {
 }
 
 //Start kicks of qlearning proccess
-func (q *QLearning) Start() {
+func (su *SimulatedUser) Start(q *QLearning) {
 	var tdc int
+	var wts [][]float64
 	vs := VirtualState{}
-	wts, sa := GenerateTrainingSet()
-	q.vsa = sa
+	wts, su.vsa = GenerateTrainingSet()
 
 	var wa []int
 
-	for reps := 0; reps < 1000; reps++ {
+	for reps := 0; reps < 1; reps++ {
 		for d := 0; d < q.workdays; d++ {
 			//drinkcount reset
 			tdc = 0
@@ -91,8 +102,9 @@ func (q *QLearning) Start() {
 				for st := 0; st < fsc+1; st++ {
 					tdc += st
 					q.state = vs.New(drinkcount{CoffeeCount: tdc, WaterCount: 0, MateCount: 0}, d, float64(sl))
+					fb := su.UserMock(q.state)
 					fmt.Println(q.state)
-					q.learn()
+					q.learn(fb)
 				}
 			}
 		}
@@ -100,12 +112,14 @@ func (q *QLearning) Start() {
 		q.sr.neg = 0
 	}
 
-	fmt.Println("Q-Table \n", q.qt)
+	writeJsonFile(mapToString(q.qt))
+
+	// fmt.Println("Q-Table \n", q.qt)
 	fmt.Println("successratio", wa)
 }
 
 //learn one iteration of qlearning proccess
-func (q *QLearning) learn() {
+func (q *QLearning) learn(fb Action) {
 
 	// q.learningRate = float64(1 / (q.sr.steps + 1))
 	// if q.learningRate
@@ -114,8 +128,7 @@ func (q *QLearning) learn() {
 	q.AddState(s)
 
 	greedyAction := q.EpsilonGreedy(s)
-	actionTook := q.UserMock()
-	reward, newstate := q.TakeAction(greedyAction, actionTook)
+	reward, newstate := q.TakeAction(greedyAction, fb)
 	q.AddState(newstate)
 
 	// maxAction := q.GetAction(newstate)
@@ -145,8 +158,8 @@ func (q *QLearning) GetAction(s State) Action {
 }
 
 //UserMock mocks user behavior
-func (q *QLearning) UserMock() Action {
-	return q.vsa[q.state.Get()]
+func (su *SimulatedUser) UserMock(s State) Action {
+	return su.vsa[s.Get()]
 }
 
 //TakeAction exec given action and gets reward based on user action
@@ -203,7 +216,7 @@ func (q *QLearning) SetQ(a Action, qv float64) {
 }
 
 //GenerateTrainingSet returns action state pairs for mocking user
-func GenerateTrainingSet() ([][]float64, VirtualStateActions) {
+func GenerateTrainingSet() ([][]float64, SimulatedStateActions) {
 	mondayTimes := []float64{8.33, 10, 15}
 	tuesdayTimes := []float64{8.49, 10.30, 12.30}
 	wednesdayTimes := []float64{8.15, 10, 14.37}

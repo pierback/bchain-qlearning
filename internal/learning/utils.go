@@ -3,6 +3,8 @@ package learning
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"os/user"
 )
 
 func FilterSlice(dayArr []float64, sl timeslot) int {
@@ -14,6 +16,39 @@ func FilterSlice(dayArr []float64, sl timeslot) int {
 	}
 
 	return stateCount
+}
+
+func mapToString(qt QTable) []byte {
+	sm := map[string][]float64{}
+
+	for st, v := range qt {
+		sm[st.toString()] = v
+	}
+
+	jsonData, err := json.Marshal(sm)
+	if err != nil {
+		panic(err)
+	}
+	return jsonData
+}
+
+func writeJsonFile(jsonData []byte) {
+	usr, err := user.Current()
+
+	if err != nil {
+		panic(err)
+	}
+
+	jsonFile, err := os.Create(usr.HomeDir + "/qtable.json")
+
+	if err != nil {
+		panic(err)
+	}
+	defer jsonFile.Close()
+
+	jsonFile.Write(jsonData)
+	jsonFile.Close()
+	fmt.Println("JSON data written to ", jsonFile.Name())
 }
 
 func stateToString(state State) string {

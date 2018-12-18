@@ -9,7 +9,7 @@
     "ignore":[
         "a/*",
         "b/*/c/*.go",
-        "contracts/*"
+        "internal/contracts/*"
     ],
     "fatal":[
         "formated"

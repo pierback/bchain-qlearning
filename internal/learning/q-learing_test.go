@@ -1,4 +1,4 @@
-package main
+package learning
 
 import (
 	"fmt"
@@ -8,7 +8,8 @@ import (
 func TestStartLearn(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestDrinksCount start")
-	initLearner()
+	su := SimulatedUser{}
+	su.InitLearner()
 
 	fmt.Println("	")
 }

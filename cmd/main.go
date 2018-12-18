@@ -2,23 +2,16 @@ package main
 
 import (
 	"fmt"
-	"reflect"
-	"time"
-
-	. "github.com/pierback/bchain-qlearning/tree/feature/restructure-project/internal/learning"
+	// bc "bchain-qlearning/internal/blockchain"
+	. "bchain-qlearning/internal/learning"
+	// ws "bchain-qlearning/internal/websocket"
 )
 
 func main() {
-	// handleRequests()
-	// initLearner()
-	/* var ts timeslot = 9
-	h := time.Now().Hour()
-	ts = GetCurrentTimeSlot(h)
-	fmt.Println("&slot", ts)
-	*/
-	fmt.Printf("Which day it is? %s\n", time.Now().Weekday())
-	fmt.Printf("Slot? %s\n", reflect.TypeOf(time.Now().Hour()))
-	// Which day it is? Sunday
-	// insertNRetrieve()
-	// wsInit()
+	// ws.WsInit()
+	su := SimulatedUser{}
+	su.InitLearner()
+	// bc.InsertNRetrieve()
+
+	fmt.Println("Main")
 }

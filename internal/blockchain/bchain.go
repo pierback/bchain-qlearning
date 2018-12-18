@@ -1,4 +1,4 @@
-package bchain
+package blockchain
 
 import (
 	"context"
@@ -9,14 +9,15 @@ import (
 	// for demo
 	"math/big"
 
+	userManagement "bchain-qlearning/internal/contracts" // for demo
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common" //"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	userManagement "github.com/pierback/contracts" // for demo
 )
 
-func insertNRetrieve() {
+func InsertNRetrieve() {
 
 	client, err := ethclient.Dial("ws://127.0.0.1:8545")
 
