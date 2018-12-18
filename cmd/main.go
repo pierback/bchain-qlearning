@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"time"
+
+	. "github.com/pierback/bchain-qlearning/tree/feature/restructure-project/internal/learning"
 )
 
 func main() {
