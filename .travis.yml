@@ -12,7 +12,7 @@ notifications:
   email: false
 before_script:
 - echo -e "Host github.com\n\tHostName github.com/pierback git\n\tIdentityFile ~/.ssh/id_rsa\n"
-  >> ~/.ssh/config - go get github.com/pierback/bchain-qlearning/learner - go get
+  >> ~/.ssh/config - go get github.com/pierback/bchain-qlearning/internal/learning - go get
   -t -v ./...
 script:
 - go test -v -race ./...
