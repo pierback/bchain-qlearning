@@ -74,6 +74,5 @@ func handler(res http.ResponseWriter, req *http.Request) {
 			}
 		}()
 	}
-
 	log.Println("WebSocket connection terminated.")
 }
