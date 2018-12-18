@@ -1,38 +1,26 @@
 language: go
-
 env:
-  - GO111MODULE=on
-
+- GO111MODULE=on
 go:
 - '1.0'
 - '1.3'
-
 go_import_path: github.com/pierback/bchain-qlearning
-
-# Only clone the most recent commit.
 git:
   depth: 1
-
-# Skip the install step. Don't `go get` dependencies. Only build with the code
-# in vendor/
 install: true
-
-# Don't email me the results of the test runs.
 notifications:
   email: false
-
-# Anything in before_script that returns a nonzero exit code will flunk the
-# build and immediately stop. It's sorta like having set -e enabled in bash.
-# Make sure golangci-lint is vendored.
 before_script:
-  # - go install -mod vendor github.com/golangci/golangci-lint/cmd/golangci-lint
-  - echo -e "Host github.com\n\tHostName github.com/pierback git\n\tIdentityFile ~/.ssh/id_rsa\n" >> ~/.ssh/config
-    - go get github.com/pierback/bchain-qlearning/learner
-    - go get -t -v ./...
-
-# script always runs to completion (set +e). If we have linter issues AND a
-# failing test, we want to see both. Configure golangci-lint with a
-# .golangci.yml file at the top level of your repo.
+- echo -e "Host github.com\n\tHostName github.com/pierback git\n\tIdentityFile ~/.ssh/id_rsa\n"
+  >> ~/.ssh/config - go get github.com/pierback/bchain-qlearning/learner - go get
+  -t -v ./...
 script:
-  #- golangci-lint run       # run a bunch of code checkers/linters in parallel
-  - go test -v -race ./...  # Run all the tests with the race detector enabled
+- go test -v -race ./...
+deploy:
+  provider: releases
+  api_key:
+    secure: XuZXSALVIaFQKqa221sjlsCEOrMHIpFH26QMC8xrXwbi2Dl2m1A4fXgOl1NBGY766j64kACKuo7i74nBjhroIbw2rex/9KJp6vwLh8n/RP0tFCMMhYApu5wkvKSeLuKf51oMO53cfEibk4riN+L3M3T9sZsRD38w81f1OmLl5THA2Rw7wi+E6knW8xG1+c9ttst6rOY5qzXcdGnWUP2rt4zP+tI8VMv+PphRDnHHL22sit92R3J3nUIFxjuNgMmnoMn9+314qglKvxWYjdEhEczqgfZz3iyzAlLiwcLc4qTilsL0+hXSimgihP1AlTlya+3hvDXNPmbfTMJ8/oJsoy0XOSvFgASipVtLpjc0sMzikgjOCiVQ8OdT4bNA2AcypGXByIeu9MRp3OM3gz8uxjyJC2gVUOTdzR56yUZZF3crVUCaY5/7HOonvdOoBxWjC3Brjg2derHHSgDMCk39f4KrvujyfvJkfRWVzdHEkIkmgnp6NnV4m3xg4gmEUeblEidd44yZeDAeDq+wOguNC2Dhippx4UaLvvi7RIXOMNYp92q+g6GEAKFeV+6COl2dgQ0qwA+KqwX4cPhM1O67cfER/xBchiDqn+8KJJOBusKMi+5whVS9dUBoAE782Q2gX3GqhfaRNv0QhvvSNr5cpXNDjoWbueuhKD0QCe7Jxhc=
+  file: ''
+  on:
+    repo: pierback/bchain-qlearning
+    branch: feature/restructure-project
