@@ -62,10 +62,10 @@ func TestFilterSlice(t *testing.T) {
 		input    Input
 		expected int
 	}{
-		{input: Input{tm: []float64{8.37, 10.15, 13.23, 14.57}, sl: timeslot(3)}, expected: 2},
-		{input: Input{tm: []float64{8.37, 16.15, 15.23, 15.57}, sl: timeslot(4)}, expected: 3},
-		{input: Input{tm: []float64{9.37, 10.15, 13.23, 14.57}, sl: timeslot(1)}, expected: 2},
-		{input: Input{tm: []float64{1.37, 2.15, 3.23, 4.57}, sl: timeslot(6)}, expected: 4},
+		{input: Input{tm: []float64{8.37, 10.15, 13.23, 14.57}, sl: timeslot(2)}, expected: 2},
+		{input: Input{tm: []float64{8.37, 16.15, 15.23, 15.57}, sl: timeslot(0)}, expected: 1},
+		{input: Input{tm: []float64{10.37, 11.15, 13.23, 14.57}, sl: timeslot(1)}, expected: 2},
+		{input: Input{tm: []float64{1.37, 2.15, 3.23, 4.57}, sl: timeslot(4)}, expected: 4},
 		{input: Input{tm: []float64{0, 0, 0, 0}, sl: timeslot(-1)}, expected: 0},
 	}
 
@@ -88,9 +88,9 @@ func TestGetReward(t *testing.T) {
 		{[]Action{Coffee, Nothing}, -1},
 		{[]Action{Coffee, Coffee}, 1},
 		{[]Action{Nothing, Coffee}, -1},
-		{[]Action{Nothing, Nothing}, 0},
-		{[]Action{Mate, Mate}, 0},
-		{[]Action{Water, Water}, 0},
+		{[]Action{Nothing, Nothing}, 1},
+		{[]Action{Mate, Mate}, 1},
+		{[]Action{Water, Water}, 1},
 		{[]Action{Water, Coffee}, -1},
 	}
 

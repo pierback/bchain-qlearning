@@ -167,14 +167,16 @@ func (str *SSID) isEduroam() bool {
 
 func GetCurrentTimeSlot(ch int) timeslot {
 	switch ch {
-	case 7, 8, 9, 10:
+	case 7, 8, 9:
 		return 0
-	case 11, 12, 13, 14:
+	case 10, 11, 12:
 		return 1
-	case 15, 16, 17, 18:
+	case 13, 14, 15:
 		return 2
-	case 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6:
+	case 16, 17, 18:
 		return 3
+	case 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6:
+		return 4
 	default:
 		return -1
 	}
