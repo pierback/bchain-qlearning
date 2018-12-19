@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func wsInit() {
+func WsInit() {
 	http.HandleFunc("/", handler)
 	http.ListenAndServe(":8089", nil)
 }

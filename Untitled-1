@@ -1,8 +1,0 @@
-Prediction immer am anfang vom Timeslot 
-wenn feedback vom User kommt, dann neue Prediction für den resthlichen Timeslot.
-Ende vom Timeslot Prediction überprüfen 
-Timeslot := 3-4 stunden
-
-Wochentage mal weg und oder Mate
-Arm bandits q-learning
-exploration kleiner werden lassen und bis zu einer gewissen einpendeln 5%
