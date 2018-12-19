@@ -5,6 +5,7 @@ go:
  - 1.5.1
  - release
  - tip
+go_import_path: github.com/pierback/bchain-qlearning
 
 before_script:
 - go get -t -v ./...
