@@ -6,10 +6,11 @@ go:
 go_import_path: github.com/pierback/bchain-qlearning
 git:
   depth: 1
-install: true
+# install: true
 notifications:
   email: false
 before_script:
+- rvm install 2.2.5
 - go get -t -v ./...
 script:
 - go test -v -race ./...
