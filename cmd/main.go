@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	// bc "bchain-qlearning/internal/blockchain"
-	. "bchain-qlearning/pkg/learning"
-	// ws "bchain-qlearning/internal/websocket"
+
+	// bc "github.com/pierback/bchain-qlearning/internal/blockchain"
+	l "github.com/pierback/bchain-qlearning/internal/learning"
+	// ws "github.com/pierback/bchain-qlearning/internal/websocket"
 )
 
 func main() {
 	// ws.WsInit()
-	su := SimulatedUser{}
+	su := l.SimulatedUser{}
 	su.InitLearner()
 	// bc.InsertNRetrieve()
 

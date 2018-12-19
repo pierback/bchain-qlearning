@@ -11,7 +11,6 @@ install: true
 notifications:
   email: false
 before_script:
-- go get github.com/pierback/bchain-qlearning/internal/learning 
 - go get -t -v ./...
 script:
 - go test -v -race ./...

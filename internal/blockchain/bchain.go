@@ -9,7 +9,7 @@ import (
 	// for demo
 	"math/big"
 
-	userManagement "bchain-qlearning/internal/contracts" // for demo
+	userManagement "github.com/pierback/bchain-qlearning/internal/contracts" // for demo
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common" //"github.com/ethereum/go-ethereum/common/hexutil"
