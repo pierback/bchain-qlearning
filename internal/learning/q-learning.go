@@ -112,7 +112,7 @@ func (su *SimulatedUser) Start(q *QLearning) {
 		q.sr.neg = 0
 	}
 
-	writeJsonFile(mapToString(q.qt))
+	// writeJsonFile(mapToString(q.qt))
 
 	// fmt.Println("Q-Table \n", q.qt)
 	fmt.Println("successratio", wa)
