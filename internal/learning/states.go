@@ -45,18 +45,18 @@ type drinkcount struct {
 	MateCount   int `json:"mateCount"`
 }
 
-//StateStruct type definition of a state
-type StateStruct struct {
+//stateType type definition of a state
+type stateType struct {
 	Weekday    weekday    `json:"weekday"`
 	Timeslot   timeslot   `json:"timeslot"`
 	Drinkcount drinkcount `json:"drinkcount"`
 }
 
 //UserState representing state of a user
-type UserState StateStruct
+type UserState stateType
 
 //VirtualState representing state of dummy-user
-type VirtualState StateStruct
+type VirtualState stateType
 
 //State interface methods
 type State interface {
