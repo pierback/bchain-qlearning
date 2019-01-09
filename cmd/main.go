@@ -10,9 +10,13 @@ import (
 
 func main() {
 	// ws.WsInit()
+
 	su := l.SimulatedUser{}
 	su.InitLearner()
+
 	// bc.InsertNRetrieve()
+	// bc.DeployContract()
+	// l.StartWorker()
 
 	fmt.Println("Main")
 }

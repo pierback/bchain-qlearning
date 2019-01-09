@@ -10,7 +10,7 @@ import (
 func FilterSlice(dayArr []float64, sl timeslot) int {
 	var stateCount int //per slot
 	for _, t := range dayArr {
-		if GetCurrentTimeSlot(int(t)) == sl {
+		if getCurrentTimeSlot(int(t)) == sl {
 			stateCount++
 		}
 	}
@@ -84,4 +84,20 @@ func contains(s []int, e int) bool {
 		}
 	}
 	return false
+}
+
+//String converts weekday to string
+func (a Action) String() string {
+	actions := [...]string{
+		"Nothing",
+		"Coffee",
+		"Mate",
+		"Water",
+	}
+
+	if a > Action(3) || a < Action(0) {
+		return "Unknown"
+	}
+
+	return actions[a]
 }

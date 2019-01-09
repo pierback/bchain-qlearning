@@ -3,23 +3,24 @@ package learning
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
-func TestStartLearn(t *testing.T) {
+/* func TestStartLearn(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestDrinksCount start")
 	su := SimulatedUser{}
 	su.InitLearner()
 
 	fmt.Println("	")
-}
+} */
 
 func TestSetQ(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestSetQ start")
 	q := QLearning{}
 	vs := VirtualState{}
-	ss := vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(Monday), 8.45)
+	ss := vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(time.Monday), 8.45)
 	q.qt = make(QTable)
 
 	type Input struct {
@@ -98,36 +99,6 @@ func TestGetReward(t *testing.T) {
 		if output := GetReward(ap.input[0], ap.input[1]); output != ap.expected {
 			t.Error("Wrong reward given", output, "Input", ap.input, ap.expected, ap)
 		}
-	}
-
-}
-
-func TestUpdate(t *testing.T) {
-	t.Parallel()
-	fmt.Println("TestUpdate start")
-	tq := QLearning{}
-	vs := VirtualState{}
-	sampleState := vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)
-
-	var execActns = []struct {
-		input    Action
-		expected State
-	}{
-		{Coffee, vs.New(drinkcount{CoffeeCount: 1, WaterCount: 0, MateCount: 0}, -1, -1)},
-		{Nothing, vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
-		{Mate, vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 1}, -1, -1)},
-		{Water, vs.New(drinkcount{CoffeeCount: 0, WaterCount: 1, MateCount: 0}, -1, -1)},
-		{4, vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
-	}
-
-	for _, ea := range execActns {
-		tq.state = sampleState
-		output := tq.state.Update(ea.input)
-
-		if output != ea.expected {
-			t.Error("Wrong reward given", ea.input, ea.expected, ea)
-		}
-		fmt.Println("output: ", output)
 	}
 
 }
