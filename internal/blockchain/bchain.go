@@ -1,25 +1,20 @@
 package blockchain
 
 import (
-	"context"
-	"crypto/ecdsa"
 	"fmt"
 	"log" //"github.com/ethereum/go-ethereum/common/hexutil"
 
 	// for demo
-	"math/big"
 
-	userManagement "github.com/pierback/bchain-qlearning/internal/contracts" // for demo
+	userManagement "github.com/pierback/bchain-qlearning/internal/contracts/UserManagement" // for demo
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common" //"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 func InsertNRetrieve() {
 
-	client, err := ethclient.Dial("ws://127.0.0.1:8545")
+	client, err := ethclient.Dial("ws://192.168.178.34:8545")
 
 	if err != nil {
 		log.Fatal(err)
@@ -33,7 +28,7 @@ func InsertNRetrieve() {
 
 	fmt.Println("contract is loaded")
 
-	privateKey, err := crypto.HexToECDSA("9fa16474b3bc9351a93987003034443ebfe4cbf4a7c3cd19d04d2c5ac76f6d0d")
+	/* privateKey, err := crypto.HexToECDSA("9fa16474b3bc9351a93987003034443ebfe4cbf4a7c3cd19d04d2c5ac76f6d0d")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,7 +61,7 @@ func InsertNRetrieve() {
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.Value = big.NewInt(0)      // in wei
 	auth.GasLimit = uint64(3000000) // in units
-	auth.GasPrice = gasPrice
+	auth.GasPrice = gasPrice */
 
 	email := [32]byte{}
 	value := [32]byte{}
