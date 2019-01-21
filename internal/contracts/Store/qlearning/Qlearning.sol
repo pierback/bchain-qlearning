@@ -45,29 +45,26 @@ contract Qlearning {
     uint timeslot;
   }*/
 
-  bytes32[2][] private _actnvls;
-  string[] private _sts;
-
+  bytes32[2][] private actnvls;
   function getQtable() public returns (string[] memory, bytes32[2][] memory) {
-    delete _actnvls;
-    delete _sts;
+    bytes32[2][] memory _actnvls = new bytes32[2][](states.length);
 
+    actnvls = _actnvls;
     for (uint i = 0; i < states.length; i++) {
-      _sts.push(states[i]);
-      _actnvls.push(qtable[i]);
+      actnvls.push(qtable[i]);
     }
 
-    return (_sts, _actnvls);
+    return (states, actnvls);
   }
 
   function setQValue(string memory _st, bytes32[2] memory qvalArr) public {
     int stateIndex = stateExists(_st, states);
-    require(stateIndex > -1);
+    //require(stateIndex > -1);
     qtable[uint(stateIndex)] = qvalArr;
   }
 
   function addState(string memory st, bytes32[2] memory qvalArr) public {
-    require(stateExists(st, states) < 0);
+    //require(stateExists(st, states) < 0);
     states.push(st);
     uint newIndex = states.length - 1;
 
