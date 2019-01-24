@@ -63,12 +63,12 @@ contract CoffeeDash {
     return (users[msg.sender].qtable[_state].data);
   }
 
-  function setQValue(string memory _st, string memory qvalArr) public {
+  function setQValue(string memory _st, string memory qvalArr) public payable {
     if (!users[msg.sender].qtable[_st].exists) revert();
     users[msg.sender].qtable[_st].data = qvalArr;
   }
 
-  function addState(string memory _st, string memory qvalArr) public {
+  function addState(string memory _st, string memory qvalArr) public payable {
     if (users[msg.sender].qtable[_st].exists) revert();
     //uint8 stcnt = users[msg.sender].stateCnt;
     users[msg.sender].qtable[_st].exists = true;
