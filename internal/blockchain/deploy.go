@@ -8,7 +8,10 @@ import (
 	"math/big"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/core/types"
 
@@ -16,6 +19,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
+	bl "github.com/pierback/bchain-qlearning/internal/contracts/BeverageList"
 	cfd "github.com/pierback/bchain-qlearning/internal/contracts/Store/CoffeeDash"
 )
 
@@ -112,10 +116,110 @@ func ReadWrite() {
 	}
 }
 
-func DeployCommon() {
+func TestBl() {
+	client, err := ethclient.Dial("ws://127.0.0.1:8545")
+	if err != nil {
+		fmt.Println("Unable to connect to network:%v\n", err)
+	}
+	contractAddress := common.HexToAddress("0x4688fb4ea4c047ab809b5a908c0d1650353a3640")
+	query := ethereum.FilterQuery{
+		Addresses: []common.Address{contractAddress},
+	}
+
+	fmt.Println("wait\n")
+
+	logs := make(chan types.Log)
+	sub, err := client.SubscribeFilterLogs(context.Background(), query, logs)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	instance, err1 := bl.NewBeveragelist(contractAddress, client)
+	if err1 != nil {
+		fmt.Println("err1: ", err1)
+		log.Fatal(err)
+	}
+
+	auth, err := bind.NewTransactor(strings.NewReader(key), "0000")
+	drink := [32]byte{}
+	weekday := [32]byte{}
+	ti := [32]byte{}
+	copy(drink[:], []byte("coffee"))
+	copy(weekday[:], []byte(time.Now().Weekday().String()))
+	copy(ti[:], []byte(time.Now().String()))
+	_, errr := instance.SetDrinkData(auth, ti, drink, weekday)
+	if errr != nil {
+		fmt.Println("err1: ", errr)
+	}
+
+	for {
+
+		select {
+		case err := <-sub.Err():
+			log.Fatal(err)
+		case vLog := <-logs:
+			fmt.Println("vLog: ", vLog)
+			ReadVlog(vLog, client)
+			// pointer to event log
+		}
+	}
+
+}
+
+func ReadVlog(vLog types.Log, client *ethclient.Client) {
+	fmt.Println("ReadVlog: ")
+
+	contractAbi, err := abi.JSON(strings.NewReader(string(bl.BeveragelistABI)))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(vLog.BlockHash.Hex()) // 0x3404b8c050aa0aacd0223e91b5c32fee6400f357764771d0684fa7b3f448f1a8
+	fmt.Println(vLog.BlockNumber)     // 2394201
+	fmt.Println(vLog.TxHash.Hex())    // 0x280201eda63c9ff6f305fcee51d5eb86167fab40ca3108ec784e8652a0e2b1a6
+
+	event := struct {
+		Time    [32]byte
+		Drink   [32]byte
+		Weekday [32]byte
+	}{}
+
+	err1 := contractAbi.Unpack(&event, "NewDrink", vLog.Data)
+	if err1 != nil {
+		log.Fatal(err1)
+	}
+
+	fmt.Println("time", string(event.Time[:]))       // foo
+	fmt.Println("drink", string(event.Drink[:]))     // bar
+	fmt.Println("weekday", string(event.Weekday[:])) // bar
+
+	block, err := client.BlockByNumber(context.Background(), big.NewInt(int64(vLog.BlockNumber)))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, tx := range block.Transactions() {
+		fmt.Println(tx.Hash().Hex())            // 0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2
+		fmt.Println(tx.Value().String())        // 10000000000000000
+		fmt.Println(tx.Gas())                   // 105000
+		fmt.Println(tx.GasPrice().Uint64())     // 102000000000
+		fmt.Println(tx.Nonce())                 // 110644
+		fmt.Println(tx.Data())                  // []
+		fmt.Println("Recipient", tx.To().Hex()) // 0x55fE59D8Ad77035154dDd0AD0388D09Dd4047A8e
+
+		receipt, err := client.TransactionReceipt(context.Background(), tx.Hash())
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(receipt.Status) // 1
+	}
+}
+
+func DeployBeveragelist() {
 	// connect to an ethereum node  hosted by infura
 	// blockchain, err := ethclient.Dial("http://127.0.0.1:8501")
-	blockchain, err := ethclient.Dial("http://localhost:8545")
+	client, err := ethclient.Dial("ws://127.0.0.1:8545")
 
 	if err != nil {
 		log.Fatalf("Unable to connect to network:%v\n", err)
@@ -127,38 +231,13 @@ func DeployCommon() {
 	if err != nil {
 		log.Fatalf("Failed to create authorized transactor: %v", err)
 	}
-	_st := "coffee"
-	_lr := big.NewInt(700000)
-	_gm := big.NewInt(700000)
-	_ep := big.NewInt(700000)
-	_epd := big.NewInt(700000)
-	_sr := big.NewInt(0)
-	_pd := big.NewInt(0)
 
-	address, _, instance, err1 := cfd.DeployCoffeedash(
-		auth,
-		blockchain, _st,
-		_lr,
-		_gm,
-		_ep,
-		_epd,
-		_sr,
-		_pd,
-	)
+	address, _, _, err1 := bl.DeployBeveragelist(auth, client)
 	if err1 != nil {
 		fmt.Println("err1: ", err1)
 		log.Fatal(err)
 	}
 	fmt.Printf("Contract pending deploy: 0x%x\n", address)
-
-	length, _ := instance.GetStateCnt(nil)
-	fmt.Println("length: ", length)
-
-	_, err = instance.AddState(auth, "mate1", "-0.9999999999651321, -0.9999999999651321")
-	if err != nil {
-		fmt.Println("AddState: ", err)
-		log.Fatal(err)
-	}
 	/* for index := 0; index < int(length); index++ {
 		state, values, err1 := instance.GetQtableState(nil, uint8(index))
 		if err1 != nil {

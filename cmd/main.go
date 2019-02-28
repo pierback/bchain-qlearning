@@ -15,8 +15,10 @@ func main() {
 	// bc.ReadWrite()
 	// l.StartWorker()
 
-	su := l.SimulatedUser{}
-	su.InitLearner()
+	/* su := l.SimulatedUser{}
+	su.InitLearner() */
+
+	bc.TestBl()
 
 	_ = l.SimulatedUser{}
 
