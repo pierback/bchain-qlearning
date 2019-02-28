@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	bc   *bchainMock
+	bcm  *bchainMock
 	once sync.Once
 )
 
@@ -21,25 +21,25 @@ type Worker interface {
 //BchainMock singleton constructor
 func initBm() *bchainMock {
 	once.Do(func() {
-		bc = &bchainMock{users: make(map[User]QLearning)}
+		bcm = &bchainMock{users: make(map[User]QLearning)}
 		initUsers()
 	})
 
-	return bc
+	return bcm
 }
 
 func initUsers() {
-	for index := 0; index < 1; index++ {
+	for index := 0; index < 300; index++ {
 		ethaddrs := ethaddress("asdfasdf" + strconv.Itoa(index))
 		fmt.Println("ethaddrs: ", ethaddrs)
 		usr := User{ethaddrs}
 		ql := usr.InitLearner()
-		bc.Set(usr, ql)
+		bcm.Set(usr, ql)
 		tmpState := UserState{}
 		ql.state = tmpState.New(drinkcount{}, -1, -1)
 		fmt.Println("q.state: ", ql.state)
 	}
-	bc.printUsers()
+	bcm.printUsers()
 }
 
 //StartWorker starts worker job
@@ -54,7 +54,7 @@ func StartWorker() {
 
 func run() {
 	actn := Nothing
-	for usr, ql := range bc.users {
+	for usr, ql := range bcm.users {
 		fmt.Println("next tick", ql, usr)
 		ql.learn(actn)
 	}
@@ -65,7 +65,7 @@ func websocketInput(ethAdrs ethaddress, at Action) {
 	// compare action took with usr.predicted action
 	// get new state make prediction for next state/timeslot
 
-	q, err := bc.getQlearning(ethAdrs)
+	q, err := bcm.getQlearning(ethAdrs)
 	if err != nil {
 		log.Println("No user found with this address")
 		return

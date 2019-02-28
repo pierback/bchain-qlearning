@@ -7,8 +7,10 @@ import (
 	"log"
 	"math/big"
 	"strings"
+	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -17,12 +19,103 @@ import (
 	cfd "github.com/pierback/bchain-qlearning/internal/contracts/Store/CoffeeDash"
 )
 
-const key = `{"address":"02e9f84165314bb8c255d8d3303b563b7375eb61","crypto":{"cipher":"aes-128-ctr","ciphertext":"f4952ba9725d5ae83f6e2c47714e4a1ed533a60a4ea97d635fd674e84b419f8a","cipherparams":{"iv":"98de0f7f0469a83ee3f543b232a9ec67"},"kdf":"scrypt","kdfparams":{"dklen":32,"n":262144,"p":1,"r":8,"salt":"7629ecaf07277427a80e8e3138d9fc4058ca63b004f7ba3a2b253f22db55bced"},"mac":"b10cc5c56aa64f2246a5786ea3247ab6a133961b3b62985bc999dcc7cb51ade7"},"id":"3dfb452c-af90-41aa-aa8f-6da654b818e9","version":3}`
+var jobQueue Queue
+
+type singleton struct {
+	dpi cfd.Coffeedash
+}
+
+var instance *cfd.Coffeedash
+var once sync.Once
+
+func GetInstance() *cfd.Coffeedash {
+	once.Do(func() {
+		fmt.Println("GetInstance")
+		blockchain, err := ethclient.Dial("http://localhost:8545")
+		fmt.Println("blockchain: ", blockchain)
+
+		if err != nil {
+			log.Fatalf("Unable to connect to network:%v\n", err)
+		}
+		/* 		auth, err := bind.NewTransactor(strings.NewReader(key), "0000")
+
+		   		if err != nil {
+		   			log.Fatalf("Failed to create authorized transactor: %v", err)
+		   		} */
+		// projektmodul blockchain contracts addresses
+		//cont := common.HexToAddress("0x76696ffcb3fad0fea8228e99766222339a4abd24")
+		// cont := common.HexToAddress("0xfaf1858ec3b324718f9401f633ca9880f9e64e03")
+		cont := common.HexToAddress("0x2cfef625b8421dde00474d6805ef4758363fbdf7")
+
+		//docker bchain adresses
+		// cont := common.HexToAddress("0xb7f2adbf4a6449af41f29a40b92b1b9334990e43")
+
+		//
+		dpi, _ := cfd.NewCoffeedash(cont, blockchain)
+		instance = dpi
+		jobQueue = Queue{&sync.Mutex{}, make([]bchainData, 0)}
+		auth, err := bind.NewTransactor(strings.NewReader(key), "0000")
+		jobQueue.AddToQueue(hello, auth, "df", "df")
+
+		go jobQueue.Worker()
+	})
+	return instance
+}
+
+func hello(*bind.TransactOpts, string, string) (*types.Transaction, error) {
+	fmt.Println("hello hello ")
+	return nil, nil
+}
+
+func ReadWrite() {
+	// blockchain, err := ethclient.Dial("http://127.0.0.1:8501")
+	blockchain, err := ethclient.Dial("http://localhost:8545")
+
+	if err != nil {
+		log.Fatalf("Unable to connect to network:%v\n", err)
+	}
+	auth, err := bind.NewTransactor(strings.NewReader(key), "0000")
+
+	// projektmodul blockchain contracts addresses
+	//cont := common.HexToAddress("0x76696ffcb3fad0fea8228e99766222339a4abd24")
+	// cont := common.HexToAddress("0xfaf1858ec3b324718f9401f633ca9880f9e64e03")
+	cont := common.HexToAddress("0x2cfef625b8421dde00474d6805ef4758363fbdf7")
+
+	instance, err1 := cfd.NewCoffeedash(cont, blockchain)
+	if err1 != nil {
+		fmt.Println("err1: ", err1)
+		log.Fatal(err)
+	}
+
+	// _, err = instance.SetQValue(auth, "coffee", "-0.d, -d")
+	newstate := "{Monday 3 {4 0 0}}"
+	if output, _ := instance.StateExists(nil, newstate); !output {
+		_, err = instance.AddState(auth, newstate, "-0.9999999956953279, -0.99999822853")
+		if err != nil {
+			fmt.Printf("set error")
+			log.Fatal(err)
+		}
+	} else {
+		fmt.Println("StateExists: ", output)
+	}
+
+	length, _ := instance.GetStateCnt(nil)
+	fmt.Println("length: ", length)
+
+	for index := 0; index < int(length); index++ {
+		state, val, err1 := instance.GetQtableState(nil, uint8(index))
+		if err1 != nil {
+			fmt.Printf("set error")
+			log.Fatal(err)
+		}
+		fmt.Println("state", state, "values", val)
+	}
+}
 
 func DeployCommon() {
 	// connect to an ethereum node  hosted by infura
 	// blockchain, err := ethclient.Dial("http://127.0.0.1:8501")
-	blockchain, err := ethclient.Dial("http://localhost:8501")
+	blockchain, err := ethclient.Dial("http://localhost:8545")
 
 	if err != nil {
 		log.Fatalf("Unable to connect to network:%v\n", err)
@@ -62,7 +155,10 @@ func DeployCommon() {
 	fmt.Println("length: ", length)
 
 	_, err = instance.AddState(auth, "mate1", "-0.9999999999651321, -0.9999999999651321")
-
+	if err != nil {
+		fmt.Println("AddState: ", err)
+		log.Fatal(err)
+	}
 	/* for index := 0; index < int(length); index++ {
 		state, values, err1 := instance.GetQtableState(nil, uint8(index))
 		if err1 != nil {
@@ -74,34 +170,20 @@ func DeployCommon() {
 }
 
 func Playwithit() {
-	// blockchain, err := ethclient.Dial("http://127.0.0.1:8501")
-	blockchain, err := ethclient.Dial("http://0.0.0.0:8501")
-
-	if err != nil {
-		log.Fatalf("Unable to connect to network:%v\n", err)
-	}
-	auth, err := bind.NewTransactor(strings.NewReader(key), "0000")
-
-	// projektmodul blockchain contracts addresses
-	//cont := common.HexToAddress("0x76696ffcb3fad0fea8228e99766222339a4abd24")
-	// cont := common.HexToAddress("0x5627e83b84e88965a5bc4d052e754448f3522098")
-
-	//docker bchain adresses
-	cont := common.HexToAddress("0xb7f2adbf4a6449af41f29a40b92b1b9334990e43")
-
-	//
-	instance, err1 := cfd.NewCoffeedash(cont, blockchain)
-	if err1 != nil {
-		fmt.Println("err1: ", err1)
-		log.Fatal(err)
-	}
+	blockchain, _ := ethclient.Dial("http://localhost:8545")
+	cont := common.HexToAddress("0xa1d50d1e2e1be9293a82cb597086a46ff57b7193")
+	instance, _ := cfd.NewCoffeedash(cont, blockchain)
 
 	// _, err = instance.SetQValue(auth, "coffee", "-0.d, -d")
-	newstate := "{Monday 0 {4 0 0}}"
-	if output, _ := instance.StateExists(nil, newstate); !output {
-		_, err = instance.AddState(auth, newstate, "-0.9999999956953279, -0.99999822853")
+	/* newstate := `adsf` //`"{\"weekday\":1,\"timeslot\":0,\"drinkcount\":{\"coffeeCount\":0,\"waterCount\":0,\"mateCount\":0}}"`
+	output, err := instance.StateExists(nil, newstate)
+	if err != nil {
+		fmt.Println("StateExists error", err, output)
+		// log.Fatal(err)
 	}
-
+	fmt.Println("StateExists: ", output)
+	// newstate := "{Monday 7 {4 0 0}}"
+	AddState(newstate, "0ddd, 0ddd")*/
 	length, _ := instance.GetStateCnt(nil)
 	fmt.Println("length: ", length)
 
@@ -109,7 +191,7 @@ func Playwithit() {
 		state, val, err1 := instance.GetQtableState(nil, uint8(index))
 		if err1 != nil {
 			fmt.Printf("set error")
-			log.Fatal(err)
+			log.Fatal(err1)
 		}
 		fmt.Println("state", state, "values", val)
 	}
@@ -184,6 +266,7 @@ func UpdateContract() {
 }
 
 func StartDeploy() {
+	fmt.Println("StartDeploy")
 	// connect to an ethereum node  hosted by infura
 	client, err := ethclient.Dial("http://localhost:8545")
 	if err != nil {

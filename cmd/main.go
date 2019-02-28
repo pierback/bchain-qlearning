@@ -4,19 +4,22 @@ import (
 	"fmt"
 
 	bc "github.com/pierback/bchain-qlearning/internal/blockchain"
-	// l "github.com/pierback/bchain-qlearning/internal/learning"
+	l "github.com/pierback/bchain-qlearning/internal/learning"
 	// ws "github.com/pierback/bchain-qlearning/internal/websocket"
 )
 
 func main() {
 	// ws.WsInit()
 
-	/* su := l.SimulatedUser{}
-	su.InitLearner() */
-
 	// bc.InsertNRetrieve()
-	bc.Playwithit()
+	// bc.ReadWrite()
 	// l.StartWorker()
 
+	su := l.SimulatedUser{}
+	su.InitLearner()
+
+	_ = l.SimulatedUser{}
+
+	_ = bc.Queue{}
 	fmt.Println("Main")
 }

@@ -86,7 +86,6 @@ func (q *QLearning) evalPrediction(fb Action) {
 	fmt.Println("eval prediction: ", q.state, "user: ", fb, "ql: ", q.prediction)
 
 	q.state = newstate
-
 }
 
 func (q *QLearning) makePrediction() {
@@ -153,6 +152,7 @@ func (q *QLearning) GetQ(a Action, s State) float64 {
 // SetQ sets qval of given state action pair
 func (q *QLearning) SetQ(a Action, qv float64) {
 	s := q.state.Get()
+	// bc.SetQValue(stateToString(s), fmt.Sprintf("%f", qv))
 	q.qt[s][a] = qv
 }
 

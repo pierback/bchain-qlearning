@@ -54,7 +54,7 @@ func (su *SimulatedUser) Start(q *QLearning) {
 	var wa []int
 
 	fmt.Println("start")
-	for reps := 0; reps < 200; reps++ {
+	for reps := 0; reps < 100; reps++ {
 
 		q.state = vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(time.Monday), float64(7))
 
@@ -79,7 +79,8 @@ func (su *SimulatedUser) Start(q *QLearning) {
 			}
 		}
 		wa = append(wa, q.sr.neg)
-		fmt.Println("q.sr.neg: ", q.sr.neg)
+		fmt.Println("Negs: ", wa)
+		// fmt.Println("q.sr.neg: ", q.sr.neg)
 		fmt.Println(" ")
 		q.sr.neg = 0
 	}
