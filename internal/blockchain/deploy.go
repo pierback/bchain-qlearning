@@ -121,7 +121,7 @@ func TestBl() {
 	if err != nil {
 		fmt.Println("Unable to connect to network:%v\n", err)
 	}
-	contractAddress := common.HexToAddress("0x4688fb4ea4c047ab809b5a908c0d1650353a3640")
+	contractAddress := common.HexToAddress("0x763f3b1223e4fc2d13993875a00cbb91cfb17aa7")
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{contractAddress},
 	}
@@ -144,13 +144,17 @@ func TestBl() {
 	drink := [32]byte{}
 	weekday := [32]byte{}
 	ti := [32]byte{}
-	copy(drink[:], []byte("coffee"))
-	copy(weekday[:], []byte(time.Now().Weekday().String()))
+	copy(drink[:], []byte("cola"))
+	copy(weekday[:], []byte("mannfred"))
+	// copy(weekday[:], []byte(time.Now().Weekday().String()))
 	copy(ti[:], []byte(time.Now().String()))
 	_, errr := instance.SetDrinkData(auth, ti, drink, weekday)
+
 	if errr != nil {
 		fmt.Println("err1: ", errr)
 	}
+
+	getDrinkData(instance)
 
 	for {
 
@@ -158,15 +162,28 @@ func TestBl() {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case vLog := <-logs:
-			fmt.Println("vLog: ", vLog)
-			ReadVlog(vLog, client)
+			// fmt.Println("vLog: ", vLog)
+
+			tim := ReadVlog(vLog, client)
+			getFromTime(instance, tim)
 			// pointer to event log
 		}
 	}
-
 }
 
-func ReadVlog(vLog types.Log, client *ethclient.Client) {
+func getFromTime(instance *bl.Beveragelist, t [32]byte) {
+	drink, weekday, _ := instance.GetDrinkData(nil, t)
+	fmt.Println("getFromTime drink", string(drink[:]))     // foo
+	fmt.Println("getFromTime weekday", string(weekday[:])) // foo
+}
+
+func getDrinkData(instance *bl.Beveragelist) {
+	drink, weekday, _ := instance.LastDrink(nil)
+	fmt.Println("getDrinkData drink", string(drink[:]))     // foo
+	fmt.Println("getDrinkData weekday", string(weekday[:])) // foo
+}
+
+func ReadVlog(vLog types.Log, client *ethclient.Client) [32]byte {
 	fmt.Println("ReadVlog: ")
 
 	contractAbi, err := abi.JSON(strings.NewReader(string(bl.BeveragelistABI)))
@@ -174,10 +191,10 @@ func ReadVlog(vLog types.Log, client *ethclient.Client) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(vLog.BlockHash.Hex()) // 0x3404b8c050aa0aacd0223e91b5c32fee6400f357764771d0684fa7b3f448f1a8
+	/* fmt.Println(vLog.BlockHash.Hex()) // 0x3404b8c050aa0aacd0223e91b5c32fee6400f357764771d0684fa7b3f448f1a8
 	fmt.Println(vLog.BlockNumber)     // 2394201
 	fmt.Println(vLog.TxHash.Hex())    // 0x280201eda63c9ff6f305fcee51d5eb86167fab40ca3108ec784e8652a0e2b1a6
-
+	*/
 	event := struct {
 		Time    [32]byte
 		Drink   [32]byte
@@ -199,12 +216,12 @@ func ReadVlog(vLog types.Log, client *ethclient.Client) {
 	}
 
 	for _, tx := range block.Transactions() {
-		fmt.Println(tx.Hash().Hex())            // 0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2
+		/* fmt.Println(tx.Hash().Hex())            // 0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2
 		fmt.Println(tx.Value().String())        // 10000000000000000
 		fmt.Println(tx.Gas())                   // 105000
 		fmt.Println(tx.GasPrice().Uint64())     // 102000000000
 		fmt.Println(tx.Nonce())                 // 110644
-		fmt.Println(tx.Data())                  // []
+		fmt.Println(tx.Data())                  // [] */
 		fmt.Println("Recipient", tx.To().Hex()) // 0x55fE59D8Ad77035154dDd0AD0388D09Dd4047A8e
 
 		receipt, err := client.TransactionReceipt(context.Background(), tx.Hash())
@@ -214,6 +231,8 @@ func ReadVlog(vLog types.Log, client *ethclient.Client) {
 
 		fmt.Println(receipt.Status) // 1
 	}
+
+	return event.Time
 }
 
 func DeployBeveragelist() {
