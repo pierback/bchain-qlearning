@@ -29,12 +29,12 @@ func main() {
 		/* su := l.SimulatedUser{}
 		su.InitLearner() */
 
-		// bc.Watch()
+		bc.Watch()
 		// bc.TestBl()
 
 		_ = l.SimulatedUser{}
 
-		_ = bc.Key
+		_ = bc.Nothing
 		fmt.Println("Main")
 	}
 }
