@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
@@ -17,16 +18,16 @@ import (
 	cc "github.com/pierback/bchain-qlearning/internal/contracts/CoffeeCoin"
 )
 
-const key = `{"address":"02e9f84165314bb8c255d8d3303b563b7375eb61","crypto":{"cipher":"aes-128-ctr","ciphertext":"f4952ba9725d5ae83f6e2c47714e4a1ed533a60a4ea97d635fd674e84b419f8a","cipherparams":{"iv":"98de0f7f0469a83ee3f543b232a9ec67"},"kdf":"scrypt","kdfparams":{"dklen":32,"n":262144,"p":1,"r":8,"salt":"7629ecaf07277427a80e8e3138d9fc4058ca63b004f7ba3a2b253f22db55bced"},"mac":"b10cc5c56aa64f2246a5786ea3247ab6a133961b3b62985bc999dcc7cb51ade7"},"id":"3dfb452c-af90-41aa-aa8f-6da654b818e9","version":3}`
+const key = `{"address":"e8816898d851d5b61b7f950627d04d794c07ca37","crypto":{"cipher":"aes-128-ctr","ciphertext":"1ff4add6955cba7ddaf29f66d7d21c5e1d714ef6191fbc651ae60f2ea3c95e8f","cipherparams":{"iv":"3ff869fbdbe1a523cdb327780365976e"},"kdf":"scrypt","kdfparams":{"dklen":32,"n":262144,"p":1,"r":8,"salt":"7372dbae5fb318f8684902e099c311d4188721d677974d729711762c7ef6030c"},"mac":"485fa5dc701067782baa1589716a53110c7f917eb259e35ebca7265bbb7150b1"},"id":"89edb004-5b00-4607-a3af-a0d9ab9b1c34","version":3}`
 
 func DeploySC(args string) {
-	client, err := ethclient.Dial("ws://127.0.0.1:8545")
+	client, err := ethclient.Dial("ws://0.0.0.0:8546")
 
 	if err != nil {
 		log.Fatalf("Unable to connect to network:%v\n", err)
 	}
 
-	auth, err := bind.NewTransactor(strings.NewReader(key), "0000")
+	auth, err := bind.NewTransactor(strings.NewReader(key), "password")
 
 	if err != nil {
 		log.Fatalf("Failed to create authorized transactor: %v", err)
@@ -48,13 +49,18 @@ func bvglDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 
 	fmt.Printf("Contract Beveragelist pending deploy: 0x%x\n", address)
 
-	err12 := ioutil.WriteFile("/tmp/dat1", address.Bytes(), 0644)
+	err12 := ioutil.WriteFile("/var/tmp/bvrglst", address.Bytes(), 0644)
 
 	check(err12)
 }
 
 func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
-	address, _, _, err1 := cc.DeployCoffeecoin(auth, client, new(big.Int).SetUint64(0))
+	chairAddress := common.HexToAddress("0x18ef96d887954472de5e9f47d60ba8dea371dbfe")
+	coffeePrice := new(big.Int).SetUint64(3)
+	matePrice := new(big.Int).SetUint64(5)
+	waterPrice := new(big.Int).SetUint64(2)
+
+	address, _, _, err1 := cc.DeployCoffeecoin(auth, client, chairAddress, coffeePrice, matePrice, waterPrice)
 	if err1 != nil {
 		fmt.Println("err1: ", err1)
 		log.Fatal(err1)
@@ -62,7 +68,7 @@ func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 
 	fmt.Printf("Contract Coffe Coin pending deploy: 0x%x\n", address)
 
-	err12 := ioutil.WriteFile("/tmp/dat2", address.Bytes(), 0644)
+	err12 := ioutil.WriteFile("/var/tmp/cffcn", address.Bytes(), 0644)
 
 	check(err12)
 }
