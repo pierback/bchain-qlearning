@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"sync"
 	"time"
-
-	bc "github.com/pierback/bchain-qlearning/internal/blockchain"
 )
 
 //stateType type definition of a state
@@ -123,12 +121,6 @@ var wg sync.WaitGroup
 
 //AddState to q-table
 func (q *QLearning) AddState(s State) {
-	wg.Add(1)
-	go bc.AddState(stateToString(s), "0,0", &wg)
-	wg.Wait()
-
-	fmt.Println("stateToString(s): ", stateToString(s))
-
 	if _, ok := q.qt[s]; !ok {
 		// fmt.Println("					Set State", s)
 		q.qt[s] = []float64{0, 0}
