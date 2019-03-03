@@ -7,7 +7,7 @@ contract BeverageList {
   }
 
   struct DrinkRecord {
-    address id;
+    address Address;
     DrinkData dd;
     bytes32 time;
   }
@@ -17,7 +17,7 @@ contract BeverageList {
     bytes32[] timeStamps;
   }
 
-  event NewDrink(address id, bytes32 time, bytes32 drink, bytes32 weekday);
+  event NewDrink(address Address, bytes32 time, bytes32 drink, bytes32 weekday);
 
   mapping(address => mapping(bytes32 => DrinkData)) private usrBvrgHist;
 
