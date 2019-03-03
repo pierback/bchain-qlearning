@@ -1,27 +1,40 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	bc "github.com/pierback/bchain-qlearning/internal/blockchain"
 	l "github.com/pierback/bchain-qlearning/internal/learning"
+
 	// ws "github.com/pierback/bchain-qlearning/internal/websocket"
+	dp "github.com/pierback/bchain-qlearning/cmd/deployment"
 )
 
 func main() {
-	// ws.WsInit()
+	var args string
+	flag.StringVar(&args, "dp", "bar", "a string var")
+	flag.Parse()
 
-	// bc.InsertNRetrieve()
-	// bc.ReadWrite()
-	// l.StartWorker()
+	if args == "cffcn" || args == "bvrglst" {
+		dp.DeploySC(args)
+	} else {
 
-	/* su := l.SimulatedUser{}
-	su.InitLearner() */
+		// ws.WsInit()
 
-	bc.TestBl()
+		// bc.InsertNRetrieve()
+		// bc.ReadWrite()
+		// l.StartWorker()
 
-	_ = l.SimulatedUser{}
+		/* su := l.SimulatedUser{}
+		su.InitLearner() */
 
-	_ = bc.Queue{}
-	fmt.Println("Main")
+		// bc.Watch()
+		// bc.TestBl()
+
+		_ = l.SimulatedUser{}
+
+		_ = bc.Key
+		fmt.Println("Main")
+	}
 }
