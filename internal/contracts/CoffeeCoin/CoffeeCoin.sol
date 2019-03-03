@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity >=0.4.22<0.6.0;
 
 contract CoffeeCoin {
   uint256 public totalSupply;
@@ -14,7 +14,7 @@ contract CoffeeCoin {
   mapping(address => uint256) public balanceOf;
   mapping(address => mapping(address => uint256)) public allowance;
 
-  function CoffeeCoin(uint256 _initialSupply) public {
+  constructor(uint256 _initialSupply) public {
     balanceOf[msg.sender] = _initialSupply;
     totalSupply = _initialSupply;
   }
@@ -25,7 +25,7 @@ contract CoffeeCoin {
     balanceOf[msg.sender] -= _value;
     balanceOf[_to] += _value;
 
-    Transfer(msg.sender, _to, _value);
+    emit Transfer(msg.sender, _to, _value);
 
     return true;
   }
@@ -36,7 +36,7 @@ contract CoffeeCoin {
   {
     allowance[msg.sender][_spender] = _value;
 
-    Approval(msg.sender, _spender, _value);
+    emit Approval(msg.sender, _spender, _value);
 
     return true;
   }
@@ -53,7 +53,7 @@ contract CoffeeCoin {
 
     allowance[_from][msg.sender] -= _value;
 
-    Transfer(_from, _to, _value);
+    emit Transfer(_from, _to, _value);
 
     return true;
   }

@@ -28,10 +28,10 @@ var (
 )
 
 // BeveragelistABI is the input ABI used to generate the binding from.
-const BeveragelistABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"lastDrink\",\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"time\",\"type\":\"bytes32\"},{\"name\":\"_drink\",\"type\":\"bytes32\"},{\"name\":\"_wd\",\"type\":\"bytes32\"}],\"name\":\"setDrinkData\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"time\",\"type\":\"bytes32\"}],\"name\":\"getDrinkData\",\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"time\",\"type\":\"bytes32\"},{\"indexed\":false,\"name\":\"drink\",\"type\":\"bytes32\"},{\"indexed\":false,\"name\":\"weekday\",\"type\":\"bytes32\"}],\"name\":\"NewDrink\",\"type\":\"event\"}]"
+const BeveragelistABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"getUsers\",\"outputs\":[{\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"userCount\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastUserDrink\",\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastDrink\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"time\",\"type\":\"bytes32\"},{\"name\":\"_drink\",\"type\":\"bytes32\"},{\"name\":\"_wd\",\"type\":\"bytes32\"}],\"name\":\"setDrinkData\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"time\",\"type\":\"bytes32\"}],\"name\":\"getDrinkData\",\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"id\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"time\",\"type\":\"bytes32\"},{\"indexed\":false,\"name\":\"drink\",\"type\":\"bytes32\"},{\"indexed\":false,\"name\":\"weekday\",\"type\":\"bytes32\"}],\"name\":\"NewDrink\",\"type\":\"event\"}]"
 
 // BeveragelistBin is the compiled bytecode used for deploying new contracts.
-const BeveragelistBin = `608060405234801561001057600080fd5b5061044c806100206000396000f3fe608060405234801561001057600080fd5b506004361061005e576000357c010000000000000000000000000000000000000000000000000000000090048063962e88fb14610063578063b89eadb614610088578063c0ba228f146100ca575b600080fd5b61006b610113565b604051808381526020018281526020019250505060405180910390f35b6100c86004803603606081101561009e57600080fd5b81019080803590602001909291908035906020019092919080359060200190929190505050610241565b005b6100f6600480360360208110156100e057600080fd5b8101908080359060200190929190505050610371565b604051808381526020018281526020019250505060405180910390f35b6000806000600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060018060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002080549050038154811015156101a857fe5b906000526020600020015490506101bd610400565b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000838152602001908152602001600020604080519081016040529081600082015481526020016001820154815250509050806000015181602001519350935050509091565b6040805190810160405280838152602001828152506000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008581526020019081526020016000206000820151816000015560208201518160010155905050600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208390806001815401808255809150509060018203906000526020600020016000909192909190915055507f45d101a97a5441b8d2ca576de6954245df176fd85d6ebaad65ae496e89079ce983838360405180848152602001838152602001828152602001935050505060405180910390a1505050565b60008061037c610400565b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000858152602001908152602001600020604080519081016040529081600082015481526020016001820154815250509050806000015181602001519250925050915091565b60408051908101604052806000801916815260200160008019168152509056fea165627a7a723058202b056dbdc8df081d5bc7d0f7f6263d57f808970c21422b3c6e189512475cbb1f0029`
+const BeveragelistBin = `608060405234801561001057600080fd5b50610955806100206000396000f3fe608060405234801561001057600080fd5b506004361061007e576000357c010000000000000000000000000000000000000000000000000000000090048062ce8e3e1461008357806307973ccf146100e25780632668f97714610100578063962e88fb14610125578063b89eadb61461017d578063c0ba228f146101bf575b600080fd5b61008b610208565b6040518080602001828103825283818151815260200191508051906020019060200280838360005b838110156100ce5780820151818401526020810190506100b3565b505050509050019250505060405180910390f35b6100ea610296565b6040518082815260200191505060405180910390f35b6101086102a3565b604051808381526020018281526020019250505060405180910390f35b61012d6103d7565b604051808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001838152602001828152602001935050505060405180910390f35b6101bd6004803603606081101561019357600080fd5b810190808035906020019092919080359060200190929190803590602001909291905050506104bd565b005b6101eb600480360360208110156101d557600080fd5b8101908080359060200190929190505050610819565b604051808381526020018281526020019250505060405180910390f35b6060600280548060200260200160405190810160405280929190818152602001828054801561028c57602002820191906000526020600020905b8160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019060010190808311610242575b5050505050905090565b6000600280549050905090565b6000806000600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060010160018060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600101805490500381548110151561033e57fe5b906000526020600020015490506103536108a8565b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000838152602001908152602001600020604080519081016040529081600082015481526020016001820154815250509050806000015181602001519350935050509091565b60008060006103e46108c8565b60036001600380549050038154811015156103fb57fe5b9060005260206000209060040201606060405190810160405290816000820160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200160018201604080519081016040529081600082015481526020016001820154815250508152602001600382015481525050905033816040015182602001516000015182925093509350935050909192565b600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160009054906101000a900460ff1615156105d45760018060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160006101000a81548160ff02191690831515021790555060023390806001815401808255809150509060018203906000526020600020016000909192909190916101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505b6105dc6108a8565b6040805190810160405280848152602001838152509050806000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008681526020019081526020016000206000820151816000015560208201518160010155905050600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060010184908060018154018082558091505090600182039060005260206000200160009091929091909150555060036060604051908101604052803373ffffffffffffffffffffffffffffffffffffffff168152602001838152602001868152509080600181540180825580915050906001820390600052602060002090600402016000909192909190915060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060208201518160010160008201518160000155602082015181600101555050604082015181600301555050507ff26bf981eed1e45a81d026c5f34958933f90c7f75cac1c362aa8a40dddfdb6cb33858585604051808573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200184815260200183815260200182815260200194505050505060405180910390a150505050565b6000806108246108a8565b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000858152602001908152602001600020604080519081016040529081600082015481526020016001820154815250509050806000015181602001519250925050915091565b604080519081016040528060008019168152602001600080191681525090565b608060405190810160405280600073ffffffffffffffffffffffffffffffffffffffff1681526020016108f9610909565b8152602001600080191681525090565b60408051908101604052806000801916815260200160008019168152509056fea165627a7a723058201a9b6f5baff90b597bc9491864b9be31e3b07389edf5125d790b5fb10b4647f90029`
 
 // DeployBeveragelist deploys a new Ethereum contract, binding an instance of Beveragelist to it.
 func DeployBeveragelist(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *Beveragelist, error) {
@@ -218,10 +218,68 @@ func (_Beveragelist *BeveragelistCallerSession) GetDrinkData(time [32]byte) ([32
 	return _Beveragelist.Contract.GetDrinkData(&_Beveragelist.CallOpts, time)
 }
 
+// GetUsers is a free data retrieval call binding the contract method 0x00ce8e3e.
+//
+// Solidity: function getUsers() constant returns(address[])
+func (_Beveragelist *BeveragelistCaller) GetUsers(opts *bind.CallOpts) ([]common.Address, error) {
+	var (
+		ret0 = new([]common.Address)
+	)
+	out := ret0
+	err := _Beveragelist.contract.Call(opts, out, "getUsers")
+	return *ret0, err
+}
+
+// GetUsers is a free data retrieval call binding the contract method 0x00ce8e3e.
+//
+// Solidity: function getUsers() constant returns(address[])
+func (_Beveragelist *BeveragelistSession) GetUsers() ([]common.Address, error) {
+	return _Beveragelist.Contract.GetUsers(&_Beveragelist.CallOpts)
+}
+
+// GetUsers is a free data retrieval call binding the contract method 0x00ce8e3e.
+//
+// Solidity: function getUsers() constant returns(address[])
+func (_Beveragelist *BeveragelistCallerSession) GetUsers() ([]common.Address, error) {
+	return _Beveragelist.Contract.GetUsers(&_Beveragelist.CallOpts)
+}
+
 // LastDrink is a free data retrieval call binding the contract method 0x962e88fb.
 //
-// Solidity: function lastDrink() constant returns(bytes32, bytes32)
-func (_Beveragelist *BeveragelistCaller) LastDrink(opts *bind.CallOpts) ([32]byte, [32]byte, error) {
+// Solidity: function lastDrink() constant returns(address, bytes32, bytes32)
+func (_Beveragelist *BeveragelistCaller) LastDrink(opts *bind.CallOpts) (common.Address, [32]byte, [32]byte, error) {
+	var (
+		ret0 = new(common.Address)
+		ret1 = new([32]byte)
+		ret2 = new([32]byte)
+	)
+	out := &[]interface{}{
+		ret0,
+		ret1,
+		ret2,
+	}
+	err := _Beveragelist.contract.Call(opts, out, "lastDrink")
+	return *ret0, *ret1, *ret2, err
+}
+
+// LastDrink is a free data retrieval call binding the contract method 0x962e88fb.
+//
+// Solidity: function lastDrink() constant returns(address, bytes32, bytes32)
+func (_Beveragelist *BeveragelistSession) LastDrink() (common.Address, [32]byte, [32]byte, error) {
+	return _Beveragelist.Contract.LastDrink(&_Beveragelist.CallOpts)
+}
+
+// LastDrink is a free data retrieval call binding the contract method 0x962e88fb.
+//
+// Solidity: function lastDrink() constant returns(address, bytes32, bytes32)
+func (_Beveragelist *BeveragelistCallerSession) LastDrink() (common.Address, [32]byte, [32]byte, error) {
+	return _Beveragelist.Contract.LastDrink(&_Beveragelist.CallOpts)
+}
+
+// LastUserDrink is a free data retrieval call binding the contract method 0x2668f977.
+//
+// Solidity: function lastUserDrink() constant returns(bytes32, bytes32)
+func (_Beveragelist *BeveragelistCaller) LastUserDrink(opts *bind.CallOpts) ([32]byte, [32]byte, error) {
 	var (
 		ret0 = new([32]byte)
 		ret1 = new([32]byte)
@@ -230,22 +288,48 @@ func (_Beveragelist *BeveragelistCaller) LastDrink(opts *bind.CallOpts) ([32]byt
 		ret0,
 		ret1,
 	}
-	err := _Beveragelist.contract.Call(opts, out, "lastDrink")
+	err := _Beveragelist.contract.Call(opts, out, "lastUserDrink")
 	return *ret0, *ret1, err
 }
 
-// LastDrink is a free data retrieval call binding the contract method 0x962e88fb.
+// LastUserDrink is a free data retrieval call binding the contract method 0x2668f977.
 //
-// Solidity: function lastDrink() constant returns(bytes32, bytes32)
-func (_Beveragelist *BeveragelistSession) LastDrink() ([32]byte, [32]byte, error) {
-	return _Beveragelist.Contract.LastDrink(&_Beveragelist.CallOpts)
+// Solidity: function lastUserDrink() constant returns(bytes32, bytes32)
+func (_Beveragelist *BeveragelistSession) LastUserDrink() ([32]byte, [32]byte, error) {
+	return _Beveragelist.Contract.LastUserDrink(&_Beveragelist.CallOpts)
 }
 
-// LastDrink is a free data retrieval call binding the contract method 0x962e88fb.
+// LastUserDrink is a free data retrieval call binding the contract method 0x2668f977.
 //
-// Solidity: function lastDrink() constant returns(bytes32, bytes32)
-func (_Beveragelist *BeveragelistCallerSession) LastDrink() ([32]byte, [32]byte, error) {
-	return _Beveragelist.Contract.LastDrink(&_Beveragelist.CallOpts)
+// Solidity: function lastUserDrink() constant returns(bytes32, bytes32)
+func (_Beveragelist *BeveragelistCallerSession) LastUserDrink() ([32]byte, [32]byte, error) {
+	return _Beveragelist.Contract.LastUserDrink(&_Beveragelist.CallOpts)
+}
+
+// UserCount is a free data retrieval call binding the contract method 0x07973ccf.
+//
+// Solidity: function userCount() constant returns(uint256)
+func (_Beveragelist *BeveragelistCaller) UserCount(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Beveragelist.contract.Call(opts, out, "userCount")
+	return *ret0, err
+}
+
+// UserCount is a free data retrieval call binding the contract method 0x07973ccf.
+//
+// Solidity: function userCount() constant returns(uint256)
+func (_Beveragelist *BeveragelistSession) UserCount() (*big.Int, error) {
+	return _Beveragelist.Contract.UserCount(&_Beveragelist.CallOpts)
+}
+
+// UserCount is a free data retrieval call binding the contract method 0x07973ccf.
+//
+// Solidity: function userCount() constant returns(uint256)
+func (_Beveragelist *BeveragelistCallerSession) UserCount() (*big.Int, error) {
+	return _Beveragelist.Contract.UserCount(&_Beveragelist.CallOpts)
 }
 
 // SetDrinkData is a paid mutator transaction binding the contract method 0xb89eadb6.
@@ -338,15 +422,16 @@ func (it *BeveragelistNewDrinkIterator) Close() error {
 
 // BeveragelistNewDrink represents a NewDrink event raised by the Beveragelist contract.
 type BeveragelistNewDrink struct {
+	Id      common.Address
 	Time    [32]byte
 	Drink   [32]byte
 	Weekday [32]byte
 	Raw     types.Log // Blockchain specific contextual infos
 }
 
-// FilterNewDrink is a free log retrieval operation binding the contract event 0x45d101a97a5441b8d2ca576de6954245df176fd85d6ebaad65ae496e89079ce9.
+// FilterNewDrink is a free log retrieval operation binding the contract event 0xf26bf981eed1e45a81d026c5f34958933f90c7f75cac1c362aa8a40dddfdb6cb.
 //
-// Solidity: event NewDrink(bytes32 time, bytes32 drink, bytes32 weekday)
+// Solidity: event NewDrink(address id, bytes32 time, bytes32 drink, bytes32 weekday)
 func (_Beveragelist *BeveragelistFilterer) FilterNewDrink(opts *bind.FilterOpts) (*BeveragelistNewDrinkIterator, error) {
 
 	logs, sub, err := _Beveragelist.contract.FilterLogs(opts, "NewDrink")
@@ -356,9 +441,9 @@ func (_Beveragelist *BeveragelistFilterer) FilterNewDrink(opts *bind.FilterOpts)
 	return &BeveragelistNewDrinkIterator{contract: _Beveragelist.contract, event: "NewDrink", logs: logs, sub: sub}, nil
 }
 
-// WatchNewDrink is a free log subscription operation binding the contract event 0x45d101a97a5441b8d2ca576de6954245df176fd85d6ebaad65ae496e89079ce9.
+// WatchNewDrink is a free log subscription operation binding the contract event 0xf26bf981eed1e45a81d026c5f34958933f90c7f75cac1c362aa8a40dddfdb6cb.
 //
-// Solidity: event NewDrink(bytes32 time, bytes32 drink, bytes32 weekday)
+// Solidity: event NewDrink(address id, bytes32 time, bytes32 drink, bytes32 weekday)
 func (_Beveragelist *BeveragelistFilterer) WatchNewDrink(opts *bind.WatchOpts, sink chan<- *BeveragelistNewDrink) (event.Subscription, error) {
 
 	logs, sub, err := _Beveragelist.contract.WatchLogs(opts, "NewDrink")
