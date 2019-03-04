@@ -12,12 +12,16 @@ import (
 )
 
 func main() {
-	var args string
-	flag.StringVar(&args, "dp", "bar", "a string var")
+	var dplFlag string
+	flag.StringVar(&dplFlag, "dp", "bar", "a string var")
 	flag.Parse()
 
-	if args == "cffcn" || args == "bvrglst" {
-		dp.DeploySC(args)
+	var bcFlag string
+	flag.StringVar(&bcFlag, "bc", "bar", "a string var")
+	flag.Parse()
+
+	if dplFlag == "cffcn" || dplFlag == "bvrglst" {
+		dp.DeploySC(dplFlag)
 	} else {
 
 		// ws.WsInit()
@@ -29,8 +33,11 @@ func main() {
 		/* su := l.SimulatedUser{}
 		su.InitLearner() */
 
-		bc.Watch()
-		// bc.TestBl()
+		if bcFlag == "watch" {
+			bc.Watch()
+		} else if bcFlag == "rw" {
+			bc.TestBl()
+		}
 
 		_ = l.SimulatedUser{}
 

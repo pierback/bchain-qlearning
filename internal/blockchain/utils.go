@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"path"
+	"runtime"
 	"strings"
 	"time"
 
@@ -20,7 +22,9 @@ import (
 const Nothing = ""
 
 func getLatestContractAddress() common.Address {
-	dat, err := ioutil.ReadFile("/var/tmp/bvrglst")
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "BeverageList", "contractAddress")
+	dat, err := ioutil.ReadFile(dir)
 	fmt.Printf("Contract Address 0x%s\n", common.Bytes2Hex(dat))
 	if err != nil {
 		fmt.Println("Error ReadFile:", err)
@@ -29,7 +33,7 @@ func getLatestContractAddress() common.Address {
 }
 
 func TestBl() {
-	client, err := ethclient.Dial("ws://127.0.0.1:8545")
+	client, err := ethclient.Dial("ws://0.0.0.0:8546")
 	if err != nil {
 		fmt.Println("Unable to connect to network:", err)
 	}
@@ -48,7 +52,7 @@ func TestBl() {
 }
 
 func setDrinkData(instance *bl.Beveragelist) {
-	auth, _ := bind.NewTransactor(strings.NewReader(key), "0000")
+	auth, _ := bind.NewTransactor(strings.NewReader(key), "password")
 	drink := [32]byte{}
 	weekday := [32]byte{}
 	ti := [32]byte{}

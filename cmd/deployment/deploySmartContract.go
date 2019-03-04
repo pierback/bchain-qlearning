@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"math/big"
+	"path"
+	"runtime"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -49,7 +51,10 @@ func bvglDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 
 	fmt.Printf("Contract Beveragelist pending deploy: 0x%x\n", address)
 
-	err12 := ioutil.WriteFile("/var/tmp/bvrglst", address.Bytes(), 0644)
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "BeverageList", "contractAddress")
+
+	err12 := ioutil.WriteFile(dir, address.Bytes(), 0644)
 
 	check(err12)
 }
@@ -67,8 +72,10 @@ func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 	}
 
 	fmt.Printf("Contract Coffe Coin pending deploy: 0x%x\n", address)
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "CoffeeCoin", "contractAddress")
 
-	err12 := ioutil.WriteFile("/var/tmp/cffcn", address.Bytes(), 0644)
+	err12 := ioutil.WriteFile(dir, address.Bytes(), 0644)
 
 	check(err12)
 }

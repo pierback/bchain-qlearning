@@ -1,8 +1,8 @@
-cd internal/contracts/$1
-solc --abi $1.sol -o build --overwrite
-solc --bin $1.sol -o build --overwrite
+
+parentdir="$(dirname $(pwd))"
+sudo solc --abi $parentdir/smart-contracts/$1/$1.sol -o $parentdir/smart-contracts/$1/build --overwrite
+sudo solc --bin $parentdir/smart-contracts/$1/$1.sol -o $parentdir/smart-contracts/$1/build --overwrite
 LOWERCASE="$(tr [A-Z] [a-z] <<< "$1")"
-abigen --bin=./build/$1.bin --abi=./build/$1.abi --pkg=$LOWERCASE --out=$1.go
-cd ../../..
+abigen --bin=$parentdir/smart-contracts/$1/build/$1.bin --abi=$parentdir/smart-contracts/$1/build/$1.abi --pkg=$LOWERCASE --out=$parentdir/bchain-qlearning/internal/contracts/BeverageList/$1.go
 INPUT=$(tr -d aeiou <<< "$LOWERCASE")
 go run cmd/main.go -dp=$INPUT
