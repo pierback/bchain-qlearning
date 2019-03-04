@@ -15,11 +15,23 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 )
 
+// Reference imports to suppress errors if they are not otherwise used.
+var (
+	_ = big.NewInt
+	_ = strings.NewReader
+	_ = ethereum.NotFound
+	_ = abi.U256
+	_ = bind.Bind
+	_ = common.Big1
+	_ = types.BloomLookup
+	_ = event.NewSubscription
+)
+
 // BeveragelistABI is the input ABI used to generate the binding from.
 const BeveragelistABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"getUsers\",\"outputs\":[{\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"userCount\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastUserDrink\",\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastDrink\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"time\",\"type\":\"bytes32\"},{\"name\":\"_drink\",\"type\":\"bytes32\"},{\"name\":\"_wd\",\"type\":\"bytes32\"}],\"name\":\"setDrinkData\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"time\",\"type\":\"bytes32\"}],\"name\":\"getDrinkData\",\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"Address\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"time\",\"type\":\"bytes32\"},{\"indexed\":false,\"name\":\"drink\",\"type\":\"bytes32\"},{\"indexed\":false,\"name\":\"weekday\",\"type\":\"bytes32\"}],\"name\":\"NewDrink\",\"type\":\"event\"}]"
 
 // BeveragelistBin is the compiled bytecode used for deploying new contracts.
-const BeveragelistBin = `608060405234801561001057600080fd5b50610a55806100206000396000f300608060405260043610610077576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168062ce8e3e1461007c57806307973ccf146100e85780632668f97714610113578063962e88fb14610155578063b89eadb6146101ca578063c0ba228f14610217575b600080fd5b34801561008857600080fd5b50610091610273565b6040518080602001828103825283818151815260200191508051906020019060200280838360005b838110156100d45780820151818401526020810190506100b9565b505050509050019250505060405180910390f35b3480156100f457600080fd5b506100fd610301565b6040518082815260200191505060405180910390f35b34801561011f57600080fd5b5061012861030e565b60405180836000191660001916815260200182600019166000191681526020019250505060405180910390f35b34801561016157600080fd5b5061016a61045a565b604051808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200183600019166000191681526020018260001916600019168152602001935050505060405180910390f35b3480156101d657600080fd5b50610215600480360381019080803560001916906020019092919080356000191690602001909291908035600019169060200190929190505050610555565b005b34801561022357600080fd5b506102466004803603810190808035600019169060200190929190505050610901565b60405180836000191660001916815260200182600019166000191681526020019250505060405180910390f35b606060028054806020026020016040519081016040528092919081815260200182805480156102f757602002820191906000526020600020905b8160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190600101908083116102ad575b5050505050905090565b6000600280549050905090565b600080600061031b6109a8565b600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060010160018060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060010180549050038154811015156103b157fe5b906000526020600020015491506000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000836000191660001916815260200190815260200160002060408051908101604052908160008201546000191660001916815260200160018201546000191660001916815250509050806000015181602001519350935050509091565b60008060006104676109c8565b600360016003805490500381548110151561047e57fe5b9060005260206000209060040201606060405190810160405290816000820160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200160018201604080519081016040529081600082015460001916600019168152602001600182015460001916600019168152505081526020016003820154600019166000191681525050905033816040015182602001516000015193509350935050909192565b61055d6109a8565b600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160009054906101000a900460ff1615156106745760018060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160006101000a81548160ff02191690831515021790555060023390806001815401808255809150509060018203906000526020600020016000909192909190916101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505b60408051908101604052808460001916815260200183600019168152509050806000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600086600019166000191681526020019081526020016000206000820151816000019060001916905560208201518160010190600019169055905050600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060010184908060018154018082558091505090600182039060005260206000200160009091929091909150906000191690555060036060604051908101604052803373ffffffffffffffffffffffffffffffffffffffff16815260200183815260200186600019168152509080600181540180825580915050906001820390600052602060002090600402016000909192909190915060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060208201518160010160008201518160000190600019169055602082015181600101906000191690555050604082015181600301906000191690555050507ff26bf981eed1e45a81d026c5f34958933f90c7f75cac1c362aa8a40dddfdb6cb33858585604051808573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200184600019166000191681526020018360001916600019168152602001826000191660001916815260200194505050505060405180910390a150505050565b60008061090c6109a8565b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000856000191660001916815260200190815260200160002060408051908101604052908160008201546000191660001916815260200160018201546000191660001916815250509050806000015181602001519250925050915091565b604080519081016040528060008019168152602001600080191681525090565b608060405190810160405280600073ffffffffffffffffffffffffffffffffffffffff1681526020016109f9610a09565b8152602001600080191681525090565b6040805190810160405280600080191681526020016000801916815250905600a165627a7a72305820080f526a486328810ae36cac861b152c5f45bef6dbc4233b941ed2cbbbca700a0029`
+const BeveragelistBin = `608060405234801561001057600080fd5b50610955806100206000396000f3fe608060405234801561001057600080fd5b506004361061007e576000357c010000000000000000000000000000000000000000000000000000000090048062ce8e3e1461008357806307973ccf146100e25780632668f97714610100578063962e88fb14610125578063b89eadb61461017d578063c0ba228f146101bf575b600080fd5b61008b610208565b6040518080602001828103825283818151815260200191508051906020019060200280838360005b838110156100ce5780820151818401526020810190506100b3565b505050509050019250505060405180910390f35b6100ea610296565b6040518082815260200191505060405180910390f35b6101086102a3565b604051808381526020018281526020019250505060405180910390f35b61012d6103d7565b604051808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001838152602001828152602001935050505060405180910390f35b6101bd6004803603606081101561019357600080fd5b810190808035906020019092919080359060200190929190803590602001909291905050506104bd565b005b6101eb600480360360208110156101d557600080fd5b8101908080359060200190929190505050610819565b604051808381526020018281526020019250505060405180910390f35b6060600280548060200260200160405190810160405280929190818152602001828054801561028c57602002820191906000526020600020905b8160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019060010190808311610242575b5050505050905090565b6000600280549050905090565b6000806000600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060010160018060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600101805490500381548110151561033e57fe5b906000526020600020015490506103536108a8565b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000838152602001908152602001600020604080519081016040529081600082015481526020016001820154815250509050806000015181602001519350935050509091565b60008060006103e46108c8565b60036001600380549050038154811015156103fb57fe5b9060005260206000209060040201606060405190810160405290816000820160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200160018201604080519081016040529081600082015481526020016001820154815250508152602001600382015481525050905033816040015182602001516000015182925093509350935050909192565b600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160009054906101000a900460ff1615156105d45760018060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160006101000a81548160ff02191690831515021790555060023390806001815401808255809150509060018203906000526020600020016000909192909190916101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505b6105dc6108a8565b6040805190810160405280848152602001838152509050806000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008681526020019081526020016000206000820151816000015560208201518160010155905050600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060010184908060018154018082558091505090600182039060005260206000200160009091929091909150555060036060604051908101604052803373ffffffffffffffffffffffffffffffffffffffff168152602001838152602001868152509080600181540180825580915050906001820390600052602060002090600402016000909192909190915060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060208201518160010160008201518160000155602082015181600101555050604082015181600301555050507ff26bf981eed1e45a81d026c5f34958933f90c7f75cac1c362aa8a40dddfdb6cb33858585604051808573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200184815260200183815260200182815260200194505050505060405180910390a150505050565b6000806108246108a8565b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000858152602001908152602001600020604080519081016040529081600082015481526020016001820154815250509050806000015181602001519250925050915091565b604080519081016040528060008019168152602001600080191681525090565b608060405190810160405280600073ffffffffffffffffffffffffffffffffffffffff1681526020016108f9610909565b8152602001600080191681525090565b60408051908101604052806000801916815260200160008019168152509056fea165627a7a7230582018864097ffa57b1623004835a36eee07db39fb5f4b01741d1da356e4abd851280029`
 
 // DeployBeveragelist deploys a new Ethereum contract, binding an instance of Beveragelist to it.
 func DeployBeveragelist(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *Beveragelist, error) {
@@ -178,7 +190,7 @@ func (_Beveragelist *BeveragelistTransactorRaw) Transact(opts *bind.TransactOpts
 
 // GetDrinkData is a free data retrieval call binding the contract method 0xc0ba228f.
 //
-// Solidity: function getDrinkData(time bytes32) constant returns(bytes32, bytes32)
+// Solidity: function getDrinkData(bytes32 time) constant returns(bytes32, bytes32)
 func (_Beveragelist *BeveragelistCaller) GetDrinkData(opts *bind.CallOpts, time [32]byte) ([32]byte, [32]byte, error) {
 	var (
 		ret0 = new([32]byte)
@@ -194,14 +206,14 @@ func (_Beveragelist *BeveragelistCaller) GetDrinkData(opts *bind.CallOpts, time 
 
 // GetDrinkData is a free data retrieval call binding the contract method 0xc0ba228f.
 //
-// Solidity: function getDrinkData(time bytes32) constant returns(bytes32, bytes32)
+// Solidity: function getDrinkData(bytes32 time) constant returns(bytes32, bytes32)
 func (_Beveragelist *BeveragelistSession) GetDrinkData(time [32]byte) ([32]byte, [32]byte, error) {
 	return _Beveragelist.Contract.GetDrinkData(&_Beveragelist.CallOpts, time)
 }
 
 // GetDrinkData is a free data retrieval call binding the contract method 0xc0ba228f.
 //
-// Solidity: function getDrinkData(time bytes32) constant returns(bytes32, bytes32)
+// Solidity: function getDrinkData(bytes32 time) constant returns(bytes32, bytes32)
 func (_Beveragelist *BeveragelistCallerSession) GetDrinkData(time [32]byte) ([32]byte, [32]byte, error) {
 	return _Beveragelist.Contract.GetDrinkData(&_Beveragelist.CallOpts, time)
 }
@@ -322,21 +334,21 @@ func (_Beveragelist *BeveragelistCallerSession) UserCount() (*big.Int, error) {
 
 // SetDrinkData is a paid mutator transaction binding the contract method 0xb89eadb6.
 //
-// Solidity: function setDrinkData(time bytes32, _drink bytes32, _wd bytes32) returns()
+// Solidity: function setDrinkData(bytes32 time, bytes32 _drink, bytes32 _wd) returns()
 func (_Beveragelist *BeveragelistTransactor) SetDrinkData(opts *bind.TransactOpts, time [32]byte, _drink [32]byte, _wd [32]byte) (*types.Transaction, error) {
 	return _Beveragelist.contract.Transact(opts, "setDrinkData", time, _drink, _wd)
 }
 
 // SetDrinkData is a paid mutator transaction binding the contract method 0xb89eadb6.
 //
-// Solidity: function setDrinkData(time bytes32, _drink bytes32, _wd bytes32) returns()
+// Solidity: function setDrinkData(bytes32 time, bytes32 _drink, bytes32 _wd) returns()
 func (_Beveragelist *BeveragelistSession) SetDrinkData(time [32]byte, _drink [32]byte, _wd [32]byte) (*types.Transaction, error) {
 	return _Beveragelist.Contract.SetDrinkData(&_Beveragelist.TransactOpts, time, _drink, _wd)
 }
 
 // SetDrinkData is a paid mutator transaction binding the contract method 0xb89eadb6.
 //
-// Solidity: function setDrinkData(time bytes32, _drink bytes32, _wd bytes32) returns()
+// Solidity: function setDrinkData(bytes32 time, bytes32 _drink, bytes32 _wd) returns()
 func (_Beveragelist *BeveragelistTransactorSession) SetDrinkData(time [32]byte, _drink [32]byte, _wd [32]byte) (*types.Transaction, error) {
 	return _Beveragelist.Contract.SetDrinkData(&_Beveragelist.TransactOpts, time, _drink, _wd)
 }
@@ -419,7 +431,7 @@ type BeveragelistNewDrink struct {
 
 // FilterNewDrink is a free log retrieval operation binding the contract event 0xf26bf981eed1e45a81d026c5f34958933f90c7f75cac1c362aa8a40dddfdb6cb.
 //
-// Solidity: e NewDrink(Address address, time bytes32, drink bytes32, weekday bytes32)
+// Solidity: event NewDrink(address Address, bytes32 time, bytes32 drink, bytes32 weekday)
 func (_Beveragelist *BeveragelistFilterer) FilterNewDrink(opts *bind.FilterOpts) (*BeveragelistNewDrinkIterator, error) {
 
 	logs, sub, err := _Beveragelist.contract.FilterLogs(opts, "NewDrink")
@@ -431,7 +443,7 @@ func (_Beveragelist *BeveragelistFilterer) FilterNewDrink(opts *bind.FilterOpts)
 
 // WatchNewDrink is a free log subscription operation binding the contract event 0xf26bf981eed1e45a81d026c5f34958933f90c7f75cac1c362aa8a40dddfdb6cb.
 //
-// Solidity: e NewDrink(Address address, time bytes32, drink bytes32, weekday bytes32)
+// Solidity: event NewDrink(address Address, bytes32 time, bytes32 drink, bytes32 weekday)
 func (_Beveragelist *BeveragelistFilterer) WatchNewDrink(opts *bind.WatchOpts, sink chan<- *BeveragelistNewDrink) (event.Subscription, error) {
 
 	logs, sub, err := _Beveragelist.contract.WatchLogs(opts, "NewDrink")
