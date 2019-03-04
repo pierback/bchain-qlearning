@@ -18,7 +18,6 @@ func main() {
 	flag.Parse()
 
 	if *dplFlag == "cffcn" || *dplFlag == "bvrglst" {
-		fmt.Println("*dplFlag: ", *dplFlag)
 		dp.DeploySC(*dplFlag)
 	} else {
 
