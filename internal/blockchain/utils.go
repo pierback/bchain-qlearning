@@ -19,11 +19,13 @@ import (
 	//"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
-const Nothing = ""
+var (
+  _, Filename, _, _ = runtime.Caller(0)
+)
 
 func getLatestContractAddress() common.Address {
-	_, filename, _, _ := runtime.Caller(0)
-	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "BeverageList", "contractAddress")
+
+	dir := path.Join(path.Dir(Filename), "../../..", "smart-contracts", "BeverageList", "contractAddress")
 	dat, err := ioutil.ReadFile(dir)
 	fmt.Printf("Contract Address 0x%s\n", common.Bytes2Hex(dat))
 	if err != nil {

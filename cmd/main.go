@@ -12,16 +12,14 @@ import (
 )
 
 func main() {
-	var dplFlag string
-	flag.StringVar(&dplFlag, "dp", "bar", "a string var")
+	var dplFlag = flag.String("dp", "", "deploy sm")
+	var bcFlag = flag.String("bc", "watch", "test bchain")
+
 	flag.Parse()
 
-	var bcFlag string
-	flag.StringVar(&bcFlag, "bc", "bar", "a string var")
-	flag.Parse()
-
-	if dplFlag == "cffcn" || dplFlag == "bvrglst" {
-		dp.DeploySC(dplFlag)
+	if *dplFlag == "cffcn" || *dplFlag == "bvrglst" {
+		fmt.Println("*dplFlag: ", *dplFlag)
+		dp.DeploySC(*dplFlag)
 	} else {
 
 		// ws.WsInit()
@@ -33,15 +31,14 @@ func main() {
 		/* su := l.SimulatedUser{}
 		su.InitLearner() */
 
-		if bcFlag == "watch" {
+		if *bcFlag == "watch" {
 			bc.Watch()
-		} else if bcFlag == "rw" {
+		} else if *bcFlag == "rw" {
 			bc.TestBl()
 		}
 
 		_ = l.SimulatedUser{}
-
-		_ = bc.Nothing
+		_ = bc.Filename
 		fmt.Println("Main")
 	}
 }
