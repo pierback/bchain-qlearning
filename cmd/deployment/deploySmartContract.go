@@ -3,10 +3,12 @@ package deployment
 import (
 	"context"
 	"crypto/ecdsa"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"math/big"
+	"os"
 	"path"
 	"runtime"
 	"strings"
@@ -16,26 +18,24 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
+	en "github.com/pierback/bchain-qlearning/cmd/environment"
 	bl "github.com/pierback/bchain-qlearning/internal/contracts/BeverageList"
 	cc "github.com/pierback/bchain-qlearning/internal/contracts/CoffeeCoin"
+
+	ut "github.com/pierback/bchain-qlearning/pkg/utils"
 )
 
 const key = `{"address":"e8816898d851d5b61b7f950627d04d794c07ca37","crypto":{"cipher":"aes-128-ctr","ciphertext":"1ff4add6955cba7ddaf29f66d7d21c5e1d714ef6191fbc651ae60f2ea3c95e8f","cipherparams":{"iv":"3ff869fbdbe1a523cdb327780365976e"},"kdf":"scrypt","kdfparams":{"dklen":32,"n":262144,"p":1,"r":8,"salt":"7372dbae5fb318f8684902e099c311d4188721d677974d729711762c7ef6030c"},"mac":"485fa5dc701067782baa1589716a53110c7f917eb259e35ebca7265bbb7150b1"},"id":"89edb004-5b00-4607-a3af-a0d9ab9b1c34","version":3}`
 
-func DeploySC(args string) {
-	client, err := ethclient.Dial("ws://0.0.0.0:8546")
-
-	if err != nil {
-		log.Fatalf("Unable to connect to network:%v\n", err)
-	}
-
+func DeploySC() {
+	client := ut.GetClientConnection()
 	auth, err := bind.NewTransactor(strings.NewReader(key), "password")
 
 	if err != nil {
 		log.Fatalf("Failed to create authorized transactor: %v", err)
 	}
 
-	if args == "cffcn" {
+	if *en.DplFlag == "cffcn" {
 		ccDeploy(auth, client)
 	} else {
 		bvglDeploy(auth, client)
@@ -54,9 +54,45 @@ func bvglDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "BeverageList", "contractAddress")
 
-	err12 := ioutil.WriteFile(dir, address.Bytes(), 0644)
+	// bvglJSON := createBvglJson(address)
 
+	err12 := ioutil.WriteFile(dir, address.Bytes(), 0644)
 	check(err12)
+
+	bvglJSON := createSCJson(address.Hex(), string(bl.BeveragelistABI))
+	bvglJSONDir := path.Join(path.Dir(filename), "bvgl.json")
+
+	err := ioutil.WriteFile(bvglJSONDir, bvglJSON, 0644)
+	if err != nil {
+		fmt.Println("Error writing JSON to file:", err)
+	}
+
+	err = ut.PostFile(bvglJSONDir, os.Getenv("UPID"))
+	ut.PrintError(err)
+
+	err = os.Remove(bvglJSONDir)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+type SCJson struct {
+	Address string `json:"address"`
+	Abi     string `json:"abi"`
+}
+
+func createSCJson(address string, abi string) []byte {
+	data := SCJson{
+		Address: address,
+		Abi:     abi,
+	}
+
+	output, err := json.MarshalIndent(&data, "", "\t\t")
+	if err != nil {
+		fmt.Println("Error marshalling to JSON:", err)
+	}
+	return output
 }
 
 func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
@@ -78,6 +114,23 @@ func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 	err12 := ioutil.WriteFile(dir, address.Bytes(), 0644)
 
 	check(err12)
+
+	bvglJSON := createSCJson(address.Hex(), string(cc.CoffeecoinABI))
+	bvglJSONDir := path.Join(path.Dir(filename), "cc.json")
+
+	err := ioutil.WriteFile(bvglJSONDir, bvglJSON, 0644)
+	if err != nil {
+		fmt.Println("Error writing JSON to file:", err)
+	}
+
+	err = ut.PostFile(bvglJSONDir, os.Getenv("UPID"))
+	ut.PrintError(err)
+
+	err = os.Remove(bvglJSONDir)
+
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func check(e error) {
