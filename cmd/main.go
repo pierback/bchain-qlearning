@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 
 	bc "github.com/pierback/bchain-qlearning/internal/blockchain"
@@ -9,16 +8,14 @@ import (
 
 	// ws "github.com/pierback/bchain-qlearning/internal/websocket"
 	dp "github.com/pierback/bchain-qlearning/cmd/deployment"
+	en "github.com/pierback/bchain-qlearning/cmd/environment"
 )
 
 func main() {
-	var dplFlag = flag.String("dp", "", "deploy sm")
-	var bcFlag = flag.String("bc", "watch", "test bchain")
+	en.SetEnvVars()
 
-	flag.Parse()
-
-	if *dplFlag == "cffcn" || *dplFlag == "bvrglst" {
-		dp.DeploySC(*dplFlag)
+	if *en.DplFlag == "cffcn" || *en.DplFlag == "bvrglst" {
+		dp.DeploySC()
 	} else {
 
 		// ws.WsInit()
@@ -30,14 +27,13 @@ func main() {
 		/* su := l.SimulatedUser{}
 		su.InitLearner() */
 
-		if *bcFlag == "watch" {
+		if *en.BcFlag == "watch" {
 			bc.Watch()
-		} else if *bcFlag == "rw" {
+		} else if *en.BcFlag == "rw" {
 			bc.TestBl()
 		}
-
-		_ = l.SimulatedUser{}
-		_ = bc.Filename
-		fmt.Println("Main")
 	}
+
+	_ = l.SimulatedUser{}
+	fmt.Println("Main")
 }
