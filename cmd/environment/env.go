@@ -23,7 +23,7 @@ func SetEnvVars() {
 
 	sip := ut.GetServerIP()
 	fmt.Printf("ServerIP: %s", sip)
-	os.Setenv("SIP", "oc-appsrv01.informatik.uni-augsburg.de")
+	os.Setenv("SIP", sip)
 
 	uip := ut.GetUploadIP()
 	fmt.Printf("  UploadIP: %s", uip)

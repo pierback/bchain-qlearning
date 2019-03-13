@@ -18,9 +18,9 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	en "github.com/pierback/bchain-qlearning/cmd/environment"
 	bl "github.com/pierback/bchain-qlearning/internal/contracts/BeverageList"
 	cc "github.com/pierback/bchain-qlearning/internal/contracts/CoffeeCoin"
+	pt "github.com/pierback/bchain-qlearning/internal/contracts/Parent"
 
 	ut "github.com/pierback/bchain-qlearning/pkg/utils"
 )
@@ -35,11 +35,41 @@ func DeploySC() {
 		log.Fatalf("Failed to create authorized transactor: %v", err)
 	}
 
-	if *en.DplFlag == "cffcn" {
+	/* if *en.DplFlag == "cffcn" {
 		ccDeploy(auth, client)
 	} else {
 		bvglDeploy(auth, client)
+	} */
+	parentDeploy(auth, client)
+}
+
+func parentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
+	address, _, _, err1 := pt.DeployParent(auth, client)
+	if err1 != nil {
+		fmt.Println("err1: ", err1)
+		log.Fatal(err1)
 	}
+
+	fmt.Printf("Contract Beveragelist pending deploy: 0x%x\n", address)
+
+	/* address := common.HexToAddress("0xb6e8ec82bf05713bb44789cbef81d188b35a263b") */
+	instance, err := pt.NewParent(address, client)
+
+	pa, _ := instance.GetUserController(nil)
+	fmt.Println("pa: ", pa)
+	// check(err)
+	oa := [32]byte{}
+	copy(oa[:], []byte("0xf65240445c781a0facbce69d17e63a51e95a8c59"))
+	instance.UpgradeOrganisation(auth, oa)
+	fmt.Println("pa: 2222222", pa.Hex())
+	// _, err = instance.SetTodo(auth, "you are awesome!!!!!")
+
+	// time.Sleep(10 * time.Second)
+
+	re, err := instance.Ready(nil)
+	check(err)
+	fmt.Println("ready", re)
+
 }
 
 func bvglDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
