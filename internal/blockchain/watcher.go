@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -15,6 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	bl "github.com/pierback/bchain-qlearning/internal/contracts/BeverageList"
+	wk "github.com/pierback/bchain-qlearning/internal/usermanagement"
 	ut "github.com/pierback/bchain-qlearning/pkg/utils"
 )
 
@@ -35,7 +37,7 @@ func Watch() {
 	sub, err := client.SubscribeFilterLogs(ctx, query, ch)
 	ut.PrintError(err)
 
-	fmt.Println("Watch")
+	fmt.Println("\nStart watching for bchain events...")
 
 	for {
 		select {
@@ -68,9 +70,11 @@ func readEvent(eventLog types.Log, client *ethclient.Client) {
 	fmt.Println("New Event:")
 	fmt.Println("   Address", event.Address.Hex())
 	fmt.Println("   time", string(event.Time[:]))
-	fmt.Println("   drink", string(event.Drink[:]))
+	fmt.Println("   drink", string(event.Drink[:32]))
 	fmt.Println(" ")
 
+	dr := string(bytes.Trim(event.Drink[:], "\x00"))
+	wk.Learn(event.Address.Hex(), dr)
 	// getBlockTransactions(eventLog, client)
 }
 

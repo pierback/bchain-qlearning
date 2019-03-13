@@ -48,7 +48,7 @@ func TestTimeSlot(t *testing.T) {
 	}
 
 	for _, slot := range slotIds {
-		if out := getCurrentTimeSlot(slot.input); out != slot.expected {
+		if out := GetCurrentTimeSlot(slot.input); out != slot.expected {
 			t.Error("Input Hour", slot.input, slot.expected, ts)
 		}
 	}

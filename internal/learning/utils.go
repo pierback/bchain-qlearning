@@ -10,7 +10,7 @@ import (
 func FilterSlice(dayArr []float64, sl timeslot) int {
 	var stateCount int //per slot
 	for _, t := range dayArr {
-		if getCurrentTimeSlot(int(t)) == sl {
+		if GetCurrentTimeSlot(int(t)) == sl {
 			stateCount++
 		}
 	}
@@ -18,10 +18,10 @@ func FilterSlice(dayArr []float64, sl timeslot) int {
 	return stateCount
 }
 
-func mapToString(qt QTable) []byte {
+func MapToString(Qt QTable) []byte {
 	sm := map[string][]float64{}
 
-	for st, v := range qt {
+	for st, v := range Qt {
 		sm[st.toString()] = v
 	}
 
@@ -86,7 +86,7 @@ func contains(s []int, e int) bool {
 	return false
 }
 
-//String converts weekday to string
+//String converts action to string
 func (a Action) String() string {
 	actions := [...]string{
 		"Nothing",
@@ -99,5 +99,16 @@ func (a Action) String() string {
 		return "Unknown"
 	}
 
+	return actions[a]
+}
+
+//GetAction converts string to action
+func GetAction(a string) Action {
+	actions := map[string]Action{
+		"nothing": Nothing,
+		"coffee":  Coffee,
+		"mate":    Mate,
+		"water":   Water,
+	}
 	return actions[a]
 }

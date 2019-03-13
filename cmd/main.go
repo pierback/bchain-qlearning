@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	bc "github.com/pierback/bchain-qlearning/internal/blockchain"
-	l "github.com/pierback/bchain-qlearning/internal/learning"
+	um "github.com/pierback/bchain-qlearning/internal/usermanagement"
+
+	db "github.com/pierback/bchain-qlearning/pkg/database"
 
 	// ws "github.com/pierback/bchain-qlearning/internal/websocket"
 	dp "github.com/pierback/bchain-qlearning/cmd/deployment"
@@ -14,6 +16,9 @@ import (
 func main() {
 	en.SetEnvVars()
 
+	db.StartDB()
+	db.StartJsonDB()
+
 	if *en.DplFlag == "cffcn" || *en.DplFlag == "bvrglst" {
 		dp.DeploySC()
 	} else {
@@ -22,7 +27,8 @@ func main() {
 
 		// bc.InsertNRetrieve()
 		// bc.ReadWrite()
-		// l.StartWorker()
+
+		go um.StartWorker()
 
 		/* su := l.SimulatedUser{}
 		su.InitLearner() */
@@ -33,7 +39,5 @@ func main() {
 			bc.TestBl()
 		}
 	}
-
-	_ = l.SimulatedUser{}
 	fmt.Println("Main")
 }

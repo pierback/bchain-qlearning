@@ -2,6 +2,7 @@ package environment
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	ut "github.com/pierback/bchain-qlearning/pkg/utils"
@@ -21,11 +22,14 @@ func SetEnvVars() {
 	os.Setenv("WS", ws)
 
 	sip := ut.GetServerIP()
-	os.Setenv("SIP", sip)
+	fmt.Printf("ServerIP: %s", sip)
+	os.Setenv("SIP", "oc-appsrv01.informatik.uni-augsburg.de")
 
 	uip := ut.GetUploadIP()
+	fmt.Printf("  UploadIP: %s", uip)
 	os.Setenv("UPID", uip)
 
 	bcip := ut.GetBchainIP()
+	fmt.Printf("  BchainIP: %s\n", bcip)
 	os.Setenv("BCIP", bcip)
 }

@@ -22,22 +22,22 @@ const (
 	Slot7 timeslot = -1
 )
 
-//drinkcount of a user
-type drinkcount struct {
+//Drinkcount of a user
+type Drinkcount struct {
 	CoffeeCount int `json:"coffeeCount"`
 	WaterCount  int `json:"waterCount"`
 	MateCount   int `json:"mateCount"`
 }
 
-func initDrinksCountStates() []drinkcount {
-	var drinksStates []drinkcount
+func initDrinksCountStates() []Drinkcount {
+	var drinksStates []Drinkcount
 	for i := 0; i < 8; i++ {
 		// for j := 0; j < 4; j++ {
 		// 	for k := 0; k < 5; k++ {
-		// 		drinksStates = append(drinksStates, drinkcount{Coffee: i, Water: j, Mate: k})
+		// 		drinksStates = append(drinksStates, Drinkcount{Coffee: i, Water: j, Mate: k})
 		// 	}
 		// }
-		drinksStates = append(drinksStates, drinkcount{CoffeeCount: i, WaterCount: 0, MateCount: 0})
+		drinksStates = append(drinksStates, Drinkcount{CoffeeCount: i, WaterCount: 0, MateCount: 0})
 	}
 	return drinksStates
 }
@@ -66,7 +66,8 @@ func (str *ssid) isEduroam() bool {
 	return false
 }
 
-func getCurrentTimeSlot(ch int) timeslot {
+//GetCurrentTimeSlot returns current timeslot
+func GetCurrentTimeSlot(ch int) timeslot {
 	switch ch {
 	case 7, 8, 9:
 		return 0

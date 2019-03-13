@@ -10,7 +10,7 @@ import (
 type stateType struct {
 	Weekday    time.Weekday `json:"weekday"`
 	Timeslot   timeslot     `json:"timeslot"`
-	Drinkcount drinkcount   `json:"drinkcount"`
+	Drinkcount Drinkcount   `json:"Drinkcount"`
 }
 
 //UserState representing state of a user
@@ -24,7 +24,7 @@ type State interface {
 	Get() State
 	toString() string
 	Update(a Action) State
-	New(dc drinkcount, _wd int, _ct float64) State
+	New(dc Drinkcount, _wd int, _ct float64) State
 }
 
 func (vs *VirtualState) getVS() *VirtualState {
@@ -53,7 +53,7 @@ func (vs VirtualState) Update(a Action) State {
 	return VirtualState{
 		Weekday:  wd,
 		Timeslot: ts,
-		Drinkcount: drinkcount{
+		Drinkcount: Drinkcount{
 			CoffeeCount: cc,
 			WaterCount:  wc,
 			MateCount:   mc,
@@ -67,7 +67,7 @@ func (s UserState) Update(a Action) State {
 
 	var cc, wc, mc int
 
-	ts = getCurrentTimeSlot(time.Now().Hour())
+	ts = GetCurrentTimeSlot(time.Now().Hour())
 	wd := time.Now().Weekday()
 	cc = s.Drinkcount.CoffeeCount
 	wc = s.Drinkcount.WaterCount
@@ -84,7 +84,7 @@ func (s UserState) Update(a Action) State {
 	return UserState{
 		Weekday:  wd,
 		Timeslot: ts,
-		Drinkcount: drinkcount{
+		Drinkcount: Drinkcount{
 			CoffeeCount: cc,
 			WaterCount:  wc,
 			MateCount:   mc,
@@ -121,9 +121,9 @@ var wg sync.WaitGroup
 
 //AddState to q-table
 func (q *QLearning) AddState(s State) {
-	if _, ok := q.qt[s]; !ok {
+	if _, ok := q.Qt[s]; !ok {
 		// fmt.Println("					Set State", s)
-		q.qt[s] = []float64{0, 0}
+		q.Qt[s] = []float64{0, 0}
 	}
 }
 
@@ -134,13 +134,13 @@ func (vs VirtualState) Get() State {
 
 //Get returns current UserState
 func (s UserState) Get() State {
-	var dc drinkcount
+	var dc Drinkcount
 	wd := time.Now().Weekday()
-	ts := getCurrentTimeSlot(time.Now().Hour())
+	ts := GetCurrentTimeSlot(time.Now().Hour())
 
-	//if new day set drinkcount to 0
+	//if new day set Drinkcount to 0
 	if s.Weekday != wd {
-		dc = drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}
+		dc = Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}
 	} else {
 		dc = s.Drinkcount
 	}
@@ -149,7 +149,7 @@ func (s UserState) Get() State {
 }
 
 //New returns a new Userstate object
-func (s UserState) New(dc drinkcount, _wd int, _ct float64) State {
+func (s UserState) New(dc Drinkcount, _wd int, _ct float64) State {
 	var wd time.Weekday
 	var ct timeslot
 
@@ -160,15 +160,15 @@ func (s UserState) New(dc drinkcount, _wd int, _ct float64) State {
 	}
 
 	if _ct == -1 {
-		ct = getCurrentTimeSlot(time.Now().Hour())
+		ct = GetCurrentTimeSlot(time.Now().Hour())
 	} else {
-		ct = getCurrentTimeSlot(int(_ct))
+		ct = GetCurrentTimeSlot(int(_ct))
 	}
 
 	return UserState{
 		Weekday:  wd,
 		Timeslot: ct,
-		Drinkcount: drinkcount{
+		Drinkcount: Drinkcount{
 			CoffeeCount: dc.CoffeeCount,
 			WaterCount:  dc.WaterCount,
 			MateCount:   dc.MateCount,
@@ -177,7 +177,7 @@ func (s UserState) New(dc drinkcount, _wd int, _ct float64) State {
 }
 
 //New returns a new VirtualState object
-func (vs VirtualState) New(dc drinkcount, _wd int, _ct float64) State {
+func (vs VirtualState) New(dc Drinkcount, _wd int, _ct float64) State {
 	var wd time.Weekday
 	var ct timeslot
 
@@ -188,15 +188,15 @@ func (vs VirtualState) New(dc drinkcount, _wd int, _ct float64) State {
 	}
 
 	if _ct == -1 {
-		ct = getCurrentTimeSlot(time.Now().Hour())
+		ct = GetCurrentTimeSlot(time.Now().Hour())
 	} else {
-		ct = getCurrentTimeSlot(int(_ct))
+		ct = GetCurrentTimeSlot(int(_ct))
 	}
 
 	return VirtualState{
 		Weekday:  wd,
 		Timeslot: ct,
-		Drinkcount: drinkcount{
+		Drinkcount: Drinkcount{
 			CoffeeCount: dc.CoffeeCount,
 			WaterCount:  dc.WaterCount,
 			MateCount:   dc.MateCount,
@@ -206,12 +206,12 @@ func (vs VirtualState) New(dc drinkcount, _wd int, _ct float64) State {
 
 func NewState() State {
 	wd := time.Now().Weekday()
-	ct := getCurrentTimeSlot(time.Now().Hour())
+	ct := GetCurrentTimeSlot(time.Now().Hour())
 
 	return UserState{
 		Weekday:  wd,
 		Timeslot: ct,
-		Drinkcount: drinkcount{
+		Drinkcount: Drinkcount{
 			CoffeeCount: 0,
 			WaterCount:  0,
 			MateCount:   0,

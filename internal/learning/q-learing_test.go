@@ -20,8 +20,8 @@ func TestSetQ(t *testing.T) {
 	fmt.Println("TestSetQ start")
 	q := QLearning{}
 	vs := VirtualState{}
-	ss := vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(time.Monday), 8.45)
-	q.qt = make(QTable)
+	ss := vs.New(Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(time.Monday), 8.45)
+	q.Qt = make(QTable)
 
 	type Input struct {
 		a Action
@@ -38,16 +38,16 @@ func TestSetQ(t *testing.T) {
 	}
 
 	q.AddState(ss)
-	q.state = ss
+	q.State = ss
 
 	for _, qav := range qavs {
 		q.SetQ(qav.input.a, qav.input.v)
 
-		if q.qt[ss][qav.input.a] != qav.expected {
+		if q.Qt[ss][qav.input.a] != qav.expected {
 			t.Error("Value does not match input val")
 		}
 	}
-	fmt.Println("q.qt: ", q.qt)
+	fmt.Println("q.Qt: ", q.Qt)
 }
 
 func TestFilterSlice(t *testing.T) {

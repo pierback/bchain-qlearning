@@ -6,8 +6,10 @@ import (
 	"time"
 )
 
+//Action type
 type Action int8
 
+//Actions a user can take
 const (
 	Nothing Action = iota
 	Coffee
@@ -15,25 +17,32 @@ const (
 	Water
 )
 
+//QLearning struct
 type QLearning struct {
-	qt QTable
+	Qt QTable `json:"qt"`
 
-	state State
-	actns int
+	State State `json:"state"`
+	Actns int   `json:"actns"`
 
-	workdays int
-	dc       drinkcount
+	Workdays int        `json:"workdays"`
+	Dc       Drinkcount `json:"dc"`
 
-	learningRate float64
-	epsilon      float64
-	epsilonDecay float64
+	LearningRate float64 `json:"learningRate"`
+	Epsilon      float64 `json:"epsilon"`
+	EpsilonDecay float64 `json:"epsilonDecay"`
 
-	gamma float64
+	Gamma float64 `json:"gamma"`
 
-	reward float64
-	sr     successratio
+	Reward float64      `json:"reward"`
+	Sr     Successratio `json:"sr"`
 
-	prediction Action
+	Prediction Action `json:"prediction"`
+}
+
+type Successratio struct {
+	Steps  int
+	Neg    int
+	Greedy int
 }
 
 // QTable type
@@ -47,64 +56,65 @@ type SimulatedStateActions map[State]Action
 
 // Initialize set init vals of qlearning object
 func (q *QLearning) Initialize() {
-	q.learningRate = 0.7
-	q.epsilon = 0.99
+	q.LearningRate = 0.7
+	q.Epsilon = 0.99
 
-	q.gamma = 0.8
+	q.Gamma = 0.8
 
-	q.actns = 2
-	q.workdays = 5
+	q.Actns = 2
+	q.Workdays = 5
 
-	q.epsilonDecay = 0.9995
+	q.EpsilonDecay = 0.9995
 
-	q.qt = make(QTable)
+	q.Qt = make(QTable)
 }
 
-//learn one iteration of qlearning proccess
-func (q *QLearning) learn(fb Action) {
+//Learn one iteration of qlearning proccess
+func (q *QLearning) Learn(fb Action) {
+	fmt.Println("Watched User Action: ", fb, q.Prediction)
 	//
-	// q.epsilon = float64(1 / (q.sr.steps + 1))
-	q.evalPrediction(fb)
-	q.makePrediction()
+	// q.Epsilon = float64(1 / (q.Sr.steps + 1))
+	q.EvalPrediction(fb)
+	q.MakePrediction()
 
 	fmt.Println("   ")
 }
 
-func (q *QLearning) evalPrediction(fb Action) {
-	qsa := q.GetQ(q.prediction, q.getState())
-	reward, newstate := q.TakeAction(q.prediction, fb)
+func (q *QLearning) EvalPrediction(fb Action) {
+	qsa := q.GetQ(q.Prediction, q.GetState())
+	reward, newstate := q.TakeAction(q.Prediction, fb)
 	q.AddState(newstate)
 
-	qval := qsa + q.learningRate*(reward-qsa)
+	qval := qsa + q.LearningRate*(reward-qsa)
 
 	/* maxAction := q.GetAction(newstate)
 		_qsa := q.GetQ(maxAction, newstate)
 
-	  qval := qsa + q.learningRate*(reward+q.gamma*_qsa-qsa) */
+	  qval := qsa + q.LearningRate*(reward+q.Gamma*_qsa-qsa) */
 
-	q.SetQ(q.prediction, qval)
-	fmt.Println("eval prediction: ", q.state, "user: ", fb, "ql: ", q.prediction)
+	q.SetQ(q.Prediction, qval)
+	fmt.Println("eval prediction: ", q.State, "user: ", fb, "ql: ", q.Prediction)
 
-	q.state = newstate
+	q.State = newstate
 }
 
-func (q *QLearning) makePrediction() {
-	s := q.getState()
+func (q *QLearning) MakePrediction() {
+	s := q.GetState()
 
-	q.prediction = q.EpsilonGreedy(s)
+	q.Prediction = q.EpsilonGreedy(s)
 
-	q.epsilon *= q.epsilonDecay
-	fmt.Println("make prediction: ", s, "ql:   ", q.prediction.String())
+	q.Epsilon *= q.EpsilonDecay
+	fmt.Println("make prediction: ", s, "ql:   ", q.Prediction.String())
 }
 
 //GetAction returns action with highest qval on given state
 func (q *QLearning) GetAction(s State) Action {
 	action := Action(0)
-	max := q.qt[s][0]
+	max := q.Qt[s][0]
 
-	for i := 1; i < q.actns; i++ {
-		if max < q.qt[s][Action(i)] {
-			max = q.qt[s][Action(i)]
+	for i := 1; i < q.Actns; i++ {
+		if max < q.Qt[s][Action(i)] {
+			max = q.Qt[s][Action(i)]
 			action = Action(i)
 		}
 	}
@@ -114,11 +124,11 @@ func (q *QLearning) GetAction(s State) Action {
 //TakeAction exec given action and gets reward based on user action
 func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, State) {
 	reward := GetReward(a, actionTook)
-	newstate := q.state.Update(actionTook)
+	newstate := q.State.Update(actionTook)
 
-	q.sr.steps++
+	q.Sr.Steps++
 	if reward < 0 {
-		q.sr.neg++
+		q.Sr.Neg++
 	}
 
 	return reward, newstate
@@ -126,7 +136,7 @@ func (q *QLearning) TakeAction(a Action, actionTook Action) (float64, State) {
 
 //EpsilonGreedy greedy-policy
 func (q *QLearning) EpsilonGreedy(s State) Action {
-	if rand.Float64() < q.epsilon {
+	if rand.Float64() < q.Epsilon {
 		act := rand.Intn(2)
 		return Action(act)
 	}
@@ -146,37 +156,37 @@ func GetReward(a Action, feedback Action) float64 {
 
 // GetQ returns qval of given state action pair
 func (q *QLearning) GetQ(a Action, s State) float64 {
-	return q.qt[s][int(a)]
+	return q.Qt[s][int(a)]
 }
 
 // SetQ sets qval of given state action pair
 func (q *QLearning) SetQ(a Action, qv float64) {
-	s := q.state.Get()
+	s := q.State.Get()
 	// bc.SetQValue(stateToString(s), fmt.Sprintf("%f", qv))
-	q.qt[s][a] = qv
+	q.Qt[s][a] = qv
 }
 
-func (q *QLearning) getState() State {
+func (q *QLearning) GetState() State {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("panic panic panic")
-			q.state = NewState()
+			q.State = NewState()
 		}
 	}()
 
-	if q.state == nil {
+	if q.State == nil {
 		fmt.Println("No panic")
-		q.state = NewState()
+		q.State = NewState()
 	}
 
-	s := q.state.Get()
+	s := q.State.Get()
 	q.AddState(s)
 	return s
 }
 
-func (q *QLearning) setNewState(vs VirtualState, d int, sl int) State {
-	cnt := getCC(q.state)
-	return vs.New(drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, float64(sl))
+func (q *QLearning) SetNewState(vs VirtualState, d int, sl int) State {
+	cnt := getCC(q.State)
+	return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, float64(sl))
 }
 
 func (q *QLearning) initStateSpace() {
@@ -193,5 +203,5 @@ func (q *QLearning) initStateSpace() {
 			}
 		}
 	}
-	q.qt = statemap
+	q.Qt = statemap
 }

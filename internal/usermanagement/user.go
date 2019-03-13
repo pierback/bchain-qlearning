@@ -1,103 +1,101 @@
-package learning
+package usermanagement
 
 import (
 	"fmt"
 	"time"
+
+	l "github.com/pierback/bchain-qlearning/internal/learning"
 )
 
-type ethaddress string
-
 type User struct {
-	ea ethaddress
+	ethaddress string
 }
 
 type SimulatedUser struct {
-	vsa SimulatedStateActions
+	vsa l.SimulatedStateActions
 }
 
 type Training struct {
-	State
-	stateActns SimulatedStateActions
-}
-
-type successratio struct {
-	steps  int
-	neg    int
-	greedy int
+	l.State
+	stateActns l.SimulatedStateActions
 }
 
 //InitLearner for SimulatedUser
 func (su *SimulatedUser) InitLearner() {
-	q := QLearning{}
+	q := l.QLearning{}
 	q.Initialize()
 	su.Start(&q)
 }
 
 //InitLearner for real user
-func (u *User) InitLearner() QLearning {
-	q := QLearning{}
+func (u *User) InitLearner() l.QLearning {
+	q := l.QLearning{}
 	q.Initialize()
+
+	tmpState := l.UserState{}
+	q.State = tmpState.New(l.Drinkcount{}, -1, -1)
+
 	return q
 }
 
 //Start kicks of qlearning proccess for user
-func (u *User) Start(q *QLearning) {
-	feedback := Nothing
-	q.learn(feedback)
+func (u *User) Start(q *l.QLearning) {
+	feedback := l.Nothing
+	q.Learn(feedback)
 }
 
 //Start kicks of qlearning proccess for simulated user
-func (su *SimulatedUser) Start(q *QLearning) {
+func (su *SimulatedUser) Start(q *l.QLearning) {
 	var wts [][]float64
-	vs := VirtualState{}
+	vs := l.VirtualState{}
 	wts, su.vsa = GenerateTrainingSet()
 	var wa []int
 
 	fmt.Println("start")
 	for reps := 0; reps < 100; reps++ {
 
-		q.state = vs.New(drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(time.Monday), float64(7))
+		q.State = vs.New(l.Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(time.Monday), float64(7))
 
 		fmt.Println(" ")
 		fmt.Println(" ")
 
-		for d := 1; d < q.workdays+1; d++ {
+		for d := 1; d < q.Workdays+1; d++ {
 			for sl := 7; sl < 19; sl += 3 {
 				//filter all from trainingsset equals day and slot
-				fsc := FilterSlice(wts[d-1], getCurrentTimeSlot(sl))
+				fsc := l.FilterSlice(wts[d-1], l.GetCurrentTimeSlot(sl))
 
-				q.state = q.setNewState(vs, d, sl)
-				q.makePrediction()
+				q.State = q.SetNewState(vs, d, sl)
+				q.MakePrediction()
 
 				for st := 0; st < fsc+1; st++ {
-					newState := q.setNewState(vs, d, sl)
-					q.state = newState
-					fb := su.UserMock(q.state)
-					q.learn(fb)
+					newState := q.SetNewState(vs, d, sl)
+					q.State = newState
+					fb := su.UserMock(q.State)
+					q.Learn(fb)
 				}
-				q.evalPrediction(Nothing)
+				q.EvalPrediction(l.Nothing)
 			}
 		}
-		wa = append(wa, q.sr.neg)
+		wa = append(wa, q.Sr.Neg)
 		fmt.Println("Negs: ", wa)
-		// fmt.Println("q.sr.neg: ", q.sr.neg)
+		// fmt.Println("q.Sr.neg: ", q.Sr.neg)
 		fmt.Println(" ")
-		q.sr.neg = 0
+		q.Sr.Neg = 0
 	}
 
-	// writeJsonFile(mapToString(q.qt))
+	// writeJsonFile(MapToString(q.Qt))
 
-	fmt.Println("Q-Table \n", q.qt)
+	fmt.Println("Q-Table \n", q.Qt)
 	fmt.Println("successratio", wa)
 }
 
 //UserMock mocks user behavior
-func (su *SimulatedUser) UserMock(s State) Action {
+func (su *SimulatedUser) UserMock(s l.State) l.Action {
 	return su.vsa[s.Get()]
 }
 
 //GenerateTrainingSet returns action state pairs for mocking user
-func GenerateTrainingSet() ([][]float64, SimulatedStateActions) {
+func GenerateTrainingSet() ([][]float64, l.SimulatedStateActions) {
 	mondayTimes := []float64{8.33, 10, 15}
 	tuesdayTimes := []float64{8.49, 10.30, 12.30}
 	wednesdayTimes := []float64{8.15, 10, 14.37}
@@ -105,17 +103,17 @@ func GenerateTrainingSet() ([][]float64, SimulatedStateActions) {
 	fridayTimes := []float64{8.37, 10.15, 13.23, 15.57}
 
 	wts := [][]float64{mondayTimes, tuesdayTimes, wednesdayTimes, thursdayTimes, fridayTimes}
-	trs := map[State]Action{}
+	trs := map[l.State]l.Action{}
 
-	ss := VirtualState{}
+	ss := l.VirtualState{}
 
 	for day, wt := range wts {
 		for slot, clock := range wt {
-			s := ss.New(drinkcount{CoffeeCount: slot, WaterCount: 0, MateCount: 0}, day+1, clock)
+			s := ss.New(l.Drinkcount{CoffeeCount: slot, WaterCount: 0, MateCount: 0}, day+1, clock)
 			if time.Weekday(day+1) == time.Friday {
 				fmt.Println("state state state", s)
 			}
-			trs[s] = Coffee
+			trs[s] = l.Coffee
 		}
 	}
 

@@ -15,10 +15,7 @@ const (
 // func GetServerIP(done chan string) string {
 func GetServerIP() string {
 	ip := Listen(defaultMulticastAddress)
-	fmt.Println("ip: ", ip)
 	if ip != "" {
-		fmt.Println("ip ip ip not null", ip)
-		// done <- ip
 		return ip
 	}
 
