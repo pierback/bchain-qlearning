@@ -53,7 +53,7 @@ func GetEthWsAddr() string {
 }
 
 func GetUploadIP() string {
-	return "http://" + os.Getenv("SIP") + ":9090/upload"
+	return "http://" + os.Getenv("SIP") + ":8081/upload"
 }
 
 func GetBchainIP() string {
