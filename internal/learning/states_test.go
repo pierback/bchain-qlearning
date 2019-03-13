@@ -17,21 +17,73 @@ func TestDrinksCount(t *testing.T) {
 func TestGenerateTrainingSet(t *testing.T) {
 	GenerateTrainingSet()
 }
-func TestSSID(t *testing.T) {
-	t.Parallel()
-	fmt.Println("TestSSID start")
 
-	var ssids = []struct {
-		input    SSID
-		expected bool
+func TestUpdate(t *testing.T) {
+	t.Parallel()
+	fmt.Println("TestUpdate start")
+	tq := QLearning{}
+	vs := VirtualState{}
+	sampleState := vs.New(Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)
+
+	var execActns = []struct {
+		input    Action
+		expected State
 	}{
-		{"eduroam", true},
-		{"ipsum", false},
+		{Coffee, vs.New(Drinkcount{CoffeeCount: 1, WaterCount: 0, MateCount: 0}, -1, -1)},
+		{Nothing, vs.New(Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
+		{Mate, vs.New(Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 1}, -1, -1)},
+		{Water, vs.New(Drinkcount{CoffeeCount: 0, WaterCount: 1, MateCount: 0}, -1, -1)},
+		{4, vs.New(Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, -1, -1)},
 	}
 
-	for _, ssid := range ssids {
-		if output := ssid.input.isEduroam(); output != ssid.expected {
-			t.Error("Wrong wifi", ssid.input, ssid.expected, ssid)
+	for _, ea := range execActns {
+		tq.State = sampleState
+		output := tq.State.Update(ea.input)
+
+		if output != ea.expected {
+			t.Error("Wrong reward given", ea.input, ea.expected, ea)
+		}
+		fmt.Println("output: ", output)
+	}
+}
+
+func TestGet(t *testing.T) {
+	t.Parallel()
+	fmt.Println("TestGet start")
+
+	var ussts = []struct {
+		input    UserState
+		expected State
+	}{
+		{
+			input: UserState{
+				Weekday:    time.Now().Weekday(),
+				Timeslot:   GetCurrentTimeSlot(time.Now().Hour()),
+				Drinkcount: Drinkcount{CoffeeCount: 1, WaterCount: 2, MateCount: 3},
+			},
+			expected: UserState{
+				Weekday:    time.Now().Weekday(),
+				Timeslot:   GetCurrentTimeSlot(time.Now().Hour()),
+				Drinkcount: Drinkcount{CoffeeCount: 1, WaterCount: 2, MateCount: 3},
+			},
+		},
+		{
+			input: UserState{
+				Weekday:    time.Now().Weekday() - 1,
+				Timeslot:   GetCurrentTimeSlot(time.Now().Hour()),
+				Drinkcount: Drinkcount{CoffeeCount: 4, WaterCount: 4, MateCount: 4},
+			},
+			expected: UserState{
+				Weekday:    time.Now().Weekday(),
+				Timeslot:   GetCurrentTimeSlot(time.Now().Hour()),
+				Drinkcount: Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0},
+			},
+		},
+	}
+
+	for _, us := range ussts {
+		if output := us.input.Get(); output != us.expected {
+			t.Error("Get Userstate not working properly", us.input, us.expected, output)
 		}
 	}
 
@@ -42,7 +94,7 @@ func TestNew(t *testing.T) {
 	fmt.Println("TestNew start")
 
 	type Input struct {
-		dc drinkcount
+		dc Drinkcount
 		wd int
 		ct float64
 	}
@@ -52,11 +104,11 @@ func TestNew(t *testing.T) {
 		expected State
 	}{
 		{
-			input: Input{dc: drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: -1, ct: -1},
+			input: Input{dc: Drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: -1, ct: -1},
 			expected: VirtualState{
-				Weekday:  weekday(time.Now().Weekday()),
+				Weekday:  time.Now().Weekday(),
 				Timeslot: GetCurrentTimeSlot(time.Now().Hour()),
-				Drinkcount: drinkcount{
+				Drinkcount: Drinkcount{
 					CoffeeCount: 4,
 					WaterCount:  0,
 					MateCount:   0,
@@ -64,11 +116,11 @@ func TestNew(t *testing.T) {
 			},
 		},
 		{
-			input: Input{dc: drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: 3, ct: 3},
+			input: Input{dc: Drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: 3, ct: 3},
 			expected: VirtualState{
-				Weekday:  weekday(3),
+				Weekday:  3,
 				Timeslot: GetCurrentTimeSlot(int(3)),
-				Drinkcount: drinkcount{
+				Drinkcount: Drinkcount{
 					CoffeeCount: 4,
 					WaterCount:  0,
 					MateCount:   0,
@@ -79,79 +131,8 @@ func TestNew(t *testing.T) {
 
 	vs := VirtualState{}
 	for _, s := range stfs {
-		if output := vs.New(s.input.dc, s.input.wd, s.input.ct); output != s.expected {
+		if output := vs.New(s.input.Dc, s.input.wd, s.input.ct); output != s.expected {
 			t.Error("New not working properly", s.input, s.expected, output)
-		}
-	}
-
-}
-
-func TestTimeSlot(t *testing.T) {
-	t.Parallel()
-	fmt.Println("TestTimeSlot start")
-
-	var slotStrings = []struct {
-		input    timeslot
-		expected string
-	}{
-		{0, "Slot0"},
-		{1, "Slot1"},
-		{2, "Slot2"},
-		{3, "Slot3"},
-		{4, "Slot4"},
-		{5, "Slot5"},
-		{6, "Slot6"},
-		{777, "Unknown"},
-	}
-
-	var slotIds = []struct {
-		input    int
-		expected timeslot
-	}{
-		{7, 0},
-		{9, 0},
-		{8, 0},
-		{10, 1},
-		{12, 1},
-		{14, 2},
-		{16, 3},
-		{18, 3},
-		{22, 4},
-		{26, -1},
-	}
-	var ts timeslot
-
-	for _, slot := range slotStrings {
-		if output := slot.input.TimeSlotString(); output != slot.expected {
-			t.Error("Slot Strings", slot.input, slot.expected, output)
-		}
-	}
-
-	for _, slot := range slotIds {
-		if out := GetCurrentTimeSlot(slot.input); out != slot.expected {
-			t.Error("Input Hour", slot.input, slot.expected, ts)
-		}
-	}
-}
-
-func TestWeekdayString(t *testing.T) {
-	t.Parallel()
-	fmt.Println("TestWeekdayString start")
-
-	var weekdays = []struct {
-		input    weekday
-		expected string
-	}{
-		{0, "Monday"},
-		{1, "Tuesday"},
-		{2, "Wednesday"},
-		{3, "Thursday"},
-		{4, "Friday"},
-	}
-
-	for _, weekday := range weekdays {
-		if output := weekday.input.String(); output != weekday.expected {
-			t.Error("weekday Failed: {} inputted, {} expected, recieved: {}", weekday.input, weekday.expected, output)
 		}
 	}
 }

@@ -1,14 +1,11 @@
 FROM golang:1.9.1
-LABEL maintainer="fabian.pieringer@gmail.com" 
+LABEL maintainer="fabian.pieringer@gmail.com"
 
-COPY . /go/src/bchain-qlearning
-# COPY ./internal /go/src/bchain-qlearning/internal
-# COPY ./internal/learning /go/src/bchain-qlearning/internal/learning
+COPY . /go/src/github.com/pierback/bchain-qlearning
 
-WORKDIR /go/src/bchain-qlearning
-COPY ./cmd .
+WORKDIR /go/src/github.com/pierback/bchain-qlearning
 
 RUN go get -d -v ./...
 RUN go install -v ./...
 
-CMD ["bchain-qlearning"]
+CMD ["cmd"]
