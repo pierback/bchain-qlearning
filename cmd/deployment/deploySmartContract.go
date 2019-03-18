@@ -46,15 +46,72 @@ func DeploySC() {
 	// parentDeploy(auth, client)
 }
 
-func parentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
-	/* address, _, _, err1 := pt.DeployParent(auth, client)
+func ccParentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
+	address, _, _, err1 := pt.DeployCoffeCoinParent(auth, client)
 	if err1 != nil {
 		fmt.Println("err1: ", err1)
 		log.Fatal(err1)
 	}
 
-	fmt.Printf("Contract Parent pending deploy: 0x%x\n", address) */
+	fmt.Printf("Contract CC-Parent pending deploy: 0x%x\n", address)
 
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "CoffeeCoin", "contractAddress")
+
+	bvglJSON := createSCJson(address.Hex(), string(cc.CoffeecoinParentABI))
+	bvglJSONDir := path.Join(path.Dir(filename), "ccParent.json")
+
+	err := ioutil.WriteFile(bvglJSONDir, bvglJSON, 0644)
+	if err != nil {
+		fmt.Println("Error writing JSON to file:", err)
+	}
+
+	err = ut.PostFile(bvglJSONDir, os.Getenv("UPID"))
+	ut.PrintError(err)
+
+	err = os.Remove(bvglJSONDir)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func bvglParentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
+	address, _, _, err1 := pt.DeployBeverageListParent(auth, client)
+	if err1 != nil {
+		fmt.Println("err1: ", err1)
+		log.Fatal(err1)
+	}
+
+	fmt.Printf("Contract BeverageList Parent pending deploy: 0x%x\n", address)
+
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "BeverageList", "contractAddress")
+
+	// bvglJSON := createBvglJson(address)
+
+	err12 := ioutil.WriteFile(dir, address.Bytes(), 0644)
+	check(err12)
+
+	bvglJSON := createSCJson(address.Hex(), string(bl.BeveragelistParentABI))
+	bvglJSONDir := path.Join(path.Dir(filename), "bvglParent.json")
+
+	err := ioutil.WriteFile(bvglJSONDir, bvglJSON, 0644)
+	if err != nil {
+		fmt.Println("Error writing JSON to file:", err)
+	}
+
+	err = ut.PostFile(bvglJSONDir, os.Getenv("UPID"))
+	ut.PrintError(err)
+
+	err = os.Remove(bvglJSONDir)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func upgradeContract() {
 	address := common.HexToAddress("0xa5073710ee54574b77bfe8faebebe07823dc7dac")
 	instance, err := pt.NewParent(address, client)
 
@@ -62,8 +119,13 @@ func parentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 
 	key := [32]byte{}
 	copy(key[:], []byte("1"))
-	_, err = instance.RegisterBeverageList(auth, key, bvglAddress)
-	time.Sleep(10 * time.Second)
+
+	if *en.DplFlag == "upgrade" {
+		_, err = instance.RegisterBeverageList(auth, key, bvglAddress)
+	} else {
+		_, err = instance.UpgradeBeverageList(auth, key, bvglAddress)
+	}
+	time.Sleep(2 * time.Second)
 	check(err)
 
 	drink := [32]byte{}
@@ -104,6 +166,8 @@ func parentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 }
 
 func bvglDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
+	parentDeploy(auth, client)
+
 	address, _, _, err1 := bl.DeployBeveragelist(auth, client)
 	if err1 != nil {
 		fmt.Println("err1: ", err1)
@@ -113,7 +177,7 @@ func bvglDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 	fmt.Printf("Contract Beveragelist pending deploy: 0x%x\n", address)
 
 	_, filename, _, _ := runtime.Caller(0)
-	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "BeverageList", "contractAddress")
+	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "CoffeeCoin", "contractAddress")
 
 	// bvglJSON := createBvglJson(address)
 
@@ -156,7 +220,26 @@ func createSCJson(address string, abi string) []byte {
 	return output
 }
 
+func upgradeCC(auth *bind.TransactOpts, client *ethclient.Client) {
+	var result map[string]interface{} = ut.DownloadFile("ccParent.json")
+
+	address := common.HexToAddress("0xa5073710ee54574b77bfe8faebebe07823dc7dac")
+	instance, err := pt.NewParent(address, client)
+
+	bvglAddress := common.HexToAddress("0xf189078a9969cc0247b01437d2a6deb7be83e7bf")
+
+	key := [32]byte{}
+	copy(key[:], []byte("1"))
+
+	if *en.DplFlag == "upgrade" {
+		_, err = instance.RegisterBeverageList(auth, key, bvglAddress)
+	} else {
+		_, err = instance.UpgradeBeverageList(auth, key, bvglAddress)
+	}
+}
 func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
+	upgradeCC(auth, client)
+
 	chairAddress := common.HexToAddress("0x18ef96d887954472de5e9f47d60ba8dea371dbfe")
 	coffeePrice := new(big.Int).SetUint64(3)
 	matePrice := new(big.Int).SetUint64(5)

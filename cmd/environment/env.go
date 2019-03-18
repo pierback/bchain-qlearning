@@ -9,13 +9,15 @@ import (
 )
 
 var (
-	BcFlag  *string
-	DplFlag *string
+	BcFlag     *string
+	DplFlag    *string
+	parentFlag *string
 )
 
 func SetEnvVars() {
 	DplFlag = flag.String("dp", "", "deploy sm")
 	BcFlag = flag.String("bc", "watch", "test bchain")
+	parentFlag = flag.String("pt", "upgrade", "deploy or upgrade parent contract")
 	flag.Parse()
 
 	ws := ut.GetEthWsAddr()

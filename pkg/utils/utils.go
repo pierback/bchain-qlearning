@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -60,6 +61,10 @@ func GetBchainIP() string {
 	return "ws://" + os.Getenv("SIP") + ":8546"
 }
 
+func DownloadIP() string {
+	return "http://" + os.Getenv("SIP") + ":9090/files"
+}
+
 //GetClientConnection returns eth client
 func GetClientConnection() *ethclient.Client {
 	address := os.Getenv("BCIP")
@@ -79,6 +84,53 @@ func PrintError(err error) {
 	if err != nil {
 		log.Printf("%s", err)
 	}
+}
+
+func DownloadFile(filename string) map[string]interface{} {
+	url := DownloadIP() + filename
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
+
+	// Create the file
+	/* 	out, err := os.Create(path.Base(url))
+	   	if err != nil {
+	   		fmt.Println(err)
+	   	}
+	   	defer out.Close()
+
+	   	// Write the body to file
+	   	_, err = io.Copy(out, resp.Body) */
+
+	/* jsonFile, err := os.Open("users.json")
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Successfully Opened users.json")
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	*/
+
+	body, readErr := ioutil.ReadAll(resp.Body)
+	if readErr != nil {
+		log.Fatal(readErr)
+	}
+
+	var result map[string]interface{}
+	jsonErr := json.Unmarshal(body, &result)
+	if jsonErr != nil {
+		log.Fatal(jsonErr)
+	}
+
+	fmt.Println(result["users"])
+
+	return result
 }
 
 func PostFile(filename string, targetUrl string) error {
