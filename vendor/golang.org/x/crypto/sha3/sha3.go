@@ -53,19 +53,19 @@ func (d *state) BlockSize() int { return d.rate }
 func (d *state) Size() int { return d.outputLen }
 
 // Reset clears the internal state by zeroing the sponge state and
-// the byte buffer, and setting Sponge.State to absorbing.
+// the byte buffer, and setting Sponge.state to absorbing.
 func (d *state) Reset() {
 	// Zero the permutation's state.
 	for i := range d.a {
 		d.a[i] = 0
 	}
-	d.State = spongeAbsorbing
+	d.state = spongeAbsorbing
 	d.buf = d.storage[:0]
 }
 
 func (d *state) clone() *state {
 	ret := *d
-	if ret.State == spongeAbsorbing {
+	if ret.state == spongeAbsorbing {
 		ret.buf = ret.storage[:len(ret.buf)]
 	} else {
 		ret.buf = ret.storage[d.rate-cap(d.buf) : d.rate]
@@ -77,7 +77,7 @@ func (d *state) clone() *state {
 // permute applies the KeccakF-1600 permutation. It handles
 // any input-output buffering.
 func (d *state) permute() {
-	switch d.State {
+	switch d.state {
 	case spongeAbsorbing:
 		// If we're absorbing, we need to xor the input into the state
 		// before applying the permutation.
@@ -115,7 +115,7 @@ func (d *state) padAndPermute(dsbyte byte) {
 	d.buf[d.rate-1] ^= 0x80
 	// Apply the permutation
 	d.permute()
-	d.State = spongeSqueezing
+	d.state = spongeSqueezing
 	d.buf = d.storage[:d.rate]
 	copyOut(d, d.buf)
 }
@@ -123,7 +123,7 @@ func (d *state) padAndPermute(dsbyte byte) {
 // Write absorbs more data into the hash's state. It produces an error
 // if more data is written to the ShakeHash after writing
 func (d *state) Write(p []byte) (written int, err error) {
-	if d.State != spongeAbsorbing {
+	if d.state != spongeAbsorbing {
 		panic("sha3: write to sponge after read")
 	}
 	if d.buf == nil {
@@ -159,7 +159,7 @@ func (d *state) Write(p []byte) (written int, err error) {
 // Read squeezes an arbitrary number of bytes from the sponge.
 func (d *state) Read(out []byte) (n int, err error) {
 	// If we're still absorbing, pad and apply the permutation.
-	if d.State == spongeAbsorbing {
+	if d.state == spongeAbsorbing {
 		d.padAndPermute(d.dsbyte)
 	}
 

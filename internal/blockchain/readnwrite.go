@@ -13,9 +13,6 @@ import (
 func TestBl() {
 	client := ut.GetClientConnection()
 	contractAddress := ut.GetLatestContractAddress()
-
-	fmt.Printf("wait\n\n")
-
 	instance, err1 := bl.NewBeveragelist(contractAddress, client)
 	ut.PrintError(err1)
 
@@ -38,14 +35,14 @@ func setDrinkData(instance *bl.Beveragelist) {
 
 func getFromTime(instance *bl.Beveragelist, t [32]byte) {
 	drink, weekday, _ := instance.GetDrinkData(nil, t)
-	fmt.Println("getFromTime drink", string(drink[:]))     // foo
-	fmt.Println("getFromTime weekday", string(weekday[:])) // foo
+	fmt.Println("getFromTime drink", string(drink[:]))
+	fmt.Println("getFromTime weekday", string(weekday[:]))
 }
 
-func getLastDrink(instance *bl.Beveragelist) {
+/* func getLastDrink(instance *bl.Beveragelist) {
 	addr, drink, weekday, _ := instance.LastDrink(nil)
 
 	fmt.Println("getDrinkData id", addr.Hex())              // foo
 	fmt.Println("getDrinkData drink", string(drink[:]))     // foo
 	fmt.Println("getDrinkData weekday", string(weekday[:])) // foo
-}
+} */

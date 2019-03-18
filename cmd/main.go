@@ -17,9 +17,9 @@ func main() {
 	en.SetEnvVars()
 
 	db.StartDB()
-	db.StartJsonDB()
+	// db.StartJsonDB()
 
-	dp.DeploySC()
+	// dp.DeploySC()
 
 	if *en.DplFlag == "cffcn" || *en.DplFlag == "bvrglst" {
 		dp.DeploySC()

@@ -5,6 +5,8 @@ github.com/allegro/bigcache/queue
 github.com/aristanetworks/goarista/monotime
 # github.com/btcsuite/btcd v0.0.0-20190213025234-306aecffea32
 github.com/btcsuite/btcd/btcec
+# github.com/bwmarrin/snowflake v0.0.0-20180412010544-68117e6bbede
+github.com/bwmarrin/snowflake
 # github.com/deckarep/golang-set v1.7.1
 github.com/deckarep/golang-set
 # github.com/ethereum/go-ethereum v1.8.23
@@ -39,12 +41,20 @@ github.com/golang/snappy
 github.com/google/uuid
 # github.com/gorilla/websocket v1.4.0
 github.com/gorilla/websocket
+# github.com/grandecola/mmap v0.2.0
+github.com/grandecola/mmap
+# github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f
+github.com/mailru/easyjson/jlexer
+github.com/mailru/easyjson/jwriter
+github.com/mailru/easyjson/buffer
 # github.com/pborman/uuid v1.2.0
 github.com/pborman/uuid
 # github.com/rjeczalik/notify v0.9.2
 github.com/rjeczalik/notify
 # github.com/rs/cors v1.6.0
 github.com/rs/cors
+# github.com/sonyarouje/simdb v0.0.0-20181202125413-c2488dfc374a
+github.com/sonyarouje/simdb/db
 # github.com/syndtr/goleveldb v1.0.0
 github.com/syndtr/goleveldb/leveldb
 github.com/syndtr/goleveldb/leveldb/errors
@@ -58,13 +68,21 @@ github.com/syndtr/goleveldb/leveldb/journal
 github.com/syndtr/goleveldb/leveldb/memdb
 github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
+# github.com/xujiajun/nutsdb v0.2.0
+github.com/xujiajun/nutsdb
+github.com/xujiajun/nutsdb/ds/list
+github.com/xujiajun/nutsdb/ds/set
+github.com/xujiajun/nutsdb/ds/zset
+# github.com/xujiajun/utils v0.0.0-20190123093513-8bf096c4f53b
+github.com/xujiajun/utils/filesystem
+github.com/xujiajun/utils/strconv2
 # golang.org/x/crypto v0.0.0-20190228161510-8dd112bcdc25
 golang.org/x/crypto/sha3
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/scrypt
 # golang.org/x/net v0.0.0-20190301231341-16b79f2e4e95
 golang.org/x/net/websocket
-# golang.org/x/sys v0.0.0-20190303192550-c2f5717e611c
+# golang.org/x/sys v0.0.0-20190306071516-a98ae47d97a5
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
 # gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce

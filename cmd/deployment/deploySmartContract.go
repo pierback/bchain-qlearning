@@ -12,12 +12,14 @@ import (
 	"path"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
+	en "github.com/pierback/bchain-qlearning/cmd/environment"
 	bl "github.com/pierback/bchain-qlearning/internal/contracts/BeverageList"
 	cc "github.com/pierback/bchain-qlearning/internal/contracts/CoffeeCoin"
 	pt "github.com/pierback/bchain-qlearning/internal/contracts/Parent"
@@ -35,41 +37,70 @@ func DeploySC() {
 		log.Fatalf("Failed to create authorized transactor: %v", err)
 	}
 
-	/* if *en.DplFlag == "cffcn" {
+	if *en.DplFlag == "cffcn" {
 		ccDeploy(auth, client)
 	} else {
 		bvglDeploy(auth, client)
-	} */
-	parentDeploy(auth, client)
+	}
+	// bvglDeploy(auth, client)
+	// parentDeploy(auth, client)
 }
 
 func parentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
-	address, _, _, err1 := pt.DeployParent(auth, client)
+	/* address, _, _, err1 := pt.DeployParent(auth, client)
 	if err1 != nil {
 		fmt.Println("err1: ", err1)
 		log.Fatal(err1)
 	}
 
-	fmt.Printf("Contract Beveragelist pending deploy: 0x%x\n", address)
+	fmt.Printf("Contract Parent pending deploy: 0x%x\n", address) */
 
-	/* address := common.HexToAddress("0xb6e8ec82bf05713bb44789cbef81d188b35a263b") */
+	address := common.HexToAddress("0xa5073710ee54574b77bfe8faebebe07823dc7dac")
 	instance, err := pt.NewParent(address, client)
 
-	pa, _ := instance.GetUserController(nil)
-	fmt.Println("pa: ", pa)
-	// check(err)
-	oa := [32]byte{}
-	copy(oa[:], []byte("0xf65240445c781a0facbce69d17e63a51e95a8c59"))
-	instance.UpgradeOrganisation(auth, oa)
-	fmt.Println("pa: 2222222", pa.Hex())
-	// _, err = instance.SetTodo(auth, "you are awesome!!!!!")
+	bvglAddress := common.HexToAddress("0xf189078a9969cc0247b01437d2a6deb7be83e7bf")
 
-	// time.Sleep(10 * time.Second)
-
-	re, err := instance.Ready(nil)
+	key := [32]byte{}
+	copy(key[:], []byte("1"))
+	_, err = instance.RegisterBeverageList(auth, key, bvglAddress)
+	time.Sleep(10 * time.Second)
 	check(err)
-	fmt.Println("ready", re)
 
+	drink := [32]byte{}
+	weekday := [32]byte{}
+	ti := [32]byte{}
+	copy(drink[:], []byte("mate"))
+	copy(weekday[:], []byte("dienstag"))
+	copy(ti[:], "2019-03-15T21:28:05")
+	// copy(weekday[:], []byte(time.Now().Weekday().String()))
+	// copy(ti[:], []byte(time.Now().String()))
+
+	/* usr := common.HexToAddress("e8816898d851d5b61b7f950627d04d794c07ca37")
+	bvgInstance, err1 := bl.NewBeveragelist(bvglAddress, client)
+	useror, err := bvgInstance.IsUser(nil, usr)
+	fmt.Println("useror: ", useror)
+	check(err1)
+	check(err)
+
+	dsa, _ := bvgInstance.DataStorage(nil)
+	fmt.Println("DataStorage: ", dsa.Hex())
+
+	_, err = bvgInstance.SetDrinkData(auth, ti, drink, weekday)
+	check(err) */
+
+	time.Sleep(10 * time.Second)
+
+	// drink1, weekday1, err := bvgInstance.GetDrinkData(nil, ti)
+	// fmt.Println("getFromTime drink", drink1)
+	/* fmt.Println("getFromTime drink", string(drink1[:]))
+	// fmt.Println("getFromTime weekday", weekday1)
+	fmt.Println("getFromTime weekday", string(weekday1[:]))
+	check(err) */
+
+	/*
+
+		time.Sleep(10 * time.Second) */
+	_ = instance
 }
 
 func bvglDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
@@ -165,7 +196,7 @@ func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 
 func check(e error) {
 	if e != nil {
-		panic(e)
+		fmt.Println(e)
 	}
 }
 

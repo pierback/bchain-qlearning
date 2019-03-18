@@ -104,7 +104,7 @@ func (s *asmState) resetBuf() {
 // Write (via the embedded io.Writer interface) adds more data to the running hash.
 // It never returns an error.
 func (s *asmState) Write(b []byte) (int, error) {
-	if s.State != spongeAbsorbing {
+	if s.state != spongeAbsorbing {
 		panic("sha3: write to sponge after read")
 	}
 	length := len(b)
@@ -142,8 +142,8 @@ func (s *asmState) Read(out []byte) (n int, err error) {
 	n = len(out)
 
 	// need to pad if we were absorbing
-	if s.State == spongeAbsorbing {
-		s.State = spongeSqueezing
+	if s.state == spongeAbsorbing {
+		s.state = spongeSqueezing
 
 		// write hash directly into out if possible
 		if len(out)%s.rate == 0 {
@@ -208,7 +208,7 @@ func (s *asmState) Reset() {
 		s.a[i] = 0
 	}
 	s.resetBuf()
-	s.State = spongeAbsorbing
+	s.state = spongeAbsorbing
 }
 
 // Size returns the number of bytes Sum will return.
