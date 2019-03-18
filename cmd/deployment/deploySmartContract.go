@@ -220,7 +220,9 @@ func createSCJson(address string, abi string) []byte {
 	return output
 }
 
-func upgradeCC(auth *bind.TransactOpts, client *ethclient.Client) {
+func deployCCParent(auth *bind.TransactOpts, client *ethclient.Client) {
+
+	// check if there is address in file if not deploy if so upgrade CoffeeCoin
 	var result map[string]interface{} = ut.DownloadFile("ccParent.json")
 
 	address := common.HexToAddress("0xa5073710ee54574b77bfe8faebebe07823dc7dac")
@@ -238,7 +240,6 @@ func upgradeCC(auth *bind.TransactOpts, client *ethclient.Client) {
 	}
 }
 func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
-	upgradeCC(auth, client)
 
 	chairAddress := common.HexToAddress("0x18ef96d887954472de5e9f47d60ba8dea371dbfe")
 	coffeePrice := new(big.Int).SetUint64(3)
@@ -250,6 +251,8 @@ func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 		fmt.Println("err1: ", err1)
 		log.Fatal(err1)
 	}
+
+	deployCCParent(auth, client)
 
 	fmt.Printf("Contract Coffe Coin pending deploy: 0x%x\n", address)
 	_, filename, _, _ := runtime.Caller(0)
