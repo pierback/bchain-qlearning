@@ -62,7 +62,7 @@ func GetBchainIP() string {
 }
 
 func DownloadIP() string {
-	return "http://" + os.Getenv("SIP") + ":9090/files"
+	return "http://" + os.Getenv("SIP") + ":9090/files/"
 }
 
 //GetClientConnection returns eth client
@@ -95,40 +95,16 @@ func DownloadFile(filename string) map[string]interface{} {
 	}
 	defer resp.Body.Close()
 
-	// Create the file
-	/* 	out, err := os.Create(path.Base(url))
-	   	if err != nil {
-	   		fmt.Println(err)
-	   	}
-	   	defer out.Close()
-
-	   	// Write the body to file
-	   	_, err = io.Copy(out, resp.Body) */
-
-	/* jsonFile, err := os.Open("users.json")
-	// if we os.Open returns an error then handle it
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Successfully Opened users.json")
-	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
-
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	*/
-
 	body, readErr := ioutil.ReadAll(resp.Body)
 	if readErr != nil {
-		log.Fatal(readErr)
+		log.Println(readErr)
 	}
 
 	var result map[string]interface{}
 	jsonErr := json.Unmarshal(body, &result)
 	if jsonErr != nil {
-		log.Fatal(jsonErr)
+		log.Println(jsonErr)
 	}
-
-	fmt.Println(result["users"])
 
 	return result
 }

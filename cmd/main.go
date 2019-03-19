@@ -19,7 +19,7 @@ func main() {
 	db.StartDB()
 	// db.StartJsonDB()
 
-	// dp.DeploySC()
+	dp.DeploySC()
 
 	if *en.DplFlag == "cffcn" || *en.DplFlag == "bvrglst" {
 		dp.DeploySC()

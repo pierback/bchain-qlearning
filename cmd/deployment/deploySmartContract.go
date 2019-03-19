@@ -22,6 +22,7 @@ import (
 	en "github.com/pierback/bchain-qlearning/cmd/environment"
 	bl "github.com/pierback/bchain-qlearning/internal/contracts/BeverageList"
 	cc "github.com/pierback/bchain-qlearning/internal/contracts/CoffeeCoin"
+	ccp "github.com/pierback/bchain-qlearning/internal/contracts/CoffeeCoinParent"
 	pt "github.com/pierback/bchain-qlearning/internal/contracts/Parent"
 
 	ut "github.com/pierback/bchain-qlearning/pkg/utils"
@@ -38,7 +39,8 @@ func DeploySC() {
 	}
 
 	if *en.DplFlag == "cffcn" {
-		ccDeploy(auth, client)
+		// ccDeploy(auth, client)
+		TestCC(auth)
 	} else {
 		bvglDeploy(auth, client)
 	}
@@ -47,7 +49,7 @@ func DeploySC() {
 }
 
 func ccParentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
-	address, _, _, err1 := pt.DeployCoffeCoinParent(auth, client)
+	/* address, _, _, err1 := pt.DeployCoffeCoinParent(auth, client)
 	if err1 != nil {
 		fmt.Println("err1: ", err1)
 		log.Fatal(err1)
@@ -73,11 +75,11 @@ func ccParentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 
 	if err != nil {
 		fmt.Println(err)
-	}
+	} */
 }
 
 func bvglParentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
-	address, _, _, err1 := pt.DeployBeverageListParent(auth, client)
+	/* address, _, _, err1 := pt.DeployBeverageListParent(auth, client)
 	if err1 != nil {
 		fmt.Println("err1: ", err1)
 		log.Fatal(err1)
@@ -108,10 +110,10 @@ func bvglParentDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 
 	if err != nil {
 		fmt.Println(err)
-	}
+	} */
 }
 
-func upgradeContract() {
+func upgradeContract(auth *bind.TransactOpts, client *ethclient.Client) {
 	address := common.HexToAddress("0xa5073710ee54574b77bfe8faebebe07823dc7dac")
 	instance, err := pt.NewParent(address, client)
 
@@ -166,7 +168,7 @@ func upgradeContract() {
 }
 
 func bvglDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
-	parentDeploy(auth, client)
+	// parentDeploy(auth, client)
 
 	address, _, _, err1 := bl.DeployBeveragelist(auth, client)
 	if err1 != nil {
@@ -220,41 +222,102 @@ func createSCJson(address string, abi string) []byte {
 	return output
 }
 
-func deployCCParent(auth *bind.TransactOpts, client *ethclient.Client) {
+func deployCCParent(auth *bind.TransactOpts, client *ethclient.Client, ccAddress common.Address) {
 
 	// check if there is address in file if not deploy if so upgrade CoffeeCoin
 	var result map[string]interface{} = ut.DownloadFile("ccParent.json")
+	fmt.Println("result: ", result["address"])
+	var parentAddress common.Address
 
-	address := common.HexToAddress("0xa5073710ee54574b77bfe8faebebe07823dc7dac")
-	instance, err := pt.NewParent(address, client)
+	//deploy parent
+	if result["address"] == nil {
 
-	bvglAddress := common.HexToAddress("0xf189078a9969cc0247b01437d2a6deb7be83e7bf")
+		parentAddress, _, _, err1 := ccp.DeployCoffeecoinparent(auth, client)
+		if err1 != nil {
+			fmt.Println("err1: ", err1)
+			log.Fatal(err1)
+		}
+
+		fmt.Printf("Contract CC-Parent pending deploy: 0x%x\n", parentAddress)
+
+		_, filename, _, _ := runtime.Caller(0)
+		// dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "CoffeeCoin", "contractparentAddress")
+
+		ccpJSON := createSCJson(parentAddress.Hex(), string(ccp.CoffeecoinparentABI))
+		ccpJSONDir := path.Join(path.Dir(filename), "ccParent.json")
+
+		err := ioutil.WriteFile(ccpJSONDir, ccpJSON, 0644)
+		if err != nil {
+			fmt.Println("Error writing JSON to file:", err)
+		}
+
+		err = ut.PostFile(ccpJSONDir, os.Getenv("UPID"))
+		ut.PrintError(err)
+
+		err = os.Remove(ccpJSONDir)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		time.Sleep(5 * time.Second)
+	} else {
+		parentAddress = common.HexToAddress(result["address"].(string))
+	}
+
+	instance, err := ccp.NewCoffeecoinparent(parentAddress, client)
+	check(err)
+	// bvglAddress := common.HexToAddress("0xf189078a9969cc0247b01437d2a6deb7be83e7bf")
 
 	key := [32]byte{}
 	copy(key[:], []byte("1"))
 
-	if *en.DplFlag == "upgrade" {
-		_, err = instance.RegisterBeverageList(auth, key, bvglAddress)
-	} else {
-		_, err = instance.UpgradeBeverageList(auth, key, bvglAddress)
-	}
+	_, err = instance.RegisterCoffeCoin(auth, key, ccAddress)
+	check(err)
 }
-func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 
+func TestCC(auth *bind.TransactOpts) {
+	client := ut.GetClientConnection()
+	contractAddress := common.HexToAddress("0x33a1bdf303d830d7264003dd9789a7f656c5c5e0")
+	ccInstance, _ := cc.NewCoffeecoin(contractAddress, client)
+
+	_, err := ccInstance.PayCoffee(auth)
+	check(err)
+	time.Sleep(5 * time.Second)
+
+	ob, _ := ccInstance.GetChairBalance(nil)
+
+	fmt.Println("own balance: ", ob)
+
+	price, _ := ccInstance.GetCoffeePrice(nil)
+
+	fmt.Println("price ", price)
+}
+
+func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 	chairAddress := common.HexToAddress("0x18ef96d887954472de5e9f47d60ba8dea371dbfe")
 	coffeePrice := new(big.Int).SetUint64(3)
 	matePrice := new(big.Int).SetUint64(5)
 	waterPrice := new(big.Int).SetUint64(2)
 
-	address, _, _, err1 := cc.DeployCoffeecoin(auth, client, chairAddress, coffeePrice, matePrice, waterPrice)
+	address, _, _, err1 := cc.DeployCoffeecoin(auth, client)
 	if err1 != nil {
 		fmt.Println("err1: ", err1)
 		log.Fatal(err1)
 	}
+	fmt.Printf("Contract CoffeCoin pending deploy: 0x%x\n", address)
+	time.Sleep(5 * time.Second)
 
-	deployCCParent(auth, client)
+	deployCCParent(auth, client, address)
+	ccInstance, _ := cc.NewCoffeecoin(address, client)
 
-	fmt.Printf("Contract Coffe Coin pending deploy: 0x%x\n", address)
+	ccInstance.SeInitValues(auth, chairAddress, coffeePrice, matePrice, waterPrice)
+
+	time.Sleep(5 * time.Second)
+
+	cprice, _ := ccInstance.GetCoffeePrice(nil)
+	fmt.Println("cprice: ", cprice)
+
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "CoffeeCoin", "contractAddress")
 
