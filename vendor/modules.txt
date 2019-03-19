@@ -41,9 +41,7 @@ github.com/golang/snappy
 github.com/google/uuid
 # github.com/gorilla/websocket v1.4.0
 github.com/gorilla/websocket
-# github.com/grandecola/mmap v0.2.0
-github.com/grandecola/mmap
-# github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f
+# github.com/mailru/easyjson v0.0.0-20190312143242-1de009706dbe
 github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
 github.com/mailru/easyjson/buffer
@@ -68,7 +66,9 @@ github.com/syndtr/goleveldb/leveldb/journal
 github.com/syndtr/goleveldb/leveldb/memdb
 github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
-# github.com/xujiajun/nutsdb v0.2.0
+# github.com/xujiajun/mmap-go v1.0.1
+github.com/xujiajun/mmap-go
+# github.com/xujiajun/nutsdb v0.4.0
 github.com/xujiajun/nutsdb
 github.com/xujiajun/nutsdb/ds/list
 github.com/xujiajun/nutsdb/ds/set
@@ -85,5 +85,6 @@ golang.org/x/net/websocket
 # golang.org/x/sys v0.0.0-20190306071516-a98ae47d97a5
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
+golang.org/x/sys/windows
 # gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 gopkg.in/natefinch/npipe.v2

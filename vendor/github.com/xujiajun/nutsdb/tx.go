@@ -139,6 +139,7 @@ func (tx *Tx) Commit() error {
 		return nil
 	}
 
+	lastIndex := writesLen - 1
 	for i := 0; i < writesLen; i++ {
 		entry := tx.pendingWrites[i]
 		entrySize := entry.Size()
@@ -152,7 +153,7 @@ func (tx *Tx) Commit() error {
 			}
 		}
 
-		if i == writesLen-1 {
+		if i == lastIndex {
 			entry.Meta.status = Committed
 		}
 
@@ -161,12 +162,21 @@ func (tx *Tx) Commit() error {
 			return err
 		}
 
+		if tx.db.opt.SyncEnable {
+			if err := tx.db.ActiveFile.rwManager.Sync(); err != nil {
+				return err
+			}
+		}
+
+		if i == lastIndex {
+			tx.db.committedTxIds[entry.Meta.txID] = struct{}{}
+		}
+
 		tx.db.ActiveFile.ActualSize += entrySize
 		tx.db.ActiveFile.writeOff += entrySize
 
 		e = nil
-		if tx.db.opt.EntryIdxMode == HintAndRAMIdxMode {
-			entry.Meta.status = Committed
+		if tx.db.opt.EntryIdxMode == HintKeyValAndRAMIdxMode {
 			e = entry
 		}
 
@@ -180,6 +190,22 @@ func (tx *Tx) Commit() error {
 		if entry.Meta.ds == DataStructureBPTree {
 			tx.buildBPTreeIdx(bucket, entry, e, off, countFlag)
 		}
+	}
+
+	tx.buildIdxes(writesLen)
+
+	tx.unlock()
+
+	tx.db = nil
+
+	return nil
+}
+
+func (tx *Tx) buildIdxes(writesLen int) {
+	for i := 0; i < writesLen; i++ {
+		entry := tx.pendingWrites[i]
+
+		bucket := string(entry.Meta.bucket)
 
 		if entry.Meta.ds == DataStructureSet {
 			tx.buildSetIdx(bucket, entry)
@@ -195,12 +221,6 @@ func (tx *Tx) Commit() error {
 
 		tx.db.KeyCount++
 	}
-
-	tx.unlock()
-
-	tx.db = nil
-
-	return nil
 }
 
 func (tx *Tx) buildBPTreeIdx(bucket string, entry, e *Entry, off int64, countFlag bool) {
@@ -291,12 +311,18 @@ func (tx *Tx) rotateActiveFile() error {
 	var err error
 	tx.db.MaxFileID++
 
-	if err := tx.db.ActiveFile.m.Unmap(); err != nil {
+	if !tx.db.opt.SyncEnable && tx.db.opt.RWMode == MMap {
+		if err := tx.db.ActiveFile.rwManager.Sync(); err != nil {
+			return err
+		}
+	}
+
+	if err := tx.db.ActiveFile.rwManager.Close(); err != nil {
 		return err
 	}
 
 	path := tx.db.getDataPath(tx.db.MaxFileID)
-	tx.db.ActiveFile, err = NewDataFile(path, tx.db.opt.SegmentSize)
+	tx.db.ActiveFile, err = NewDataFile(path, tx.db.opt.SegmentSize, tx.db.opt.RWMode)
 	if err != nil {
 		return err
 	}

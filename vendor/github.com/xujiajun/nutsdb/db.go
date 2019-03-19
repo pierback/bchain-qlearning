@@ -41,6 +41,9 @@ var (
 
 	// ErrEntryIdxModeOpt is returned when set db EntryIdxMode option is wrong.
 	ErrEntryIdxModeOpt = errors.New("err EntryIdxMode option set")
+
+	// ErrFn is returned when fn is nil.
+	ErrFn = errors.New("err fn")
 )
 
 const (
@@ -118,17 +121,18 @@ const (
 type (
 	// DB represents a collection of buckets that persist on disk.
 	DB struct {
-		opt          Options   // the database options
-		BPTreeIdx    BPTreeIdx // Hint Index
-		SetIdx       SetIdx
-		SortedSetIdx SortedSetIdx
-		ListIdx      ListIdx
-		ActiveFile   *DataFile
-		MaxFileID    int64
-		mu           sync.RWMutex
-		KeyCount     int // total key number ,include expired, deleted, repeated.
-		closed       bool
-		isMerging    bool
+		opt            Options   // the database options
+		BPTreeIdx      BPTreeIdx // Hint Index
+		SetIdx         SetIdx
+		SortedSetIdx   SortedSetIdx
+		ListIdx        ListIdx
+		ActiveFile     *DataFile
+		MaxFileID      int64
+		mu             sync.RWMutex
+		KeyCount       int // total key number ,include expired, deleted, repeated.
+		closed         bool
+		isMerging      bool
+		committedTxIds map[uint64]struct{}
 	}
 
 	// BPTreeIdx represents the B+ tree index
@@ -150,14 +154,15 @@ type (
 // Open returns a newly initialized DB object.
 func Open(opt Options) (*DB, error) {
 	db := &DB{
-		BPTreeIdx:    make(BPTreeIdx),
-		SetIdx:       make(SetIdx),
-		SortedSetIdx: make(SortedSetIdx),
-		ListIdx:      make(ListIdx),
-		MaxFileID:    0,
-		opt:          opt,
-		KeyCount:     0,
-		closed:       false,
+		BPTreeIdx:      make(BPTreeIdx),
+		SetIdx:         make(SetIdx),
+		SortedSetIdx:   make(SortedSetIdx),
+		ListIdx:        make(ListIdx),
+		MaxFileID:      0,
+		opt:            opt,
+		KeyCount:       0,
+		closed:         false,
+		committedTxIds: make(map[uint64]struct{}),
 	}
 
 	if ok := filesystem.PathIsExist(db.opt.Dir); !ok {
@@ -175,11 +180,19 @@ func Open(opt Options) (*DB, error) {
 
 // Update executes a function within a managed read/write transaction.
 func (db *DB) Update(fn func(tx *Tx) error) error {
+	if fn == nil {
+		return ErrFn
+	}
+
 	return db.managed(true, fn)
 }
 
 // View executes a function within a managed read-only transaction.
 func (db *DB) View(fn func(tx *Tx) error) error {
+	if fn == nil {
+		return ErrFn
+	}
+
 	return db.managed(false, fn)
 }
 
@@ -208,7 +221,7 @@ func (db *DB) Merge() error {
 
 	for _, pendingMergeFId := range pendingMergeFIds {
 		off = 0
-		f, err := NewDataFile(db.getDataPath(int64(pendingMergeFId)), db.opt.SegmentSize)
+		f, err := NewDataFile(db.getDataPath(int64(pendingMergeFId)), db.opt.SegmentSize, db.opt.RWMode)
 		if err != nil {
 			db.isMerging = false
 			return err
@@ -242,18 +255,23 @@ func (db *DB) Merge() error {
 				if err == io.EOF {
 					break
 				}
+				f.rwManager.Close()
 				return fmt.Errorf("when merge operation build hintIndex readAt err: %s", err)
 			}
 		}
 
 		if err := db.reWriteData(pendingMergeEntries); err != nil {
+			f.rwManager.Close()
 			return err
 		}
 
 		if err := os.Remove(db.getDataPath(int64(pendingMergeFId))); err != nil {
 			db.isMerging = false
+			f.rwManager.Close()
 			return fmt.Errorf("when merge err: %s", err)
 		}
+
+		f.rwManager.Close()
 	}
 
 	return nil
@@ -282,6 +300,8 @@ func (db *DB) Close() error {
 
 	db.closed = true
 
+	db.ActiveFile.rwManager.Close()
+
 	db.ActiveFile = nil
 
 	db.BPTreeIdx = nil
@@ -292,7 +312,7 @@ func (db *DB) Close() error {
 // setActiveFile sets the ActiveFile (DataFile object).
 func (db *DB) setActiveFile() (err error) {
 	filepath := db.getDataPath(db.MaxFileID)
-	db.ActiveFile, err = NewDataFile(filepath, db.opt.SegmentSize)
+	db.ActiveFile, err = NewDataFile(filepath, db.opt.SegmentSize, db.opt.RWMode)
 	if err != nil {
 		return
 	}
@@ -323,7 +343,7 @@ func (db *DB) getMaxFileIDAndFileIDs() (maxFileID int64, dataFileIds []int) {
 		dataFileIds = append(dataFileIds, idVal)
 	}
 
-	sort.Sort(sort.IntSlice(dataFileIds))
+	sort.Ints(dataFileIds)
 	maxFileID = int64(dataFileIds[len(dataFileIds)-1])
 
 	return
@@ -365,8 +385,7 @@ func (db *DB) parseDataFiles(dataFileIds []int) (unconfirmedRecords []*Record, c
 	for _, dataID := range dataFileIds {
 		off = 0
 		fID := int64(dataID)
-		f, err := NewDataFile(db.getDataPath(fID), db.opt.SegmentSize)
-
+		f, err := NewDataFile(db.getDataPath(fID), db.opt.SegmentSize, db.opt.StartFileLoadingMode)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -378,7 +397,7 @@ func (db *DB) parseDataFiles(dataFileIds []int) (unconfirmedRecords []*Record, c
 				}
 
 				e = nil
-				if db.opt.EntryIdxMode == HintAndRAMIdxMode {
+				if db.opt.EntryIdxMode == HintKeyValAndRAMIdxMode {
 					e = &Entry{
 						Key:   entry.Key,
 						Value: entry.Value,
@@ -410,10 +429,12 @@ func (db *DB) parseDataFiles(dataFileIds []int) (unconfirmedRecords []*Record, c
 				if off >= db.opt.SegmentSize {
 					break
 				}
-
+				f.rwManager.Close()
 				return nil, nil, fmt.Errorf("when build hintIndex readAt err: %s", err)
 			}
 		}
+
+		f.rwManager.Close()
 	}
 
 	return
@@ -422,6 +443,7 @@ func (db *DB) parseDataFiles(dataFileIds []int) (unconfirmedRecords []*Record, c
 // buildHintIdx builds the Hint Indexes.
 func (db *DB) buildHintIdx(dataFileIds []int) error {
 	unconfirmedRecords, committedTxIds, err := db.parseDataFiles(dataFileIds)
+	db.committedTxIds = committedTxIds
 
 	if err != nil {
 		return err
@@ -432,7 +454,7 @@ func (db *DB) buildHintIdx(dataFileIds []int) error {
 	}
 
 	for _, r := range unconfirmedRecords {
-		if _, ok := committedTxIds[r.H.meta.txID]; ok {
+		if _, ok := db.committedTxIds[r.H.meta.txID]; ok {
 			bucket := string(r.H.meta.bucket)
 
 			if r.H.meta.ds == DataStructureBPTree {
