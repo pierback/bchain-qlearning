@@ -18,6 +18,18 @@ func FilterSlice(dayArr []float64, sl timeslot) int {
 	return stateCount
 }
 
+func (qt *QTable) StringToMap(qts string) {
+	tqt := QTable{}
+	err := json.Unmarshal([]byte(qts), &tqt)
+	if err != nil {
+		fmt.Println("StringToMap", err)
+		*qt = make(QTable)
+	} else {
+		*qt = tqt
+	}
+
+}
+
 func MapToString(Qt QTable) []byte {
 	sm := map[string][]float64{}
 

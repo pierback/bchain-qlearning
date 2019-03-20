@@ -24,13 +24,11 @@ var (
 )
 
 func GetLatestContractAddress() common.Address {
-	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "BeverageList", "contractAddress")
-	dat, err := ioutil.ReadFile(dir)
-	fmt.Printf("Contract Address 0x%s\n", common.Bytes2Hex(dat))
-	if err != nil {
-		fmt.Println("Error ReadFile:", err)
-	}
-	return common.BytesToAddress(dat)
+	var result map[string]interface{} = DownloadFile("bvgl.json")
+	fmt.Println("result: ", result["address"])
+
+	fmt.Printf("Contract Address 0x%s\n", result["address"])
+	return common.HexToAddress(result["address"].(string))
 }
 
 //GetLocalIP get local ip
@@ -119,7 +117,6 @@ func PostFile(filename string, targetUrl string) error {
 		fmt.Println("error writing to buffer")
 		return err
 	}
-	fmt.Println("filename: ", filename)
 
 	// open file handle
 	fh, err := os.Open(filename)
@@ -143,11 +140,9 @@ func PostFile(filename string, targetUrl string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	resp_body, err := ioutil.ReadAll(resp.Body)
+	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-	fmt.Println(resp.Status)
-	fmt.Println(string(resp_body))
 	return nil
 }

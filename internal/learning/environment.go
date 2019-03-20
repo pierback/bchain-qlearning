@@ -66,6 +66,23 @@ func (str *ssid) isEduroam() bool {
 	return false
 }
 
+func TsBoundaries(ts uint) (int8, int8) {
+	switch ts {
+	case 0:
+		return 7, 9
+	case 1:
+		return 10, 12
+	case 2:
+		return 13, 15
+	case 3:
+		return 16, 18
+	case 4:
+		return 19, 6
+	default:
+		return -1, -1
+	}
+}
+
 //GetCurrentTimeSlot returns current timeslot
 func GetCurrentTimeSlot(ch int) timeslot {
 	switch ch {

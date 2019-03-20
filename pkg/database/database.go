@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 
-	dbj "github.com/sonyarouje/simdb/db"
 	"github.com/xujiajun/nutsdb"
 )
 
@@ -35,33 +34,12 @@ type qlvals struct {
 	Epsilon string `json:"ep"`
 }
 
-var (
-	driver *dbj.Driver
-)
-
-func StartJsonDB() {
-	driver, err = dbj.New("data")
-	if err != nil {
-		panic(err)
-	}
-
-	//GET ALL qlvals
-	//opens the customer json file and filter all the customers with name sarouje.
-	//AsEntity takes a pointer to qlvals array and fills the result to it.
-	//we can loop through the customers array and retireve the data.
-	/* var customers []qlvals
-	err = driver.Open(qlvals{}).Where("name", "=", "sarouje").Get().AsEntity(&customers)
-	if err != nil {
-		panic(err)
-	} */
-}
-
 //StartDB inits db
 func StartDB() {
 	// Open the database located in the /tmp/nutsdb directory.
 	// It will be created if it doesn't exist.
 	opt := nutsdb.DefaultOptions
-	fileDir := "/tmp/nutsdb_example"
+	fileDir := "/tmp/qlearning"
 
 	files, _ := ioutil.ReadDir(fileDir)
 	for _, f := range files {
@@ -80,7 +58,6 @@ func StartDB() {
 		panic(err)
 	}
 	bucket = "users"
-
 }
 
 //SaveQl saves qt and current epsilon val
@@ -96,41 +73,30 @@ func SaveQl(usr string, qt []byte, ep string) {
 
 	if err := db.Update(
 		func(tx *nutsdb.Tx) error {
-			key := []byte(usr)
+			key := []byte("usr_" + usr)
 			val := jsonData
 			return tx.RPush(bucket, key, val)
 		}); err != nil {
 		log.Fatal(err)
 	}
+}
 
-	q := Qlearner{
-		Usr: usr,
-		Qv: qlvals{
-			Qtable:  string(qt[:]),
-			Epsilon: ep,
-		},
-	}
-
-	//creates a new qlvals file inside the directory passed as the parameter to New()
-	//if the qlvals file already exist then insert operation will add the customer data to the array
-	err = driver.Insert(q)
-	if err != nil {
-		panic(err)
-	}
-
+func GetQl(usr string) (string, string) {
+	vals := qlvals{}
 	if err := db.View(
 		func(tx *nutsdb.Tx) error {
-			key := []byte(usr)
+			key := []byte("usr_" + usr)
 			item, err := tx.LPeek(bucket, key)
 			if err != nil {
 				return err
 			}
 
-			vals := qlvals{}
 			json.Unmarshal(item, &vals)
 			fmt.Printf("inserted vals epsi: %s qt: %s \n", string(vals.Epsilon[:]), string(vals.Qtable[:]))
 			return nil
 		}); err != nil {
-		log.Fatal(err)
+		log.Println("error retrieving from db", err)
+		return string(vals.Epsilon[:]), string(vals.Qtable[:])
 	}
+	return "", ""
 }
