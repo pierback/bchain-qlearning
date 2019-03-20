@@ -18,5 +18,5 @@ Untitled-1.md
 qtable.json
 id_travis_rsa
 Godeps/Readme
-internal/contracts/CoffeeCoin/CoffeeCoin.go
-internal/contracts/BeverageList/BeverageList.go
+# internal/contracts/CoffeeCoin/CoffeeCoin.go
+# internal/contracts/BeverageList/BeverageList.go
