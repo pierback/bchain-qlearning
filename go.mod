@@ -72,7 +72,7 @@ require (
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/shurcooL/webdavfs v0.0.0-20181215192745-5988b2d638f6 // indirect
 	github.com/sirupsen/logrus v1.3.0 // indirect
-	github.com/sonyarouje/simdb v0.0.0-20181202125413-c2488dfc374a
+	github.com/sonyarouje/simdb v0.0.0-20181202125413-c2488dfc374a // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/urfave/cli v1.20.0 // indirect
