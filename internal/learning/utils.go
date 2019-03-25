@@ -2,7 +2,7 @@ package learning
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"os"
 	"os/user"
 )
@@ -22,7 +22,7 @@ func (qt *QTable) StringToMap(qts string) {
 	tqt := QTable{}
 	err := json.Unmarshal([]byte(qts), &tqt)
 	if err != nil {
-		fmt.Println("StringToMap", err)
+		log.Println("StringToMap", err)
 		*qt = make(QTable)
 	} else {
 		*qt = tqt
@@ -39,7 +39,7 @@ func MapToString(Qt QTable) []byte {
 
 	jsonData, err := json.Marshal(sm)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	return jsonData
 }
@@ -48,26 +48,26 @@ func writeJsonFile(jsonData []byte) {
 	usr, err := user.Current()
 
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 
 	jsonFile, err := os.Create(usr.HomeDir + "/qtable.json")
 
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	defer jsonFile.Close()
 
 	jsonFile.Write(jsonData)
 	jsonFile.Close()
-	fmt.Println("JSON data written to ", jsonFile.Name())
+	log.Println("JSON data written to ", jsonFile.Name())
 }
 
 func stateToString(state State) string {
 	out, err := json.Marshal(state)
 	if err != nil {
-		fmt.Println(err)
-		panic(err)
+		log.Println(err)
+		log.Println(err)
 	}
 	return string(out)
 }
@@ -89,7 +89,7 @@ func makeRange(min, max int) []int {
 }
 
 func contains(s []int, e int) bool {
-	fmt.Println("s", s)
+	log.Println("s", s)
 	for _, a := range s {
 		if a == e {
 			return true

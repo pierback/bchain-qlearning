@@ -25,7 +25,7 @@ var (
 
 func GetLatestContractAddress() common.Address {
 	var result map[string]interface{} = DownloadFile("bvgl.json")
-	fmt.Println("result: ", result["address"])
+	log.Println("result: ", result["address"])
 
 	fmt.Printf("Contract Address 0x%s\n", result["address"])
 	return common.HexToAddress(result["address"].(string))
@@ -89,7 +89,7 @@ func DownloadFile(filename string) map[string]interface{} {
 	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer resp.Body.Close()
 
@@ -114,14 +114,14 @@ func PostFile(filename string, targetUrl string) error {
 	// this step is very important
 	fileWriter, err := bodyWriter.CreateFormFile("uploadfile", path.Base(filename))
 	if err != nil {
-		fmt.Println("error writing to buffer")
+		log.Println("error writing to buffer")
 		return err
 	}
 
 	// open file handle
 	fh, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("error opening file")
+		log.Println("error opening file")
 		return err
 	}
 	defer fh.Close()

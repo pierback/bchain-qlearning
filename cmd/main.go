@@ -21,6 +21,8 @@ func main() {
 
 	// dp.DeploySC()
 
+	//defer to close when you're done with it, not because you think it's idiomatic!
+
 	if *en.DplFlag == "cffcn" || *en.DplFlag == "bvrglst" {
 		dp.DeploySC()
 	} else {

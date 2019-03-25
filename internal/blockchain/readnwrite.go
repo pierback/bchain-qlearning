@@ -1,7 +1,7 @@
 package blockchain
 
 import (
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -35,8 +35,8 @@ func setDrinkData(instance *bl.Beveragelist) {
 
 func getFromTime(instance *bl.Beveragelist, t [32]byte) {
 	drink, weekday, _ := instance.GetDrinkData(nil, t)
-	fmt.Println("getFromTime drink", string(drink[:]))
-	fmt.Println("getFromTime weekday", string(weekday[:]))
+	log.Println("getFromTime drink", string(drink[:]))
+	log.Println("getFromTime weekday", string(weekday[:]))
 }
 
 /* func getLastDrink(instance *bl.Beveragelist) {

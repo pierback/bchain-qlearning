@@ -96,9 +96,9 @@ func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 	time.Sleep(5 * time.Second)
 
 	// deployCCParent(auth, client, address)
-	ccInstance, _ := cc.NewCoffeecoin(address, client)
+	// ccInstance, _ := cc.NewCoffeecoin(address, client)
 
-	time.Sleep(5 * time.Second)
+	/* time.Sleep(5 * time.Second)
 	// ccInstance.SetInitValues(auth, chairAddress, coffeePrice, matePrice, waterPrice)
 
 	_, err := ccInstance.PayCoffee(auth)
@@ -111,12 +111,12 @@ func ccDeploy(auth *bind.TransactOpts, client *ethclient.Client) {
 	cb, _ := ccInstance.GetChairBalance(nil)
 
 	fmt.Println("GetChairBalance balance: ", cb)
-
+	*/
 	_, filename, _, _ := runtime.Caller(0)
 	bvglJSON := createSCJson(address.Hex(), string(cc.CoffeecoinABI))
 	bvglJSONDir := path.Join(path.Dir(filename), "cc.json")
 
-	err = ioutil.WriteFile(bvglJSONDir, bvglJSON, 0644)
+	err := ioutil.WriteFile(bvglJSONDir, bvglJSON, 0644)
 	if err != nil {
 		fmt.Println("Error writing JSON to file:", err)
 	}

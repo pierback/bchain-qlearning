@@ -1,7 +1,7 @@
 package usermanagement
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	l "github.com/pierback/bchain-qlearning/internal/learning"
@@ -28,8 +28,8 @@ func (su *SimulatedUser) InitLearner() {
 }
 
 //InitLearner for real user
-func (u *User) InitLearner() l.QLearning {
-	q := l.QLearning{}
+func (u *User) InitLearner() *l.QLearning {
+	q := &l.QLearning{}
 	q.Initialize()
 
 	tmpState := l.UserState{}
@@ -51,13 +51,13 @@ func (su *SimulatedUser) Start(q *l.QLearning) {
 	wts, su.vsa = GenerateTrainingSet()
 	var wa []int
 
-	fmt.Println("start")
+	log.Println("start")
 	for reps := 0; reps < 100; reps++ {
 
 		q.State = vs.New(l.Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(time.Monday), float64(7))
 
-		fmt.Println(" ")
-		fmt.Println(" ")
+		log.Println(" ")
+		log.Println(" ")
 
 		for d := 1; d < q.Workdays+1; d++ {
 			for sl := 7; sl < 19; sl += 3 {
@@ -77,16 +77,16 @@ func (su *SimulatedUser) Start(q *l.QLearning) {
 			}
 		}
 		wa = append(wa, q.Sr.Neg)
-		fmt.Println("Negs: ", wa)
-		// fmt.Println("q.Sr.neg: ", q.Sr.neg)
-		fmt.Println(" ")
+		log.Println("Negs: ", wa)
+		// log.Println("q.Sr.neg: ", q.Sr.neg)
+		log.Println(" ")
 		q.Sr.Neg = 0
 	}
 
 	// writeJsonFile(MapToString(q.Qt))
 
-	fmt.Println("Q-Table \n", q.Qt)
-	fmt.Println("successratio", wa)
+	log.Println("Q-Table \n", q.Qt)
+	log.Println("successratio", wa)
 }
 
 //UserMock mocks user behavior
@@ -111,7 +111,7 @@ func GenerateTrainingSet() ([][]float64, l.SimulatedStateActions) {
 		for slot, clock := range wt {
 			s := ss.New(l.Drinkcount{CoffeeCount: slot, WaterCount: 0, MateCount: 0}, day+1, clock)
 			if time.Weekday(day+1) == time.Friday {
-				fmt.Println("state state state", s)
+				log.Println("state state state", s)
 			}
 			trs[s] = l.Coffee
 		}

@@ -3,14 +3,22 @@ package usermanagement
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	l "github.com/pierback/bchain-qlearning/internal/learning"
 	db "github.com/pierback/bchain-qlearning/pkg/database"
 )
 
+var dbFile *os.File
+
 //StartWorker starts worker job
 func StartWorker() {
+	dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer dbFile.Close()
 	fmt.Printf("\nWorker started \n")
 	initBm()
 
@@ -57,14 +65,23 @@ func run() {
 		ql.Learn(actn)
 		qvalsN += ql.GetQ(l.Nothing, ql.GetState())
 		qvalsC += ql.GetQ(l.Coffee, ql.GetState())
-		saveToDb(usr.ethaddress, ql)
+		// saveToDb(usr.ethaddress, ql)
+		log.Printf("User %s Steps: %d/%d=%f \n", usr, ql.Sr.Neg, ql.Sr.Steps)
+
+		if time.Now().Weekday() == time.Friday && time.Now().Hour() == 20 {
+			ql.Sr.Wa = append(ql.Sr.Wa, ql.Sr.Neg)
+			ql.Sr.Neg = 0
+		}
 	}
 	bcm.SetGenQvals(qvalsN, qvalsC)
+	log.SetOutput(dbFile)
 }
 
 func saveToDb(usr string, ql l.QLearning) {
 	qt := l.MapToString(ql.Qt)
+	fmt.Println("qt:", qt)
 	ep := fmt.Sprintf("%f", ql.Epsilon)
+	fmt.Println("ep:", ep)
 	db.SaveQl(usr, qt, ep)
 }
 

@@ -7,6 +7,7 @@ require (
 	dmitri.shuralyov.com/app/changes v0.0.0-20181114035150-5af16e21babb // indirect
 	dmitri.shuralyov.com/service/change v0.0.0-20190301072032-c25fb47d71b3 // indirect
 	github.com/AndreasBriese/bbloom v0.0.0-20190306092124-e2d15f34fcf9 // indirect
+	github.com/Jeffail/gabs v1.2.0
 	github.com/Shopify/sarama v1.21.0 // indirect
 	github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296 // indirect
 	github.com/allegro/bigcache v1.2.0 // indirect
@@ -88,6 +89,7 @@ require (
 	golang.org/x/perf v0.0.0-20190124201629-844a5f5b46f4 // indirect
 	golang.org/x/sys v0.0.0-20190306071516-a98ae47d97a5 // indirect
 	golang.org/x/tools v0.0.0-20190305160728-f8c04913dfb7 // indirect
+	google.golang.org/api v0.1.0
 	google.golang.org/genproto v0.0.0-20190305195749-c21a8b77f9f0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	honnef.co/go/tools v0.0.0-20190215041234-466a0476246c // indirect
