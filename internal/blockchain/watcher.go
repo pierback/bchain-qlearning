@@ -67,10 +67,10 @@ func readEvent(eventLog types.Log, client *ethclient.Client) {
 
 	log.Println(" ")
 	log.Println("New Event:")
-	log.Println("   Address", event.Address.Hex())
-	log.Println("   time", string(event.Time[:32]))
-	log.Println("   drink", string(event.Drink[:32]))
-	log.Println("   Weekday", string(event.Weekday[:32]))
+	log.Printf("   Address %s \n", event.Address.Hex())
+	log.Printf("   time %s \n", string(event.Time[:32]))
+	log.Printf("   drink %s \n", string(event.Drink[:32]))
+	log.Printf("   Weekday %s \n", string(event.Weekday[:32]))
 	log.Println(" ")
 
 	dr := string(bytes.Trim(event.Drink[:], "\x00"))

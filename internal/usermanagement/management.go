@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
-	"runtime"
 	"strconv"
 	"sync"
 
@@ -51,15 +49,19 @@ func initPrevQl() {
 	bcm.mu.Lock()
 	defer bcm.mu.Unlock()
 
-	_, filename, _, _ := runtime.Caller(0)
-	usrs, _ := readUsers(path.Join(path.Dir(filename), "/usrs.txt"))
-	log.Println("REad users \n", usrs)
+	// _, filename, _, _ := runtime.Caller(0)
+	// usrs, _ := readUsers(path.Join(path.Dir(filename), "/usrs.txt"))
+	// log.Println("REad users \n", usrs)
+
+	usrs := []string{"0xe8816898d851d5b61b7f950627d04d794c07ca37", "0x5409ed021d9299bf6814279a6a1411a7e866a631", "0x6ecbe1db9ef729cbe972c83fb886247691fb6beb", "0xe36ea790bc9d7ab70c55260c66d52b1eca985f84", "0xe834ec434daba538cd1b9fe1582052b880bd7e63", "0x78dc5d2d739606d31509c31d654056a45185ecb6"}
 
 	for _, usr := range usrs {
-		ep, qt := db.GetQl(usr)
-		log.Println("ep, qt: ", ep, qt)
-		if ep != "" {
-			ql := setQl(ep, qt)
+		result := db.GetQl(usr)
+		if result != nil {
+			qt := result["qt"].(string)
+			log.Println("ep, qt: ", result["ep"].(string), result["qt"].(string))
+
+			ql := setQl(result["ep"].(string), qt)
 			bcm.set(User{ethaddress: usr}, *ql)
 		}
 	}
@@ -115,7 +117,7 @@ func (bcm *UserManagement) initUser(ethaddrs string) *l.QLearning {
 	ql := usr.InitLearner()
 
 	bcm.set(usr, *ql)
-	saveUser()
+	// saveUser()
 
 	return ql
 }
@@ -125,8 +127,8 @@ func saveUser() {
 	for k := range bcm.users {
 		usrs = append(usrs, k.ethaddress)
 	}
-	_, filename, _, _ := runtime.Caller(0)
-	writeUsers(usrs, path.Join(path.Dir(filename), "/usrs.txt"))
+	// _, filename, _, _ := runtime.Caller(0)
+	// writeUsers(usrs, path.Join(path.Dir(filename), "/usrs.txt"))
 }
 
 func (bcm *UserManagement) printUsers() {
@@ -140,12 +142,12 @@ func (bcm *UserManagement) getGeneralPrediction(newUserQl l.QLearning) l.Action 
 }
 
 func (bcm *UserManagement) SetGenQvals(qvsn float64, qvsc float64) {
-	log.Printf("qvsn %f, qvsc %f \n", qvsn, qvsc)
+	// log.Printf("qvsn %f, qvsc %f \n", qvsn, qvsc)
 	usrCnt := len(bcm.users)
 	ql := bcm.getQlearning(GENERALUSER)
 	qvalsNothing := qvsn / float64(usrCnt)
 	qvalsCoffee := qvsc / float64(usrCnt)
-	log.Printf("qvalsNothing %f, qvalsCoffee %f \n\n", qvalsNothing, qvalsCoffee)
+	// log.Printf("qvalsNothing %f, qvalsCoffee %f \n\n", qvalsNothing, qvalsCoffee)
 	ql.SetQ(l.Nothing, qvalsNothing)
 	ql.SetQ(l.Coffee, qvalsCoffee)
 }
@@ -178,8 +180,8 @@ func writeUsers(users []string, path string) error {
 	defer file.Close()
 
 	w := bufio.NewWriter(file)
-	/* for _, line := range users {
-		// log.Println("", w, line)
-	} */
+	for _, line := range users {
+		fmt.Fprintln(w, line)
+	}
 	return w.Flush()
 }

@@ -2,6 +2,7 @@ package usermanagement
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -14,19 +15,26 @@ var dbFile *os.File
 
 //StartWorker starts worker job
 func StartWorker() {
-	dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
+
 	defer dbFile.Close()
 	fmt.Printf("\nWorker started \n")
 	initBm()
 
-	<-nextTick()
 	run()
 
-	for range time.Tick(3 * time.Hour) {
+	/* <-nextTick()
+	run()
+
+	for range time.Tick(3 * time.Hour) {*/
+	for range time.Tick(30 * time.Second) {
 		run()
+		dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer dbFile.Close()
+		wrt := io.MultiWriter(os.Stdout, dbFile)
+		log.SetOutput(wrt)
 	}
 }
 
@@ -59,14 +67,15 @@ func run() {
 	actn := l.Nothing
 	var qvalsN, qvalsC float64
 
-	log.Println("usrs ", len(bcm.users))
 	for usr, ql := range bcm.users {
 		log.Println("next urs", usr)
 		ql.Learn(actn)
 		qvalsN += ql.GetQ(l.Nothing, ql.GetState())
 		qvalsC += ql.GetQ(l.Coffee, ql.GetState())
-		// saveToDb(usr.ethaddress, ql)
-		log.Printf("User %s Steps: %d/%d=%f \n", usr, ql.Sr.Neg, ql.Sr.Steps)
+
+		go saveToDb(usr.ethaddress, ql)
+
+		log.Printf("User %s Steps: %d/ Neg: %d \n", usr, ql.Sr.Steps, ql.Sr.Neg)
 
 		if time.Now().Weekday() == time.Friday && time.Now().Hour() == 20 {
 			ql.Sr.Wa = append(ql.Sr.Wa, ql.Sr.Neg)
@@ -74,15 +83,12 @@ func run() {
 		}
 	}
 	bcm.SetGenQvals(qvalsN, qvalsC)
-	log.SetOutput(dbFile)
 }
 
 func saveToDb(usr string, ql l.QLearning) {
 	qt := l.MapToString(ql.Qt)
-	fmt.Println("qt:", qt)
 	ep := fmt.Sprintf("%f", ql.Epsilon)
-	fmt.Println("ep:", ep)
-	db.SaveQl(usr, qt, ep)
+	db.SaveQl(usr, qt, ep, ql.Sr.Neg, ql.Sr.Wa)
 }
 
 //Learn triggers learning func of qlearning
@@ -93,7 +99,6 @@ func Learn(ethAdrs string, at string) {
 		bcm.mu.RLock()
 		q := bcm.getQlearning(ethAdrs)
 		q.Learn(actn)
-		// usr := User{ethAdrs}
 		bcm.set(User{ethAdrs}, *q)
 	}
 }

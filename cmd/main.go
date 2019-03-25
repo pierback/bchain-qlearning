@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 
 	bc "github.com/pierback/bchain-qlearning/internal/blockchain"
 	um "github.com/pierback/bchain-qlearning/internal/usermanagement"
@@ -14,6 +15,8 @@ import (
 )
 
 func main() {
+	var wg sync.WaitGroup
+	wg.Add(2)
 	en.SetEnvVars()
 
 	db.StartDB()
@@ -32,16 +35,17 @@ func main() {
 		// bc.InsertNRetrieve()
 		// bc.ReadWrite()
 
-		go um.StartWorker()
-
 		/* su := l.SimulatedUser{}
 		su.InitLearner() */
 
+		go um.StartWorker()
 		if *en.BcFlag == "watch" {
-			bc.Watch()
+			go bc.Watch()
 		} else if *en.BcFlag == "rw" {
 			bc.TestBl()
 		}
+
 	}
+	wg.Wait()
 	fmt.Println("Main")
 }

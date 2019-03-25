@@ -1,12 +1,17 @@
 package database
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
+	"runtime"
 
-	"github.com/Jeffail/gabs"
 	"github.com/xujiajun/nutsdb"
+
+	ut "github.com/pierback/bchain-qlearning/pkg/utils"
 )
 
 var (
@@ -31,6 +36,8 @@ type Qlearner struct {
 type qlvals struct {
 	Qtable  string `json:"qt"`
 	Epsilon string `json:"ep"`
+	Negs    int    `json:"negs"`
+	Wa      []int  `json:"Wk_negs"`
 }
 
 var (
@@ -43,34 +50,35 @@ func StartDB() {
 }
 
 //SaveQl saves qt and current epsilon val
-func SaveQl(usr string, qt []byte, ep string) {
-	/* byteValue, _ := ioutil.ReadAll(jsonFile)
-		jsonParsedObj, _ := gabs.ParseJSON(byteValue)
-	  jsonObj, _ := gabs.Consume(jsonParsedObj)
-	*/
-	jsonObj := gabs.New()
-
+func SaveQl(usr string, qt []byte, ep string, ng int, wa []int) {
 	qlvs := &qlvals{Qtable: string(qt[:]), Epsilon: ep}
-	jsonObj.Set(qlvs, usr)
 
-	log.Println(jsonObj.String())
+	_, filename, _, _ := runtime.Caller(0)
+	bvglJSON := createSCJson(qlvs)
+	file := usr + "-ql.json"
+	bvglJSONDir := path.Join(path.Dir(filename), file)
 
-	// write to JSON file
-
+	err := ioutil.WriteFile(bvglJSONDir, bvglJSON, 0644)
 	if err != nil {
-		log.Println(err)
+		fmt.Println("Error writing JSON to file:", err)
 	}
-	defer jsonFile.Close()
 
-	jsonFile.Write([]byte(jsonObj.String()))
-	jsonFile.Close()
-	log.Println("JSON data written to ", jsonFile.Name())
+	err = ut.PostFile(bvglJSONDir, os.Getenv("UPID"))
+	ut.PrintError(err)
+
+	err = os.Remove(bvglJSONDir)
 }
 
-func GetQl(usr string) (string, string) {
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	jsonParsed, _ := gabs.ParseJSON(byteValue)
-	value, _ := jsonParsed.Search(usr).Data().(qlvals)
+func GetQl(usr string) map[string]interface{} {
+	fmt.Println("GetQl: ", usr)
+	var result map[string]interface{} = ut.DownloadFile(usr + "-ql.json")
+	return result
+}
 
-	return value.Qtable, value.Epsilon
+func createSCJson(qv *qlvals) []byte {
+	output, err := json.MarshalIndent(&qv, "", "\t\t")
+	if err != nil {
+		log.Println("Error marshalling to JSON:", err)
+	}
+	return output
 }
