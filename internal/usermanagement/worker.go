@@ -22,10 +22,10 @@ func StartWorker() {
 	fmt.Printf("\nWorker started \n")
 	initBm()
 
-	/* <-nextTick()
-	run() */
+	<-nextTick()
+	run()
 
-	for range time.Tick(30 * time.Second) {
+	for range time.Tick(3 * time.Hour) {
 		run()
 	}
 }
