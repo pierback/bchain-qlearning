@@ -23,8 +23,8 @@ func SetEnvVars() {
 	ws := ut.GetEthWsAddr()
 	os.Setenv("WS", ws)
 
-	sip := ut.GetServerIP()
-	// sip := "oc-appsrv01.informatik.uni-augsburg.de"
+	// sip := ut.GetServerIP()
+	sip := "oc-appsrv01.informatik.uni-augsburg.de"
 	fmt.Printf("ServerIP: %s", sip)
 	os.Setenv("SIP", sip)
 

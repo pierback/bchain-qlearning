@@ -22,11 +22,11 @@ func StartWorker() {
 
 	run()
 
-	/* <-nextTick()
+	<-nextTick()
 	run()
 
-	for range time.Tick(3 * time.Hour) {*/
-	for range time.Tick(30 * time.Second) {
+	for range time.Tick(3 * time.Hour) {
+		// for range time.Tick(30 * time.Second) {
 		run()
 		dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
@@ -60,6 +60,7 @@ func nextTick() <-chan time.Time {
 }
 
 func run() {
+	log.Printf("Timeslot ended worker runs: \n\n")
 	bcm.mu.RLock()
 	defer bcm.mu.RUnlock()
 
