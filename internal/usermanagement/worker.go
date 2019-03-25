@@ -2,6 +2,7 @@ package usermanagement
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	l "github.com/pierback/bchain-qlearning/internal/learning"
@@ -13,10 +14,10 @@ func StartWorker() {
 	fmt.Printf("\nWorker started \n")
 	initBm()
 
-	<-nextTick()
-	run()
+	/* <-nextTick()
+	run() */
 
-	for range time.Tick(3 * time.Hour) {
+	for range time.Tick(30 * time.Second) {
 		run()
 	}
 }
@@ -50,9 +51,9 @@ func run() {
 	actn := l.Nothing
 	var qvalsN, qvalsC float64
 
-	fmt.Println("usrs ", len(bcm.users))
+	log.Println("usrs ", len(bcm.users))
 	for usr, ql := range bcm.users {
-		fmt.Println("next urs", usr)
+		log.Println("next urs", usr)
 		ql.Learn(actn)
 		qvalsN += ql.GetQ(l.Nothing, ql.GetState())
 		qvalsC += ql.GetQ(l.Coffee, ql.GetState())
@@ -69,10 +70,13 @@ func saveToDb(usr string, ql l.QLearning) {
 
 //Learn triggers learning func of qlearning
 func Learn(ethAdrs string, at string) {
+	log.Printf("Learn ethAdrs: %s \n", ethAdrs)
 	actn := l.GetAction(at)
 	if actn == l.Coffee || actn == l.Nothing {
 		bcm.mu.RLock()
 		q := bcm.getQlearning(ethAdrs)
 		q.Learn(actn)
+		// usr := User{ethAdrs}
+		bcm.set(User{ethAdrs}, *q)
 	}
 }
