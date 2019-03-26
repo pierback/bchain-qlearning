@@ -2,6 +2,7 @@ language: go
 go:
   - 1.10.x
   - master
+go_import_path: github.com/pierback/bchain-qlearning
 os:
   - linux
   - osx
@@ -10,4 +11,4 @@ sudo: false
 install: true
 script:
   - env GO111MODULE=on go build
-  - env GO111MODULE=on go test
+  - env GO111MODULE=on go test -v -race ./...
