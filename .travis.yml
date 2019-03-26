@@ -9,5 +9,4 @@ os:
 dist: trusty
 install: true
 script:
-  - env GO111MODULE=on go build cmd/main.go
   - env GO111MODULE=on go test -v -race ./...
