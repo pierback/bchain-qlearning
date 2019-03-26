@@ -6,5 +6,8 @@ go_import_path: github.com/pierback/bchain-qlearning
 os:
   - linux
   - osx
+dist: trusty
+install: true
 script:
+  - env GO111MODULE=on go build cmd/main.go
   - env GO111MODULE=on go test -v -race ./...
