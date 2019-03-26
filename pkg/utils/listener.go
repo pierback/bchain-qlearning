@@ -46,7 +46,7 @@ func Listen(address string) string {
 	case ip, _ := <-ch:
 		return ip
 	case <-time.After(1 * time.Second):
-		fmt.Println("Timed out: no udp-cast available")
+		log.Println("Timed out: no udp-cast available")
 		return ""
 	}
 }

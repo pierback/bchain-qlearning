@@ -6,9 +6,12 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
+	"runtime"
 
-	dbj "github.com/sonyarouje/simdb/db"
 	"github.com/xujiajun/nutsdb"
+
+	ut "github.com/pierback/bchain-qlearning/pkg/utils"
 )
 
 var (
@@ -33,104 +36,49 @@ type Qlearner struct {
 type qlvals struct {
 	Qtable  string `json:"qt"`
 	Epsilon string `json:"ep"`
+	Negs    int    `json:"negs"`
+	Wa      []int  `json:"Wk_negs"`
 }
 
 var (
-	driver *dbj.Driver
+	jsonFile *os.File
 )
-
-func StartJsonDB() {
-	driver, err = dbj.New("data")
-	if err != nil {
-		panic(err)
-	}
-
-	//GET ALL qlvals
-	//opens the customer json file and filter all the customers with name sarouje.
-	//AsEntity takes a pointer to qlvals array and fills the result to it.
-	//we can loop through the customers array and retireve the data.
-	/* var customers []qlvals
-	err = driver.Open(qlvals{}).Where("name", "=", "sarouje").Get().AsEntity(&customers)
-	if err != nil {
-		panic(err)
-	} */
-}
 
 //StartDB inits db
 func StartDB() {
-	// Open the database located in the /tmp/nutsdb directory.
-	// It will be created if it doesn't exist.
-	opt := nutsdb.DefaultOptions
-	fileDir := "/tmp/nutsdb_example"
-
-	files, _ := ioutil.ReadDir(fileDir)
-	for _, f := range files {
-		name := f.Name()
-		if name != "" {
-			err := os.Remove(fileDir + "/" + name)
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-	opt.Dir = fileDir
-	opt.SegmentSize = 1024 * 1024 // 1MB
-	db, err = nutsdb.Open(opt)
-	if err != nil {
-		panic(err)
-	}
-	bucket = "users"
-
+	jsonFile, _ = os.Create("./Users.json")
 }
 
 //SaveQl saves qt and current epsilon val
-func SaveQl(usr string, qt []byte, ep string) {
+func SaveQl(usr string, qt []byte, ep string, ng int, wa []int) {
 	qlvs := &qlvals{Qtable: string(qt[:]), Epsilon: ep}
 
-	jsonData, err := json.Marshal(qlvs)
+	_, filename, _, _ := runtime.Caller(0)
+	bvglJSON := createSCJson(qlvs)
+	file := usr + "-ql.json"
+	bvglJSONDir := path.Join(path.Dir(filename), file)
+
+	err := ioutil.WriteFile(bvglJSONDir, bvglJSON, 0644)
 	if err != nil {
-		fmt.Println("error on marshalling qlvs", qlvs)
+		fmt.Println("Error writing JSON to file:", err)
 	}
 
-	fmt.Println("DB push data")
+	err = ut.PostFile(bvglJSONDir, os.Getenv("UPID"))
+	ut.PrintError(err)
 
-	if err := db.Update(
-		func(tx *nutsdb.Tx) error {
-			key := []byte(usr)
-			val := jsonData
-			return tx.RPush(bucket, key, val)
-		}); err != nil {
-		log.Fatal(err)
-	}
+	err = os.Remove(bvglJSONDir)
+}
 
-	q := Qlearner{
-		Usr: usr,
-		Qv: qlvals{
-			Qtable:  string(qt[:]),
-			Epsilon: ep,
-		},
-	}
+func GetQl(usr string) map[string]interface{} {
+	fmt.Println("GetQl: ", usr)
+	var result map[string]interface{} = ut.DownloadFile(usr + "-ql.json")
+	return result
+}
 
-	//creates a new qlvals file inside the directory passed as the parameter to New()
-	//if the qlvals file already exist then insert operation will add the customer data to the array
-	err = driver.Insert(q)
+func createSCJson(qv *qlvals) []byte {
+	output, err := json.MarshalIndent(&qv, "", "\t\t")
 	if err != nil {
-		panic(err)
+		log.Println("Error marshalling to JSON:", err)
 	}
-
-	if err := db.View(
-		func(tx *nutsdb.Tx) error {
-			key := []byte(usr)
-			item, err := tx.LPeek(bucket, key)
-			if err != nil {
-				return err
-			}
-
-			vals := qlvals{}
-			json.Unmarshal(item, &vals)
-			fmt.Printf("inserted vals epsi: %s qt: %s \n", string(vals.Epsilon[:]), string(vals.Qtable[:]))
-			return nil
-		}); err != nil {
-		log.Fatal(err)
-	}
+	return output
 }

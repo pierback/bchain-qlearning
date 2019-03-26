@@ -9,21 +9,24 @@ import (
 )
 
 var (
-	BcFlag  *string
-	DplFlag *string
+	BcFlag     *string
+	DplFlag    *string
+	parentFlag *string
 )
 
 func SetEnvVars() {
 	DplFlag = flag.String("dp", "", "deploy sm")
 	BcFlag = flag.String("bc", "watch", "test bchain")
+	parentFlag = flag.String("pt", "upgrade", "deploy or upgrade parent contract")
 	flag.Parse()
 
 	ws := ut.GetEthWsAddr()
 	os.Setenv("WS", ws)
 
-	sip := ut.GetServerIP()
+	// sip := ut.GetServerIP()
+	sip := "oc-appsrv01.informatik.uni-augsburg.de"
 	fmt.Printf("ServerIP: %s", sip)
-	os.Setenv("SIP", "oc-appsrv01.informatik.uni-augsburg.de")
+	os.Setenv("SIP", sip)
 
 	uip := ut.GetUploadIP()
 	fmt.Printf("  UploadIP: %s", uip)

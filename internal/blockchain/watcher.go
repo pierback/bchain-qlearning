@@ -3,7 +3,6 @@ package blockchain
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"log"
 	"math/big"
 	"strings"
@@ -37,7 +36,7 @@ func Watch() {
 	sub, err := client.SubscribeFilterLogs(ctx, query, ch)
 	ut.PrintError(err)
 
-	fmt.Println("\nStart watching for bchain events...")
+	log.Println("\nStart watching for bchain events...")
 
 	for {
 		select {
@@ -66,12 +65,13 @@ func readEvent(eventLog types.Log, client *ethclient.Client) {
 	err1 := contractAbi.Unpack(&event, "NewDrink", eventLog.Data)
 	ut.PrintError(err1)
 
-	fmt.Println(" ")
-	fmt.Println("New Event:")
-	fmt.Println("   Address", event.Address.Hex())
-	fmt.Println("   time", string(event.Time[:]))
-	fmt.Println("   drink", string(event.Drink[:32]))
-	fmt.Println(" ")
+	log.Println(" ")
+	log.Println("New Event:")
+	log.Printf("   Address %s \n", event.Address.Hex())
+	log.Printf("   time %s \n", string(event.Time[:32]))
+	log.Printf("   drink %s \n", string(event.Drink[:32]))
+	log.Printf("   Weekday %s \n", string(event.Weekday[:32]))
+	log.Println(" ")
 
 	dr := string(bytes.Trim(event.Drink[:], "\x00"))
 	wk.Learn(event.Address.Hex(), dr)
@@ -83,6 +83,6 @@ func getBlockTransactions(eventLog types.Log, client *ethclient.Client) {
 	ut.PrintError(err)
 
 	for _, tx := range block.Transactions() {
-		fmt.Println("Recipient", tx.To().Hex())
+		log.Println("Recipient", tx.To().Hex())
 	}
 }

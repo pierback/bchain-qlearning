@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -23,13 +24,11 @@ var (
 )
 
 func GetLatestContractAddress() common.Address {
-	dir := path.Join(path.Dir(filename), "../../..", "smart-contracts", "BeverageList", "contractAddress")
-	dat, err := ioutil.ReadFile(dir)
-	fmt.Printf("Contract Address 0x%s\n", common.Bytes2Hex(dat))
-	if err != nil {
-		fmt.Println("Error ReadFile:", err)
-	}
-	return common.BytesToAddress(dat)
+	var result map[string]interface{} = DownloadFile("bvgl.json")
+	log.Println("result: ", result["address"])
+
+	fmt.Printf("Contract Address 0x%s\n", result["address"])
+	return common.HexToAddress(result["address"].(string))
 }
 
 //GetLocalIP get local ip
@@ -60,6 +59,10 @@ func GetBchainIP() string {
 	return "ws://" + os.Getenv("SIP") + ":8546"
 }
 
+func DownloadIP() string {
+	return "http://" + os.Getenv("SIP") + ":9090/files/"
+}
+
 //GetClientConnection returns eth client
 func GetClientConnection() *ethclient.Client {
 	address := os.Getenv("BCIP")
@@ -81,6 +84,29 @@ func PrintError(err error) {
 	}
 }
 
+func DownloadFile(filename string) map[string]interface{} {
+	url := DownloadIP() + filename
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Println(err)
+	}
+	defer resp.Body.Close()
+
+	body, readErr := ioutil.ReadAll(resp.Body)
+	if readErr != nil {
+		log.Println(readErr)
+	}
+
+	var result map[string]interface{}
+	jsonErr := json.Unmarshal(body, &result)
+	if jsonErr != nil {
+		log.Println(jsonErr)
+	}
+
+	return result
+}
+
 func PostFile(filename string, targetUrl string) error {
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
@@ -88,15 +114,14 @@ func PostFile(filename string, targetUrl string) error {
 	// this step is very important
 	fileWriter, err := bodyWriter.CreateFormFile("uploadfile", path.Base(filename))
 	if err != nil {
-		fmt.Println("error writing to buffer")
+		log.Println("error writing to buffer")
 		return err
 	}
-	fmt.Println("filename: ", filename)
 
 	// open file handle
 	fh, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("error opening file")
+		log.Println("error opening file")
 		return err
 	}
 	defer fh.Close()
@@ -115,11 +140,9 @@ func PostFile(filename string, targetUrl string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	resp_body, err := ioutil.ReadAll(resp.Body)
+	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-	fmt.Println(resp.Status)
-	fmt.Println(string(resp_body))
 	return nil
 }

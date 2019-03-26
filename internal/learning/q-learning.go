@@ -2,6 +2,7 @@ package learning
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -43,6 +44,7 @@ type Successratio struct {
 	Steps  int
 	Neg    int
 	Greedy int
+	Wa     []int
 }
 
 // QTable type
@@ -71,7 +73,7 @@ func (q *QLearning) Initialize() {
 
 //Learn one iteration of qlearning proccess
 func (q *QLearning) Learn(fb Action) {
-	fmt.Println("Watched User Action: ", fb, q.Prediction)
+	log.Printf("Watched User Action:  %s <-> Prediction: %s \n", fb, q.Prediction)
 	//
 	// q.Epsilon = float64(1 / (q.Sr.steps + 1))
 	q.EvalPrediction(fb)
@@ -93,7 +95,7 @@ func (q *QLearning) EvalPrediction(fb Action) {
 	  qval := qsa + q.LearningRate*(reward+q.Gamma*_qsa-qsa) */
 
 	q.SetQ(q.Prediction, qval)
-	fmt.Println("eval prediction: ", q.State, "user: ", fb, "ql: ", q.Prediction)
+	// log.Println("eval prediction: ", q.State, "user: ", fb, "ql: ", q.Prediction)
 
 	q.State = newstate
 }
@@ -104,7 +106,7 @@ func (q *QLearning) MakePrediction() {
 	q.Prediction = q.EpsilonGreedy(s)
 
 	q.Epsilon *= q.EpsilonDecay
-	fmt.Println("make prediction: ", s, "ql:   ", q.Prediction.String())
+	log.Printf("Make prediction: %s --> state: %s", q.Prediction, s.toString())
 }
 
 //GetAction returns action with highest qval on given state
@@ -169,13 +171,13 @@ func (q *QLearning) SetQ(a Action, qv float64) {
 func (q *QLearning) GetState() State {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("panic panic panic")
+			log.Println("panic panic panic")
 			q.State = NewState()
 		}
 	}()
 
 	if q.State == nil {
-		fmt.Println("No panic")
+		log.Println("No panic")
 		q.State = NewState()
 	}
 

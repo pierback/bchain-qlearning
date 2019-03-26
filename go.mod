@@ -7,17 +7,18 @@ require (
 	dmitri.shuralyov.com/app/changes v0.0.0-20181114035150-5af16e21babb // indirect
 	dmitri.shuralyov.com/service/change v0.0.0-20190301072032-c25fb47d71b3 // indirect
 	github.com/AndreasBriese/bbloom v0.0.0-20190306092124-e2d15f34fcf9 // indirect
+	github.com/Jeffail/gabs v1.2.0
 	github.com/Shopify/sarama v1.21.0 // indirect
-	github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296
+	github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296 // indirect
 	github.com/allegro/bigcache v1.2.0 // indirect
 	github.com/aristanetworks/goarista v0.0.0-20190219163901-728bce664cf5 // indirect
 	github.com/btcsuite/btcd v0.0.0-20190213025234-306aecffea32 // indirect
 	github.com/btcsuite/goleveldb v1.0.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20190212144455-93d5ec2c7f76 // indirect
 	github.com/deckarep/golang-set v1.7.1 // indirect
-	github.com/dgraph-io/badger v1.5.4
+	github.com/dgraph-io/badger v1.5.4 // indirect
 	github.com/dgryski/go-farm v0.0.0-20190104051053-3adb47b1fb0f // indirect
-	github.com/dmichael/go-multicast v0.0.0-20170412170512-0421e0ed8695
+	github.com/dmichael/go-multicast v0.0.0-20170412170512-0421e0ed8695 // indirect
 	github.com/ethereum/go-ethereum v1.8.23
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/gliderlabs/ssh v0.1.3 // indirect
@@ -32,6 +33,7 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/gorilla/mux v1.7.0 // indirect
 	github.com/gorilla/websocket v1.4.0
+	github.com/grandecola/mmap v0.2.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.8.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
@@ -40,14 +42,14 @@ require (
 	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/kkdai/bstream v0.0.0-20181106074824-b3251f7901ec // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
-	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f
+	github.com/mailru/easyjson v0.0.0-20190312143242-1de009706dbe
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.6 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
-	github.com/nanobox-io/golang-scribble v0.0.0-20190309225732-aa3e7c118975
+	github.com/nanobox-io/golang-scribble v0.0.0-20190309225732-aa3e7c118975 // indirect
 	github.com/opentracing/opentracing-go v1.0.2 // indirect
 	github.com/openzipkin/zipkin-go v0.1.5 // indirect
-	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90 // indirect
@@ -71,11 +73,11 @@ require (
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/shurcooL/webdavfs v0.0.0-20181215192745-5988b2d638f6 // indirect
 	github.com/sirupsen/logrus v1.3.0 // indirect
-	github.com/sonyarouje/simdb v0.0.0-20181202125413-c2488dfc374a
+	github.com/sonyarouje/simdb v0.0.0-20181202125413-c2488dfc374a // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
-	github.com/urfave/cli v1.20.0
-	github.com/xujiajun/nutsdb v0.2.0
+	github.com/urfave/cli v1.20.0 // indirect
+	github.com/xujiajun/nutsdb v0.4.0
 	go.opencensus.io v0.19.1 // indirect
 	go4.org v0.0.0-20190218023631-ce4c26f7be8e // indirect
 	golang.org/x/build v0.0.0-20190306062701-d7985a8e4799 // indirect
@@ -87,6 +89,7 @@ require (
 	golang.org/x/perf v0.0.0-20190124201629-844a5f5b46f4 // indirect
 	golang.org/x/sys v0.0.0-20190306071516-a98ae47d97a5 // indirect
 	golang.org/x/tools v0.0.0-20190305160728-f8c04913dfb7 // indirect
+	google.golang.org/api v0.1.0
 	google.golang.org/genproto v0.0.0-20190305195749-c21a8b77f9f0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	honnef.co/go/tools v0.0.0-20190215041234-466a0476246c // indirect
