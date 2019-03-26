@@ -14,9 +14,9 @@ func TestDrinksCount(t *testing.T) {
 	fmt.Println("	")
 }
 
-func TestGenerateTrainingSet(t *testing.T) {
+/* func TestGenerateTrainingSet(t *testing.T) {
 	GenerateTrainingSet()
-}
+} */
 
 func TestUpdate(t *testing.T) {
 	t.Parallel()
@@ -94,7 +94,7 @@ func TestNew(t *testing.T) {
 	fmt.Println("TestNew start")
 
 	type Input struct {
-		dc Drinkcount
+		Dc Drinkcount
 		wd int
 		ct float64
 	}
@@ -104,7 +104,7 @@ func TestNew(t *testing.T) {
 		expected State
 	}{
 		{
-			input: Input{dc: Drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: -1, ct: -1},
+			input: Input{Dc: Drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: -1, ct: -1},
 			expected: VirtualState{
 				Weekday:  time.Now().Weekday(),
 				Timeslot: GetCurrentTimeSlot(time.Now().Hour()),
@@ -116,7 +116,7 @@ func TestNew(t *testing.T) {
 			},
 		},
 		{
-			input: Input{dc: Drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: 3, ct: 3},
+			input: Input{Dc: Drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: 3, ct: 3},
 			expected: VirtualState{
 				Weekday:  3,
 				Timeslot: GetCurrentTimeSlot(int(3)),
