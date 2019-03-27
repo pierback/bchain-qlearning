@@ -20,12 +20,10 @@ func StartWorker() {
 	fmt.Printf("\nWorker started \n")
 	initBm()
 
-	run()
-
 	<-nextTick()
 	run()
 
-	for range time.Tick(3 * time.Hour) {
+	for range nextTick() {
 		// for range time.Tick(30 * time.Second) {
 		run()
 		dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
@@ -39,12 +37,27 @@ func StartWorker() {
 }
 
 func nextTick() <-chan time.Time {
+	var lowerBoundary, day, hour int
 	curH := time.Now().Hour()
 	curts := l.GetCurrentTimeSlot(curH)
-	_, lb := l.TsBoundaries(uint(curts))
+	day = time.Now().Day()
+
+	//get lower boundary of next relevant timeslot
+	if curts+1 > 3 {
+		_, lowerBoundary = l.TsBoundaries(4)
+	} else {
+		_, lowerBoundary = l.TsBoundaries(uint(curts))
+	}
+	hour = lowerBoundary + 1
+
+	if time.Weekday(time.Now().Day()) == time.Saturday {
+		day = time.Now().AddDate(0, 0, 2).Day()
+		hour = 7
+	}
 
 	nextTick := time.Date(time.Now().Year(), time.Now().Month(),
-		time.Now().Day(), int(lb+1), int(0), int(0), int(0), time.Local)
+		day, hour, int(0), int(0), int(0), time.Local)
+
 	diff := nextTick.Sub(time.Now())
 	d := diff.Round(diff)
 	h := d / time.Hour
@@ -52,9 +65,7 @@ func nextTick() <-chan time.Time {
 	m := d / time.Minute
 
 	diffStr := fmt.Sprintf("%02dh %02dmin", h, m)
-	fmt.Printf("nextTick at: %02d:%02d:%02d in %s\n", nextTick.Hour(), nextTick.Minute(), nextTick.Second(), diffStr)
-
-	fmt.Printf("time.Tick(diff) %s\n", diff)
+	fmt.Printf("firstTick at: %02d:%02d:%02d in %s\n", nextTick.Hour(), nextTick.Minute(), nextTick.Second(), diffStr)
 
 	return time.Tick(diff)
 }
