@@ -25,7 +25,6 @@ var (
 
 func GetLatestContractAddress() common.Address {
 	var result map[string]interface{} = DownloadFile("bvgl.json")
-	log.Println("result: ", result["address"])
 
 	fmt.Printf("\nContract Address 0x%s\n", result["address"])
 	return common.HexToAddress(result["address"].(string))

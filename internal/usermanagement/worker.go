@@ -17,7 +17,7 @@ var dbFile *os.File
 func StartWorker() {
 
 	defer dbFile.Close()
-	fmt.Printf("\nWorker started \n")
+	fmt.Printf("\nWorker started \n\n")
 	initBm()
 
 	<-nextTick()

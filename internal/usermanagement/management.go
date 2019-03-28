@@ -58,6 +58,7 @@ func initPrevQl() {
 		"0x06cef8e666768cc40cc78cf93d9611019ddcb628",
 		"0x4404ac8bd8f9618d27ad2f1485aa1b2cfd82482d",
 		"0x7457d5e02197480db681d3fdf256c7aca21bdc12",
+		GENERALUSER,
 	}
 
 	for _, usr := range usrs {
