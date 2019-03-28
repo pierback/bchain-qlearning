@@ -80,14 +80,13 @@ func run() {
 	var qvalsN, qvalsC float64
 
 	for usr, ql := range bcm.users {
-		log.Println("next urs", usr)
 		ql.Learn(actn)
 		qvalsN += ql.GetQ(l.Nothing, ql.GetState())
 		qvalsC += ql.GetQ(l.Coffee, ql.GetState())
 
 		go saveToDb(usr.ethaddress, ql)
 
-		log.Printf("User %s Steps: %d/ Neg: %d \n", usr, ql.Sr.Steps, ql.Sr.Neg)
+		log.Printf("User %s Steps: %d/ Neg: %d \n\n", usr, ql.Sr.Steps, ql.Sr.Neg)
 
 		if time.Now().Weekday() == time.Friday && time.Now().Hour() == 20 {
 			ql.Sr.Wa = append(ql.Sr.Wa, ql.Sr.Neg)

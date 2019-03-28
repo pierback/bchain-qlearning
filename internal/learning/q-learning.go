@@ -177,7 +177,6 @@ func (q *QLearning) GetState() State {
 	}()
 
 	if q.State == nil {
-		log.Println("No panic")
 		q.State = NewState()
 	}
 

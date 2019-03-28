@@ -70,7 +70,6 @@ func SaveQl(usr string, qt []byte, ep string, ng int, wa []int) {
 }
 
 func GetQl(usr string) map[string]interface{} {
-	fmt.Println("GetQl: ", usr)
 	var result map[string]interface{} = ut.DownloadFile(usr + "-ql.json")
 	return result
 }

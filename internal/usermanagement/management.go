@@ -49,19 +49,25 @@ func initPrevQl() {
 	bcm.mu.Lock()
 	defer bcm.mu.Unlock()
 
-	// _, filename, _, _ := runtime.Caller(0)
-	// usrs, _ := readUsers(path.Join(path.Dir(filename), "/usrs.txt"))
-	// log.Println("REad users \n", usrs)
-
-	usrs := []string{"0xe8816898d851d5b61b7f950627d04d794c07ca37", "0x5409ed021d9299bf6814279a6a1411a7e866a631", "0x6ecbe1db9ef729cbe972c83fb886247691fb6beb", "0xe36ea790bc9d7ab70c55260c66d52b1eca985f84", "0xe834ec434daba538cd1b9fe1582052b880bd7e63", "0x78dc5d2d739606d31509c31d654056a45185ecb6"}
+	usrs := []string{
+		"0x5409ed021d9299bf6814279a6a1411a7e866a631",
+		"0x6ecbe1db9ef729cbe972c83fb886247691fb6beb",
+		"0xe36ea790bc9d7ab70c55260c66d52b1eca985f84",
+		"0xe834ec434daba538cd1b9fe1582052b880bd7e63",
+		"0x78dc5d2d739606d31509c31d654056a45185ecb6",
+		"0x06cef8e666768cc40cc78cf93d9611019ddcb628",
+		"0x4404ac8bd8f9618d27ad2f1485aa1b2cfd82482d",
+		"0x7457d5e02197480db681d3fdf256c7aca21bdc12",
+	}
 
 	for _, usr := range usrs {
 		result := db.GetQl(usr)
 		if result != nil {
 			qt := result["qt"].(string)
-			log.Println("ep, qt: ", result["ep"].(string), result["qt"].(string))
+			ep := result["ep"].(string)
 
-			ql := setQl(result["ep"].(string), qt)
+			ql := setQl(ep, qt)
+			log.Printf("\n User: %s Epsilon: %f \n Qtable: %v \n\n", usr, ql.Epsilon, ql.Qt)
 			bcm.set(User{ethaddress: usr}, *ql)
 		}
 	}
