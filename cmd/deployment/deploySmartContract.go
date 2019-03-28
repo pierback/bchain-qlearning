@@ -135,7 +135,6 @@ func deployCCParent(auth *bind.TransactOpts, client *ethclient.Client, ccAddress
 
 	// check if there is address in file if not deploy if so upgrade CoffeeCoin
 	var result map[string]interface{} = ut.DownloadFile("ccParent.json")
-	fmt.Println("result: ", result["address"])
 	var parentAddress common.Address
 
 	//deploy parent
