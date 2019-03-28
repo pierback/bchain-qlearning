@@ -22,11 +22,11 @@ func StartWorker() {
 
 	run()
 
-	<-nextTick()
+	/* <-nextTick()
 	run()
 
-	for range time.Tick(3 * time.Hour) {
-		// for range time.Tick(30 * time.Second) {
+	for range time.Tick(3 * time.Hour) {*/
+	for range time.Tick(30 * time.Second) {
 		run()
 		dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
@@ -69,14 +69,13 @@ func run() {
 	var qvalsN, qvalsC float64
 
 	for usr, ql := range bcm.users {
-		log.Println("next urs", usr)
 		ql.Learn(actn)
 		qvalsN += ql.GetQ(l.Nothing, ql.GetState())
 		qvalsC += ql.GetQ(l.Coffee, ql.GetState())
 
 		go saveToDb(usr.ethaddress, ql)
 
-		log.Printf("User %s Steps: %d/ Neg: %d \n", usr, ql.Sr.Steps, ql.Sr.Neg)
+		log.Printf("User %s Steps: %d/ Neg: %d \n\n", usr, ql.Sr.Steps, ql.Sr.Neg)
 
 		if time.Now().Weekday() == time.Friday && time.Now().Hour() == 20 {
 			ql.Sr.Wa = append(ql.Sr.Wa, ql.Sr.Neg)

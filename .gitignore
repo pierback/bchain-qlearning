@@ -20,4 +20,4 @@ id_travis_rsa
 Godeps/Readme
 # internal/contracts/CoffeeCoin/CoffeeCoin.gocd
 # internal/contracts/BeverageList/BeverageList.go
-  
+cmd/Users.json
