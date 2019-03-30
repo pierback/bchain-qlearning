@@ -1,7 +1,6 @@
 package learning
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -73,13 +72,13 @@ func (q *QLearning) Initialize() {
 
 //Learn one iteration of qlearning proccess
 func (q *QLearning) Learn(fb Action) {
-	log.Printf("Watched User Action:  %s <-> Prediction: %s \n", fb, q.Prediction)
+	// log.Printf("Watched User Action:  %s <-> Prediction: %s \n", fb, q.Prediction)
 	//
 	// q.Epsilon = float64(1 / (q.Sr.steps + 1))
 	q.EvalPrediction(fb)
 	q.MakePrediction()
 
-	fmt.Println("   ")
+	// fmt.Println("   ")
 }
 
 func (q *QLearning) EvalPrediction(fb Action) {
@@ -106,7 +105,7 @@ func (q *QLearning) MakePrediction() {
 	q.Prediction = q.EpsilonGreedy(s)
 
 	q.Epsilon *= q.EpsilonDecay
-	log.Printf("Make prediction: %s --> state: %s", q.Prediction, s.toString())
+	// log.Printf("Make prediction: %s --> state: %s", q.Prediction, s.toString())
 }
 
 //GetAction returns action with highest qval on given state

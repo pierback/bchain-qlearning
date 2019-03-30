@@ -25,6 +25,11 @@ func main() {
 	// dp.DeploySC()
 
 	//defer to close when you're done with it, not because you think it's idiomatic!
+	su := um.SimulatedUser{}
+	go su.InitLearner()
+
+	su2 := um.SimulatedUser{}
+	go su2.InitLearner()
 
 	if *en.DplFlag == "cffcn" || *en.DplFlag == "bvrglst" {
 		dp.DeploySC()
@@ -35,12 +40,9 @@ func main() {
 		// bc.InsertNRetrieve()
 		// bc.ReadWrite()
 
-		/* su := l.SimulatedUser{}
-		su.InitLearner() */
-
-		go um.StartWorker()
+		// go um.StartWorker()
 		if *en.BcFlag == "watch" {
-			go bc.Watch()
+			// go bc.Watch()
 		} else if *en.BcFlag == "rw" {
 			bc.TestBl()
 		}
