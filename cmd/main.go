@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"sync"
-
 	bc "github.com/pierback/bchain-qlearning/internal/blockchain"
 	um "github.com/pierback/bchain-qlearning/internal/usermanagement"
 
@@ -15,21 +12,14 @@ import (
 )
 
 func main() {
-	var wg sync.WaitGroup
-	wg.Add(2)
 	en.SetEnvVars()
-
 	db.StartDB()
 	// db.StartJsonDB()
 
 	// dp.DeploySC()
 
 	//defer to close when you're done with it, not because you think it's idiomatic!
-	su := um.SimulatedUser{}
-	go su.InitLearner()
-
-	su2 := um.SimulatedUser{}
-	go su2.InitLearner()
+	um.StartUserSimulation(8)
 
 	if *en.DplFlag == "cffcn" || *en.DplFlag == "bvrglst" {
 		dp.DeploySC()
@@ -48,6 +38,4 @@ func main() {
 		}
 
 	}
-	wg.Wait()
-	fmt.Println("Main")
 }

@@ -3,6 +3,7 @@ package usermanagement
 import (
 	"fmt"
 	"math/rand"
+	"sync"
 	"time"
 
 	l "github.com/pierback/bchain-qlearning/internal/learning"
@@ -21,8 +22,20 @@ type Training struct {
 	stateActns l.SimulatedStateActions
 }
 
+var wg sync.WaitGroup
+
+func StartUserSimulation(userCnt int) {
+	wg.Add(userCnt)
+	for i := 0; i < userCnt; i++ {
+		su := SimulatedUser{}
+		go su.InitLearner()
+	}
+	wg.Wait()
+}
+
 //InitLearner for SimulatedUser
 func (su *SimulatedUser) InitLearner() {
+	defer wg.Done()
 	q := l.QLearning{}
 	q.Initialize()
 	su.Start(&q)
@@ -63,8 +76,8 @@ func (su *SimulatedUser) Start(q *l.QLearning) {
 		// log.Println(" ")
 
 		wts, su.vsa = GenerateTrainingSet(seed)
-		if reps >= 0 && reps < 4 {
-			fmt.Printf("\nwts: %v \n", wts)
+		if reps == 0 || reps == 1 {
+			fmt.Printf("\nwts: %v %d %d\n", wts, seed, reps)
 		}
 
 		for d := 1; d < q.Workdays+1; d++ {
