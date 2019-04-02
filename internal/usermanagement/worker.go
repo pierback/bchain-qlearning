@@ -50,6 +50,7 @@ func nextTick() <-chan time.Time {
 	}
 	hour = lowerBoundary + 1
 
+	//next tick next monday at 7
 	if time.Weekday(time.Now().Day()) == time.Saturday {
 		day = time.Now().AddDate(0, 0, 2).Day()
 		hour = 7

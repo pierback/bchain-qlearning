@@ -6,14 +6,14 @@ import (
 	"time"
 )
 
-func TestDrinksCount(t *testing.T) {
+/* func TestDrinksCount(t *testing.T) {
 	t.Parallel()
 	fmt.Println("TestDrinksCount start")
 
 	// fmt.Println(Q.statemap)
 	fmt.Println("	")
 }
-
+*/
 /* func TestGenerateTrainingSet(t *testing.T) {
 	GenerateTrainingSet()
 } */
@@ -89,50 +89,39 @@ func TestGet(t *testing.T) {
 
 }
 
-func TestNew(t *testing.T) {
+func TestIsNewDay(t *testing.T) {
 	t.Parallel()
-	fmt.Println("TestNew start")
+	fmt.Println("TestIsNewDay start")
 
-	type Input struct {
-		Dc Drinkcount
-		wd int
-		ct float64
-	}
-
-	var stfs = []struct {
-		input    Input
-		expected State
-	}{
-		{
-			input: Input{Dc: Drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: -1, ct: -1},
-			expected: VirtualState{
-				Weekday:  time.Now().Weekday(),
-				Timeslot: GetCurrentTimeSlot(time.Now().Hour()),
-				Drinkcount: Drinkcount{
-					CoffeeCount: 4,
-					WaterCount:  0,
-					MateCount:   0,
-				},
-			},
-		},
-		{
-			input: Input{Dc: Drinkcount{CoffeeCount: 4, WaterCount: 0, MateCount: 0}, wd: 3, ct: 3},
-			expected: VirtualState{
-				Weekday:  3,
-				Timeslot: GetCurrentTimeSlot(int(3)),
-				Drinkcount: Drinkcount{
-					CoffeeCount: 4,
-					WaterCount:  0,
-					MateCount:   0,
-				},
-			},
-		},
-	}
-
+	q := QLearning{}
 	vs := VirtualState{}
-	for _, s := range stfs {
-		if output := vs.New(s.input.Dc, s.input.wd, s.input.ct); output != s.expected {
-			t.Error("New not working properly", s.input, s.expected, output)
-		}
+	us := UserState{}
+	q.State = us.New(Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, time.Now().AddDate(0, 0, 2).Day(), 8.45)
+
+	if q.isNewDay() == false {
+		t.Error("isNewDay not working properly \n", q.State, time.Now().Day())
+	} else {
+		fmt.Printf("TestIsNewDay Current day %s differs from State day %v \n", time.Now().Weekday(), q.State.(UserState).Weekday)
 	}
+
+	q.State = us.New(Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, time.Now().Day(), 8.45)
+
+	if q.isNewDay() == true {
+		t.Error("isNewDay not working properly \n", q.State, time.Now().Day())
+	} else {
+		fmt.Printf("TestIsNewDay Current day  %v and State day %v are the same \n", time.Now().Weekday(), q.State.(UserState).Weekday)
+	}
+
+	q.State = vs.New(Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, time.Now().Day(), 8.45)
+
+	if q.isNewDay() == true {
+		t.Error("TestIsNewDay isNewDay not working properly \n", q.State, time.Now().Day())
+	}
+
+	/* q.State = us.New(Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, time.Now().Day(), 8.45)
+
+	if q.isNewDay() == true {
+		t.Error("isNewDay not working properly", q.State, time.Now().Day())
+	} */
+
 }

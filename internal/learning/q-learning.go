@@ -4,6 +4,8 @@ import (
 	"log"
 	"math/rand"
 	"time"
+
+	en "github.com/pierback/bchain-qlearning/cmd/environment"
 )
 
 //Action type
@@ -70,14 +72,28 @@ func (q *QLearning) Initialize() {
 	q.Qt = make(QTable)
 }
 
+func (q *QLearning) isNewDay() bool {
+	curWd := CurrentWeekday(q.State)
+	if GetWeekday(q.State) != curWd {
+		return true
+	}
+	return false
+}
+
 //Learn one iteration of qlearning proccess
 func (q *QLearning) Learn(fb Action) {
-	// log.Printf("Watched User Action:  %s <-> Prediction: %s \n", fb, q.Prediction)
 	//
 	// q.Epsilon = float64(1 / (q.Sr.steps + 1))
-	q.EvalPrediction(fb)
-	q.MakePrediction()
+	if q.isNewDay() {
+		q.State = NewState()
+	} else {
+		//no need to eval prediction if new day
+		//if not eval
 
+		q.EvalPrediction(fb)
+	}
+
+	q.MakePrediction()
 	// fmt.Println("   ")
 }
 
@@ -94,7 +110,10 @@ func (q *QLearning) EvalPrediction(fb Action) {
 	  qval := qsa + q.LearningRate*(reward+q.Gamma*_qsa-qsa) */
 
 	q.SetQ(q.Prediction, qval)
-	// log.Println("eval prediction: ", q.State, "user: ", fb, "ql: ", q.Prediction)
+	if *en.SimFlag < 1 {
+		// log.Printf("Make prediction: %s --> state: %s", q.Prediction, s.toString())
+		log.Println("eval prediction: ", q.State, "user: ", fb, "ql: ", q.Prediction)
+	}
 
 	q.State = newstate
 }
@@ -105,7 +124,12 @@ func (q *QLearning) MakePrediction() {
 	q.Prediction = q.EpsilonGreedy(s)
 
 	q.Epsilon *= q.EpsilonDecay
-	// log.Printf("Make prediction: %s --> state: %s", q.Prediction, s.toString())
+
+	if *en.SimFlag < 1 {
+		// log.Printf("Watched User Action:  %s <-> Prediction: %s \n", fb, q.Prediction)
+		log.Printf("Make prediction: %s --> state: %s \n", q.Prediction, s.toString())
+	}
+
 }
 
 //GetAction returns action with highest qval on given state
@@ -186,6 +210,7 @@ func (q *QLearning) GetState() State {
 
 func (q *QLearning) SetNewState(vs VirtualState, d int, sl int) State {
 	cnt := getCC(q.State)
+	// return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, sl)
 	return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, float64(sl))
 }
 

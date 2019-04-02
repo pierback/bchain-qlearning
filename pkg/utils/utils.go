@@ -34,7 +34,8 @@ func GetLatestContractAddress() common.Address {
 func GetLocalIP() net.IP {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return []byte("")
 	}
 	defer conn.Close()
 

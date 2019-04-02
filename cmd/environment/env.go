@@ -12,12 +12,14 @@ var (
 	BcFlag     *string
 	DplFlag    *string
 	parentFlag *string
+	SimFlag    *int
 )
 
 func SetEnvVars() {
 	DplFlag = flag.String("dp", "", "deploy sm")
 	BcFlag = flag.String("bc", "watch", "test bchain")
 	parentFlag = flag.String("pt", "upgrade", "deploy or upgrade parent contract")
+	SimFlag = flag.Int("sim", 0, "simulate user")
 	flag.Parse()
 
 	ws := ut.GetEthWsAddr()

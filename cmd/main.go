@@ -14,28 +14,20 @@ import (
 func main() {
 	en.SetEnvVars()
 	db.StartDB()
-	// db.StartJsonDB()
-
-	// dp.DeploySC()
-
-	//defer to close when you're done with it, not because you think it's idiomatic!
-	um.StartUserSimulation(8)
 
 	if *en.DplFlag == "cffcn" || *en.DplFlag == "bvrglst" {
 		dp.DeploySC()
+	} else if *en.SimFlag != 0 {
+		um.StartUserSimulation(*en.SimFlag)
 	} else {
-
-		// ws.WsInit()
-
 		// bc.InsertNRetrieve()
 		// bc.ReadWrite()
 
-		// go um.StartWorker()
 		if *en.BcFlag == "watch" {
-			// go bc.Watch()
+			go um.StartWorker()
+			bc.Watch()
 		} else if *en.BcFlag == "rw" {
 			bc.TestBl()
 		}
-
 	}
 }

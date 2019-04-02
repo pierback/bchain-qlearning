@@ -70,7 +70,7 @@ func (su *SimulatedUser) Start(q *l.QLearning) {
 	fmt.Println("\n\nstart", seed)
 	for reps := 0; reps < 250; reps++ {
 
-		q.State = vs.New(l.Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(time.Monday), float64(7))
+		// q.State = vs.New(l.Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}, int(time.Monday), 7)
 
 		// log.Println(" ")
 		// log.Println(" ")
