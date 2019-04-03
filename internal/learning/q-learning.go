@@ -89,10 +89,8 @@ func (q *QLearning) Learn(fb Action) {
 	} else {
 		//no need to eval prediction if new day
 		//if not eval
-
 		q.EvalPrediction(fb)
 	}
-
 	q.MakePrediction()
 	// fmt.Println("   ")
 }
@@ -186,8 +184,15 @@ func (q *QLearning) GetQ(a Action, s State) float64 {
 
 // SetQ sets qval of given state action pair
 func (q *QLearning) SetQ(a Action, qv float64) {
-	s := q.State.Get()
+
 	// bc.SetQValue(stateToString(s), fmt.Sprintf("%f", qv))
+	// q.Qt[s][a] = qv
+
+	if q.State == nil {
+		q.State = NewState()
+	}
+
+	s := q.State.Get()
 	q.Qt[s][a] = qv
 }
 
