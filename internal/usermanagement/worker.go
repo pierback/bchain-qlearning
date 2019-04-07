@@ -20,41 +20,50 @@ func StartWorker() {
 	fmt.Printf("\nWorker started \n\n")
 	initBm()
 
-	<-nextTick()
-	run()
-
-	for range nextTick() {
-		// for range time.Tick(30 * time.Second) {
-		run()
-		dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-		if err != nil {
-			log.Fatal(err)
+	ticker := nextTick()
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				ticker.Stop()
+				run()
+				ticker = nextTick()
+				dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer dbFile.Close()
+				wrt := io.MultiWriter(os.Stdout, dbFile)
+				log.SetOutput(wrt)
+			}
 		}
-		defer dbFile.Close()
-		wrt := io.MultiWriter(os.Stdout, dbFile)
-		log.SetOutput(wrt)
-	}
+		log.Println("stopped")
+	}()
+
 }
 
-func nextTick() <-chan time.Time {
-	var lowerBoundary, day, hour int
+func nextTick() time.Ticker {
+	var lowerBoundary int
 	curH := time.Now().Hour()
 	curts := l.GetCurrentTimeSlot(curH)
-	day = time.Now().Day()
+	day := time.Now().Day()
 
 	//get lower boundary of next relevant timeslot
 	if curts+1 > 3 {
-		_, lowerBoundary = l.TsBoundaries(4)
+		_, lowerBoundary = l.TsBoundaries(4) //is always 6
+
+		//next tick next monday at 7
+		if time.Weekday(day) == time.Friday {
+			day = time.Now().AddDate(0, 0, 3).Day()
+		} else if time.Now().Hour() < 7 { //ticker started after 00:00
+			day = time.Now().Day()
+		} else { //ticker started after curts+1
+			day = time.Now().AddDate(0, 0, 1).Day()
+		}
 	} else {
 		_, lowerBoundary = l.TsBoundaries(uint(curts))
 	}
-	hour = lowerBoundary + 1
-
-	//next tick next monday at 7
-	if time.Weekday(time.Now().Day()) == time.Saturday {
-		day = time.Now().AddDate(0, 0, 2).Day()
-		hour = 7
-	}
+	hour := lowerBoundary + 1
 
 	nextTick := time.Date(time.Now().Year(), time.Now().Month(),
 		day, hour, int(0), int(0), int(0), time.Local)
@@ -68,7 +77,8 @@ func nextTick() <-chan time.Time {
 	diffStr := fmt.Sprintf("%02dh %02dmin", h, m)
 	fmt.Printf("firstTick at: %02d:%02d:%02d in %s\n", nextTick.Hour(), nextTick.Minute(), nextTick.Second(), diffStr)
 
-	return time.Tick(diff)
+	return *time.NewTicker(diff)
+	// return *time.NewTicker(10 * time.Second)
 }
 
 func run() {
