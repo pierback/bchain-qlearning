@@ -95,14 +95,13 @@ func run() {
 		qvalsN += ql.GetQ(l.Nothing, ql.GetState())
 		qvalsC += ql.GetQ(l.Coffee, ql.GetState())
 
-		go saveToDb(usr.ethaddress, ql)
-
 		log.Printf("User %s Steps: %d/ Neg: %d \n\n", usr, ql.Sr.Steps, ql.Sr.Neg)
-
 		if time.Now().Weekday() == time.Friday && time.Now().Hour() == 20 {
 			ql.Sr.Wa = append(ql.Sr.Wa, ql.Sr.Neg)
 			ql.Sr.Neg = 0
+			log.Printf("\n\n QTABLE %v \n\n", ql.Qt)
 		}
+		go saveToDb(usr.ethaddress, ql)
 	}
 	bcm.SetGenQvals(qvalsN, qvalsC)
 }
@@ -114,12 +113,13 @@ func saveToDb(usr string, ql l.QLearning) {
 }
 
 //Learn triggers learning func of qlearning
-func Learn(ethAdrs string, at string) {
+func Learn(ethAdrs string, at string, wd time.Weekday, curHour int) {
 	log.Printf("Learn ethAdrs: %s \n", ethAdrs)
 	actn := l.GetAction(at)
 	if actn == l.Coffee || actn == l.Nothing {
 		bcm.mu.RLock()
 		q := bcm.getQlearning(ethAdrs)
+		q.SetState(int(wd), curHour)
 		q.Learn(actn)
 		bcm.set(User{ethAdrs}, *q)
 	}

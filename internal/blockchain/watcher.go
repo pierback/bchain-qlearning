@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/big"
 	"strings"
+	"time"
 
 	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -65,16 +66,26 @@ func readEvent(eventLog types.Log, client *ethclient.Client) {
 	err1 := contractAbi.Unpack(&event, "NewDrink", eventLog.Data)
 	ut.PrintError(err1)
 
+	const MYDATEFORMAT = "2006-01-02T15:04:05"
+	tmstr := string(bytes.Trim(event.Time[:], "\x00"))
+
+	t, err := time.Parse(MYDATEFORMAT, tmstr)
+	ut.PrintError(err)
+
 	log.Println(" ")
 	log.Println("New Event:")
 	log.Printf("   Address %s \n", event.Address.Hex())
+	// log.Printf("   time %d \n", t.Hour())
+	// log.Printf("   time %s \n", tmstr)
 	log.Printf("   time %s \n", string(event.Time[:32]))
 	log.Printf("   drink %s \n", string(event.Drink[:32]))
 	log.Printf("   Weekday %s \n", string(event.Weekday[:32]))
 	log.Println(" ")
 
+	wd := ut.ParseWeekday(string(bytes.Trim(event.Weekday[:], "\x00")))
+
 	dr := string(bytes.Trim(event.Drink[:], "\x00"))
-	wk.Learn(event.Address.Hex(), dr)
+	wk.Learn(event.Address.Hex(), dr, wd, t.Hour())
 	// getBlockTransactions(eventLog, client)
 }
 

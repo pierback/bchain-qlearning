@@ -14,6 +14,7 @@ import (
 	"path"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -145,4 +146,22 @@ func PostFile(filename string, targetUrl string) error {
 		return err
 	}
 	return nil
+}
+
+//ParseWeekday from string
+func ParseWeekday(v string) time.Weekday {
+	var daysOfWeek = map[string]time.Weekday{
+		"Sunday":    time.Sunday,
+		"Monday":    time.Monday,
+		"Tuesday":   time.Tuesday,
+		"Wednesday": time.Wednesday,
+		"Thursday":  time.Thursday,
+		"Friday":    time.Friday,
+		"Saturday":  time.Saturday,
+	}
+
+	if d, ok := daysOfWeek[v]; ok {
+		return d
+	}
+	return time.Sunday
 }

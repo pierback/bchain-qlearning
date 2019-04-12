@@ -85,11 +85,11 @@ func (su *SimulatedUser) Start(q *l.QLearning) {
 				//filter all from trainingsset equals day and slot
 				fsc := l.FilterSlice(wts[d-1], l.GetCurrentTimeSlot(sl))
 
-				q.State = q.SetNewState(vs, d, sl)
+				q.State = q.SetNewVirtState(vs, d, sl)
 				q.MakePrediction()
 
 				for st := 0; st < fsc+1; st++ {
-					newState := q.SetNewState(vs, d, sl)
+					newState := q.SetNewVirtState(vs, d, sl)
 					q.State = newState
 					fb := su.UserMock(q.State)
 					q.Learn(fb)

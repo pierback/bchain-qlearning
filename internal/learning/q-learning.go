@@ -70,6 +70,8 @@ func (q *QLearning) Initialize() {
 	q.EpsilonDecay = 0.9995
 
 	q.Qt = make(QTable)
+
+	q.State = NewState()
 }
 
 func (q *QLearning) isNewDay() bool {
@@ -112,22 +114,18 @@ func (q *QLearning) EvalPrediction(fb Action) {
 		// log.Printf("Make prediction: %s --> state: %s", q.Prediction, s.toString())
 		log.Println("eval prediction: ", q.State, "user: ", fb, "ql: ", q.Prediction)
 	}
-
 	q.State = newstate
 }
 
 func (q *QLearning) MakePrediction() {
 	s := q.GetState()
-
 	q.Prediction = q.EpsilonGreedy(s)
-
 	q.Epsilon *= q.EpsilonDecay
 
 	if *en.SimFlag < 1 {
 		// log.Printf("Watched User Action:  %s <-> Prediction: %s \n", fb, q.Prediction)
 		log.Printf("Make prediction: %s --> state: %s \n", q.Prediction, s.toString())
 	}
-
 }
 
 //GetAction returns action with highest qval on given state
@@ -205,6 +203,7 @@ func (q *QLearning) GetState() State {
 	}()
 
 	if q.State == nil {
+		log.Println("state is nill")
 		q.State = NewState()
 	}
 
@@ -213,7 +212,18 @@ func (q *QLearning) GetState() State {
 	return s
 }
 
-func (q *QLearning) SetNewState(vs VirtualState, d int, sl int) State {
+func (q *QLearning) SetState(d int, sl int) {
+	// return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, sl)
+	q.State.New(GetCurDrinkCount(q.State), int(d), float64(sl))
+}
+
+func (q *QLearning) SetNewUsrtState(vs VirtualState, d int, sl int) State {
+	cnt := getCC(q.State)
+	// return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, sl)
+	return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, float64(sl))
+}
+
+func (q *QLearning) SetNewVirtState(vs VirtualState, d int, sl int) State {
 	cnt := getCC(q.State)
 	// return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, sl)
 	return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, float64(sl))

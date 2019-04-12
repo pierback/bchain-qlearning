@@ -144,6 +144,16 @@ func getCC(st State) int {
 	}
 }
 
+func GetCurDrinkCount(s State) Drinkcount {
+	cc := getCC(s)
+
+	return Drinkcount{
+		CoffeeCount: cc,
+		WaterCount:  0,
+		MateCount:   0,
+	}
+}
+
 var wg sync.WaitGroup
 
 //AddState to q-table
@@ -162,14 +172,22 @@ func (vs VirtualState) Get() State {
 //Get returns current UserState
 func (s UserState) Get() State {
 	var dc Drinkcount
-	wd := time.Now().Weekday()
-	ts := GetCurrentTimeSlot(time.Now().Hour())
+	var wd time.Weekday
+	var ts timeslot
 
 	//if new day set Drinkcount to 0
-	if s.Weekday != wd {
+	if s.Weekday != time.Now().Weekday() {
 		dc = Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}
 	} else {
 		dc = s.Drinkcount
+	}
+
+	if wd = s.Weekday; wd == 0 {
+		wd = time.Now().Weekday()
+	}
+
+	if ts = s.Timeslot; ts == 0 {
+		ts = GetCurrentTimeSlot(time.Now().Hour())
 	}
 
 	return UserState{Weekday: wd, Timeslot: ts, Drinkcount: dc}
