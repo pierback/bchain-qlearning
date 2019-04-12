@@ -56,6 +56,8 @@ func nextTick() time.Ticker {
 		//next tick next monday at 7
 		if time.Now().Weekday() == time.Friday {
 			day = time.Now().AddDate(0, 0, 3).Day()
+		} else if time.Now().Weekday() == time.Saturday {
+			day = time.Now().AddDate(0, 0, 2).Day()
 		} else if time.Now().Hour() < 7 { //ticker started after 00:00
 			day = time.Now().Day()
 		} else { //ticker started after curts+1
