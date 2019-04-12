@@ -87,6 +87,7 @@ func PrintError(err error) {
 
 func DownloadFile(filename string) map[string]interface{} {
 	url := DownloadIP() + filename
+	log.Printf("\nUsr file %s \n\n", url)
 	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
@@ -96,13 +97,15 @@ func DownloadFile(filename string) map[string]interface{} {
 
 	body, readErr := ioutil.ReadAll(resp.Body)
 	if readErr != nil {
-		log.Println(readErr)
+		log.Println("ioutil eror", readErr)
 	}
 
+	// log.Println("body", filename, body)
 	var result map[string]interface{}
 	jsonErr := json.Unmarshal(body, &result)
+
 	if jsonErr != nil {
-		log.Println(jsonErr)
+		log.Println("jsonErr eror", jsonErr)
 	}
 
 	return result

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strings"
 
 	"github.com/xujiajun/nutsdb"
 
@@ -70,7 +71,7 @@ func SaveQl(usr string, qt []byte, ep string, ng int, wa []int) {
 }
 
 func GetQl(usr string) map[string]interface{} {
-	var result map[string]interface{} = ut.DownloadFile(usr + "-ql.json")
+	var result map[string]interface{} = ut.DownloadFile(strings.ToLower(usr) + "-ql.json")
 	return result
 }
 

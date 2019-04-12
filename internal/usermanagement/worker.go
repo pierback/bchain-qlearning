@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	l "github.com/pierback/bchain-qlearning/internal/learning"
@@ -109,7 +110,7 @@ func run() {
 func saveToDb(usr string, ql l.QLearning) {
 	qt := l.MapToString(ql.Qt)
 	ep := fmt.Sprintf("%f", ql.Epsilon)
-	db.SaveQl(usr, qt, ep, ql.Sr.Neg, ql.Sr.Wa)
+	db.SaveQl(strings.ToLower(usr), qt, ep, ql.Sr.Neg, ql.Sr.Wa)
 }
 
 //Learn triggers learning func of qlearning
