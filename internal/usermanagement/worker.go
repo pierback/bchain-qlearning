@@ -54,7 +54,7 @@ func nextTick() time.Ticker {
 		_, lowerBoundary = l.TsBoundaries(4) //is always 6
 
 		//next tick next monday at 7
-		if time.Weekday(day) == time.Friday {
+		if time.Now().Weekday() == time.Friday {
 			day = time.Now().AddDate(0, 0, 3).Day()
 		} else if time.Now().Hour() < 7 { //ticker started after 00:00
 			day = time.Now().Day()
@@ -79,7 +79,6 @@ func nextTick() time.Ticker {
 	fmt.Printf("firstTick at: %02d:%02d:%02d in %s\n", nextTick.Hour(), nextTick.Minute(), nextTick.Second(), diffStr)
 
 	return *time.NewTicker(diff)
-	// return *time.NewTicker(10 * time.Second)
 }
 
 func run() {
