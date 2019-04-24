@@ -186,11 +186,20 @@ func (q *QLearning) SetQ(a Action, qv float64) {
 	// bc.SetQValue(stateToString(s), fmt.Sprintf("%f", qv))
 	// q.Qt[s][a] = qv
 
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("SetQ panic")
+			q.State = NewState()
+			q.AddState(q.State)
+		}
+	}()
+
 	if q.State == nil {
 		q.State = NewState()
 	}
 
 	s := q.State.Get()
+	q.AddState(s)
 	q.Qt[s][a] = qv
 }
 

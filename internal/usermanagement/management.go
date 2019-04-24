@@ -114,7 +114,7 @@ func (bcm *UserManagement) getQlearning(ea string) *l.QLearning {
 	bcm.mu.RUnlock()
 	log.Println("NEW USER:", ea)
 	ql := bcm.initUser(ea)
-	ql.Prediction = bcm.getGeneralPrediction(*ql)
+	ql.Qt = bcm.getGeneralQt()
 
 	return ql
 }
@@ -146,6 +146,11 @@ func (bcm *UserManagement) getGeneralPrediction(newUserQl l.QLearning) l.Action 
 	ql := bcm.getQlearning(GENERALUSER)
 	currentState := ql.GetState()
 	return ql.GetAction(currentState)
+}
+
+func (bcm *UserManagement) getGeneralQt() l.QTable {
+	ql := bcm.getQlearning(GENERALUSER)
+	return ql.Qt
 }
 
 func (bcm *UserManagement) SetGenQvals(qvsn float64, qvsc float64) {
