@@ -100,10 +100,12 @@ func run() {
 		log.Printf("User %s Steps: %d/ Neg: %d \n\n", usr, ql.Sr.Steps, ql.Sr.Neg)
 		if time.Now().Weekday() == time.Friday && time.Now().Hour() == 20 {
 			ql.Sr.Wa = append(ql.Sr.Wa, ql.Sr.Neg)
+			go saveToDb(usr.ethaddress, ql)
 			ql.Sr.Neg = 0
 			log.Printf("\n\n QTABLE %v \n\n", ql.Qt)
+		} else {
+			go saveToDb(usr.ethaddress, ql)
 		}
-		go saveToDb(usr.ethaddress, ql)
 	}
 	bcm.SetGenQvals(qvalsN, qvalsC)
 }

@@ -52,7 +52,7 @@ func StartDB() {
 
 //SaveQl saves qt and current epsilon val
 func SaveQl(usr string, qt []byte, ep string, ng int, wa []int) {
-	qlvs := &qlvals{Qtable: string(qt[:]), Epsilon: ep}
+	qlvs := &qlvals{Qtable: string(qt[:]), Epsilon: ep, Negs: ng, Wa: wa}
 
 	_, filename, _, _ := runtime.Caller(0)
 	bvglJSON := createSCJson(qlvs)
