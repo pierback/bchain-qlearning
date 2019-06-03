@@ -1,0 +1,336 @@
+
+2019/04/30 07:00:00 Make prediction: Nothing --> state: {"weekday":2,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/04/30 07:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 1/ Neg: 1 
+
+
+
+2019/04/30 10:00:00 Make prediction: Coffee --> state: {"weekday":2,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/04/30 10:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 1/ Neg: 1 
+
+
+
+2019/04/30 13:00:00 Make prediction: Coffee --> state: {"weekday":2,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/04/30 13:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 1/ Neg: 1 
+
+
+2019/05/03 09:46:52 New Event:
+2019/05/03 09:46:52 Learn ethAdrs: 0xE834EC434DABA538cd1b9Fe1582052B880BD7e63 
+2019/05/03 09:46:52 NEW USER: 0xE834EC434DABA538cd1b9Fe1582052B880BD7e63
+2019/05/03 09:46:52 eval prediction:  {Friday 0 {0 0 0}} user:  Coffee ql:  Nothing
+2019/05/03 09:46:52 Make prediction: Nothing --> state: {"weekday":5,"timeslot":0,"Drinkcount":{"coffeeCount":1,"waterCount":0,"mateCount":0}} 
+
+
+2019/05/03 10:00:00 eval prediction:  {Friday 0 {1 0 0}} user:  Nothing ql:  Nothing
+2019/05/03 10:00:00 Make prediction: Nothing --> state: {"weekday":5,"timeslot":1,"Drinkcount":{"coffeeCount":1,"waterCount":0,"mateCount":0}} 
+2019/05/03 10:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 2/ Neg: 1 
+
+
+2019/05/03 10:07:46 New Event:
+2019/05/03 10:07:46 Learn ethAdrs: 0xE834EC434DABA538cd1b9Fe1582052B880BD7e63 
+2019/05/03 10:07:46 eval prediction:  {Friday 0 {1 0 0}} user:  Coffee ql:  Nothing
+2019/05/03 10:07:46 Make prediction: Nothing --> state: {"weekday":5,"timeslot":1,"Drinkcount":{"coffeeCount":2,"waterCount":0,"mateCount":0}}  
+
+
+2019/05/03 13:00:00 eval prediction:  {Friday 1 {2 0 0}} user:  Nothing ql:  Nothing
+2019/05/03 13:00:00 Make prediction: Coffee --> state: {"weekday":5,"timeslot":2,"Drinkcount":{"coffeeCount":2,"waterCount":0,"mateCount":0}} 
+2019/05/03 13:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 3/ Neg: 2 
+
+
+2019/05/03 16:00:00 eval prediction:  {Friday 1 {2 0 0}} user:  Nothing ql:  Nothing
+2019/05/03 16:00:00 Make prediction: Nothing --> state: {"weekday":5,"timeslot":3,"Drinkcount":{"coffeeCount":2,"waterCount":0,"mateCount":0}} 
+2019/05/03 16:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 3/ Neg: 2 
+
+
+
+2019/05/06 07:00:00 Make prediction: Coffee --> state: {"weekday":1,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/06 07:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 2/ Neg: 2 
+
+
+
+2019/05/06 10:00:00 Make prediction: Coffee --> state: {"weekday":1,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/06 10:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 2/ Neg: 2 
+
+
+
+2019/05/06 13:00:00 Make prediction: Coffee --> state: {"weekday":1,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/06 13:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 2/ Neg: 2 
+
+
+
+2019/05/06 16:00:00 Make prediction: Nothing --> state: {"weekday":1,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/06 16:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 2/ Neg: 2 
+
+
+
+2019/05/07 07:00:00 Make prediction: Nothing --> state: {"weekday":2,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/07 07:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 2/ Neg: 2 
+
+
+2019/05/07 09:15:54 Learn ethAdrs: 0xE834EC434DABA538cd1b9Fe1582052B880BD7e63 
+2019/05/07 09:15:54 Make prediction: Coffee --> state: {"weekday":2,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+
+
+2019/05/07 09:52:49  
+2019/05/07 09:52:49 New Event:
+2019/05/07 09:52:49 Learn ethAdrs: 0xE834EC434DABA538cd1b9Fe1582052B880BD7e63 
+2019/05/07 09:52:49 eval prediction:  {Tuesday 0 {0 0 0}} user:  Coffee ql:  Coffee
+2019/05/07 09:52:49 Make prediction: Coffee --> state: {"weekday":2,"timeslot":0,"Drinkcount":{"coffeeCount":1,"waterCount":0,"mateCount":0}}  
+
+
+2019/05/07 10:00:00 eval prediction:  {Tuesday 0 {1 0 0}} user:  Nothing ql:  Coffee
+2019/05/07 10:00:00 Make prediction: Coffee --> state: {"weekday":2,"timeslot":1,"Drinkcount":{"coffeeCount":1,"waterCount":0,"mateCount":0}} 
+2019/05/07 10:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 4/ Neg: 3 
+
+
+2019/05/07 13:00:00 eval prediction:  {Tuesday 0 {1 0 0}} user:  Nothing ql:  Coffee
+2019/05/07 13:00:00 Make prediction: Coffee --> state: {"weekday":2,"timeslot":2,"Drinkcount":{"coffeeCount":1,"waterCount":0,"mateCount":0}} 
+2019/05/07 13:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 4/ Neg: 3 
+
+
+2019/05/07 16:00:00 eval prediction:  {Tuesday 0 {1 0 0}} user:  Nothing ql:  Coffee
+2019/05/07 16:00:00 Make prediction: Coffee --> state: {"weekday":2,"timeslot":3,"Drinkcount":{"coffeeCount":1,"waterCount":0,"mateCount":0}} 
+2019/05/07 16:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 4/ Neg: 3 
+
+
+2019/05/07 16:53:03  
+2019/05/07 16:53:03 New Event:
+2019/05/07 16:53:03 Learn ethAdrs: 0xE834EC434DABA538cd1b9Fe1582052B880BD7e63 
+2019/05/07 16:53:03 eval prediction:  {Tuesday 0 {1 0 0}} user:  Coffee ql:  Coffee
+2019/05/07 16:53:03 Make prediction: Coffee --> state: {"weekday":2,"timeslot":3,"Drinkcount":{"coffeeCount":2,"waterCount":0,"mateCount":0}} 
+
+
+
+2019/05/08 07:00:00 Make prediction: Nothing --> state: {"weekday":3,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/08 07:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 4/ Neg: 2 
+
+
+2019/05/08 09:51:27  
+2019/05/08 09:51:27 New Event:
+2019/05/08 09:51:27 Learn ethAdrs: 0xE834EC434DABA538cd1b9Fe1582052B880BD7e63 
+2019/05/08 09:51:27 Make prediction: Coffee --> state: {"weekday":3,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+
+
+2019/05/08 10:00:00 eval prediction:  {Wednesday 0 {0 0 0}} user:  Nothing ql:  Coffee
+2019/05/08 10:00:00 Make prediction: Coffee --> state: {"weekday":3,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/08 10:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 5/ Neg: 3 
+
+
+2019/05/08 13:00:00 eval prediction:  {Wednesday 0 {0 0 0}} user:  Nothing ql:  Coffee
+2019/05/08 13:00:00 Make prediction: Coffee --> state: {"weekday":3,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/08 13:00:00 User {0xE834EC434DABA538cd1b9Fe1582052B880BD7e63} Steps: 5/ Neg: 3 
+
+
+
+2019/05/09 07:00:00 Make prediction: Coffee --> state: {"weekday":4,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/09 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/09 10:00:00 Make prediction: Coffee --> state: {"weekday":4,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/09 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/09 13:00:00 Make prediction: Nothing --> state: {"weekday":4,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/09 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/09 16:00:00 Make prediction: Coffee --> state: {"weekday":4,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/09 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/10 07:00:00 Make prediction: Nothing --> state: {"weekday":5,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/10 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+2019/05/10 10:00:00 Make prediction: Nothing --> state: {"weekday":5,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/10 10:00:00 Make prediction: Coffee --> state: {"weekday":5,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/10 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+2019/05/10 10:00:00 User {0x78dc5d2d739606d31509c31d654056a45185ecb6} Steps: 0/ Neg: 0 
+
+2019/05/10 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+2019/05/10 13:00:00 User {0x6ecbe1db9ef729cbe972c83fb886247691fb6beb} Steps: 0/ Neg: 0 
+
+2019/05/10 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/10 13:00:00 Make prediction: Coffee --> state: {"weekday":5,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/10 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+2019/05/10 16:00:00 Make prediction: Nothing --> state: {"weekday":5,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/10 16:00:00 Make prediction: Coffee --> state: {"weekday":5,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+
+
+
+2019/05/10 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+2019/05/10 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/13 07:00:00 Make prediction: Coffee --> state: {"weekday":1,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/13 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/13 07:00:00 Make prediction: Nothing --> state: {"weekday":1,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/13 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+2019/05/13 10:00:00 Make prediction: Nothing --> state: {"weekday":1,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/13 10:00:00 Make prediction: Coffee --> state: {"weekday":1,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+
+
+
+2019/05/13 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+2019/05/13 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+2019/05/13 13:00:00 Make prediction: Nothing --> state: {"weekday":1,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/13 13:00:00 Make prediction: Nothing --> state: {"weekday":1,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+
+
+
+2019/05/13 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+2019/05/13 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+2019/05/13 16:00:00 Make prediction: Nothing --> state: {"weekday":1,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/13 16:00:00 eval prediction:  {Monday 1 {1 0 0}} user:  Nothing ql:  Coffee
+2019/05/13 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/13 16:00:00 Make prediction: Nothing --> state: {"weekday":1,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/13 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/14 07:00:00 Make prediction: Nothing --> state: {"weekday":2,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/14 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/14 10:00:00 Make prediction: Nothing --> state: {"weekday":2,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/14 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/14 13:00:00 Make prediction: Coffee --> state: {"weekday":2,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/14 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/14 16:00:00 Make prediction: Nothing --> state: {"weekday":2,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/14 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/15 07:00:00 Make prediction: Coffee --> state: {"weekday":3,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/15 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/15 10:00:00 Make prediction: Nothing --> state: {"weekday":3,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/15 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/15 13:00:00 Make prediction: Nothing --> state: {"weekday":3,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/15 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/15 16:00:00 Make prediction: Nothing --> state: {"weekday":3,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/15 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+2019/05/16 07:00:00 eval prediction:  {Thursday 4 {0 0 0}} user:  Nothing ql:  Nothing
+2019/05/16 07:00:00 Make prediction: Coffee --> state: {"weekday":4,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/16 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 1/ Neg: 0 
+
+
+2019/05/16 10:00:00 eval prediction:  {Thursday 4 {0 0 0}} user:  Nothing ql:  Nothing
+2019/05/16 10:00:00 Make prediction: Coffee --> state: {"weekday":4,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/16 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 1/ Neg: 0 
+
+
+2019/05/16 13:00:00 eval prediction:  {Thursday 4 {0 0 0}} user:  Nothing ql:  Nothing
+2019/05/16 13:00:00 Make prediction: Coffee --> state: {"weekday":4,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/16 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 1/ Neg: 0 
+
+
+2019/05/16 16:00:00 eval prediction:  {Thursday 4 {0 0 0}} user:  Nothing ql:  Nothing
+2019/05/16 16:00:00 Make prediction: Nothing --> state: {"weekday":4,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/16 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 1/ Neg: 0 
+
+
+
+2019/05/17 07:00:00 Make prediction: Nothing --> state: {"weekday":5,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/17 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/17 10:00:00 Make prediction: Nothing --> state: {"weekday":5,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/17 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/17 13:00:00 Make prediction: Coffee --> state: {"weekday":5,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/17 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/17 16:00:00 Make prediction: Nothing --> state: {"weekday":5,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/17 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/20 07:00:00 Make prediction: Nothing --> state: {"weekday":1,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/20 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/20 10:00:00 Make prediction: Nothing --> state: {"weekday":1,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/20 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/20 13:00:00 Make prediction: Coffee --> state: {"weekday":1,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/20 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/20 16:00:00 Make prediction: Coffee --> state: {"weekday":1,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/20 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/21 07:00:00 Make prediction: Nothing --> state: {"weekday":2,"timeslot":0,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/21 07:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/21 10:00:00 Make prediction: Nothing --> state: {"weekday":2,"timeslot":1,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/21 10:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/21 13:00:00 Make prediction: Nothing --> state: {"weekday":2,"timeslot":2,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/21 13:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
+
+
+2019/05/21 16:00:00 Make prediction: Nothing --> state: {"weekday":2,"timeslot":3,"Drinkcount":{"coffeeCount":0,"waterCount":0,"mateCount":0}} 
+2019/05/21 16:00:00 User {0xe834ec434daba538cd1b9fe1582052b880bd7e63} Steps: 0/ Neg: 0 
+
