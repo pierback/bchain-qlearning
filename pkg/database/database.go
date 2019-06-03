@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strings"
 
 	"github.com/xujiajun/nutsdb"
 
@@ -38,6 +39,7 @@ type qlvals struct {
 	Epsilon string `json:"ep"`
 	Negs    int    `json:"negs"`
 	Wa      []int  `json:"Wk_negs"`
+	Steps   int    `json:"steps"`
 }
 
 var (
@@ -50,8 +52,8 @@ func StartDB() {
 }
 
 //SaveQl saves qt and current epsilon val
-func SaveQl(usr string, qt []byte, ep string, ng int, wa []int) {
-	qlvs := &qlvals{Qtable: string(qt[:]), Epsilon: ep}
+func SaveQl(usr string, qt []byte, ep string, ng int, wa []int, steps int) {
+	qlvs := &qlvals{Qtable: string(qt[:]), Epsilon: ep, Negs: ng, Wa: wa, Steps: steps}
 
 	_, filename, _, _ := runtime.Caller(0)
 	bvglJSON := createSCJson(qlvs)
@@ -70,8 +72,7 @@ func SaveQl(usr string, qt []byte, ep string, ng int, wa []int) {
 }
 
 func GetQl(usr string) map[string]interface{} {
-	fmt.Println("GetQl: ", usr)
-	var result map[string]interface{} = ut.DownloadFile(usr + "-ql.json")
+	var result map[string]interface{} = ut.DownloadFile(strings.ToLower(usr) + "-ql.json")
 	return result
 }
 

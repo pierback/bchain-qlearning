@@ -14,6 +14,7 @@ import (
 	"path"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -25,9 +26,8 @@ var (
 
 func GetLatestContractAddress() common.Address {
 	var result map[string]interface{} = DownloadFile("bvgl.json")
-	log.Println("result: ", result["address"])
 
-	fmt.Printf("Contract Address 0x%s\n", result["address"])
+	fmt.Printf("\nContract Address 0x%s\n", result["address"])
 	return common.HexToAddress(result["address"].(string))
 }
 
@@ -35,7 +35,8 @@ func GetLatestContractAddress() common.Address {
 func GetLocalIP() net.IP {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return []byte("")
 	}
 	defer conn.Close()
 
@@ -86,6 +87,7 @@ func PrintError(err error) {
 
 func DownloadFile(filename string) map[string]interface{} {
 	url := DownloadIP() + filename
+	log.Printf("\nUsr file %s \n\n", url)
 	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
@@ -95,13 +97,15 @@ func DownloadFile(filename string) map[string]interface{} {
 
 	body, readErr := ioutil.ReadAll(resp.Body)
 	if readErr != nil {
-		log.Println(readErr)
+		log.Println("ioutil eror", readErr)
 	}
 
+	// log.Println("body", filename, body)
 	var result map[string]interface{}
 	jsonErr := json.Unmarshal(body, &result)
+
 	if jsonErr != nil {
-		log.Println(jsonErr)
+		log.Println("jsonErr eror", jsonErr)
 	}
 
 	return result
@@ -145,4 +149,22 @@ func PostFile(filename string, targetUrl string) error {
 		return err
 	}
 	return nil
+}
+
+//ParseWeekday from string
+func ParseWeekday(v string) time.Weekday {
+	var daysOfWeek = map[string]time.Weekday{
+		"Sunday":    time.Sunday,
+		"Monday":    time.Monday,
+		"Tuesday":   time.Tuesday,
+		"Wednesday": time.Wednesday,
+		"Thursday":  time.Thursday,
+		"Friday":    time.Friday,
+		"Saturday":  time.Saturday,
+	}
+
+	if d, ok := daysOfWeek[v]; ok {
+		return d
+	}
+	return time.Sunday
 }

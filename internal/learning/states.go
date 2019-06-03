@@ -100,7 +100,34 @@ func getTS(st State) timeslot {
 	case UserState:
 		return st.(UserState).Timeslot
 	default:
-		fmt.Printf("I don't know about type %T!\n", v)
+		fmt.Printf("getTS I don't know about type %T! %v \n", v, st)
+		return -1
+	}
+}
+
+//CurrentWeekday returns current weekday based on state type
+func CurrentWeekday(st State) time.Weekday {
+	switch v := st.(type) {
+	case VirtualState:
+		return st.(VirtualState).Weekday
+	case UserState:
+		return time.Now().Weekday()
+	default:
+		fmt.Printf("CurrentWeekday I don't know about type %T! %v\n", v, st)
+		return -1
+	}
+}
+
+//GetWeekday returns weekday based on state type
+// which is currently set in state
+func GetWeekday(st State) time.Weekday {
+	switch v := st.(type) {
+	case VirtualState:
+		return st.(VirtualState).Weekday
+	case UserState:
+		return st.(UserState).Weekday
+	default:
+		fmt.Printf("GetWeekday I don't know about type %T!\n", v)
 		return -1
 	}
 }
@@ -112,8 +139,18 @@ func getCC(st State) int {
 	case UserState:
 		return st.(UserState).Drinkcount.CoffeeCount
 	default:
-		fmt.Printf("I don't know about type %T!\n", v)
+		fmt.Printf("getCC I don't know about type %T! %v\n", v, st)
 		return -1
+	}
+}
+
+func GetCurDrinkCount(s State) Drinkcount {
+	cc := getCC(s)
+
+	return Drinkcount{
+		CoffeeCount: cc,
+		WaterCount:  0,
+		MateCount:   0,
 	}
 }
 
@@ -135,20 +172,29 @@ func (vs VirtualState) Get() State {
 //Get returns current UserState
 func (s UserState) Get() State {
 	var dc Drinkcount
-	wd := time.Now().Weekday()
-	ts := GetCurrentTimeSlot(time.Now().Hour())
+	var wd time.Weekday
+	var ts timeslot
 
 	//if new day set Drinkcount to 0
-	if s.Weekday != wd {
+	if s.Weekday != time.Now().Weekday() {
 		dc = Drinkcount{CoffeeCount: 0, WaterCount: 0, MateCount: 0}
 	} else {
 		dc = s.Drinkcount
+	}
+
+	if wd = s.Weekday; wd == 0 {
+		wd = time.Now().Weekday()
+	}
+
+	if ts = s.Timeslot; ts == 0 {
+		ts = GetCurrentTimeSlot(time.Now().Hour())
 	}
 
 	return UserState{Weekday: wd, Timeslot: ts, Drinkcount: dc}
 }
 
 //New returns a new Userstate object
+// func (s UserState) New(dc Drinkcount, _wd int, _ct int) State {
 func (s UserState) New(dc Drinkcount, _wd int, _ct float64) State {
 	var wd time.Weekday
 	var ct timeslot
@@ -177,6 +223,8 @@ func (s UserState) New(dc Drinkcount, _wd int, _ct float64) State {
 }
 
 //New returns a new VirtualState object
+//ct currentime not slot
+// func (vs VirtualState) New(dc Drinkcount, _wd int, _ct int) State {
 func (vs VirtualState) New(dc Drinkcount, _wd int, _ct float64) State {
 	var wd time.Weekday
 	var ct timeslot

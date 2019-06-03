@@ -49,23 +49,55 @@ func initPrevQl() {
 	bcm.mu.Lock()
 	defer bcm.mu.Unlock()
 
-	// _, filename, _, _ := runtime.Caller(0)
-	// usrs, _ := readUsers(path.Join(path.Dir(filename), "/usrs.txt"))
-	// log.Println("REad users \n", usrs)
-
-	usrs := []string{"0xe8816898d851d5b61b7f950627d04d794c07ca37", "0x5409ed021d9299bf6814279a6a1411a7e866a631", "0x6ecbe1db9ef729cbe972c83fb886247691fb6beb", "0xe36ea790bc9d7ab70c55260c66d52b1eca985f84", "0xe834ec434daba538cd1b9fe1582052b880bd7e63", "0x78dc5d2d739606d31509c31d654056a45185ecb6"}
+	usrs := []string{
+		"0x5409ed021d9299bf6814279a6a1411a7e866a631",
+		"0x6ecbe1db9ef729cbe972c83fb886247691fb6beb",
+		"0xe36ea790bc9d7ab70c55260c66d52b1eca985f84",
+		"0xe834ec434daba538cd1b9fe1582052b880bd7e63",
+		"0x78dc5d2d739606d31509c31d654056a45185ecb6",
+		"0x06cef8e666768cc40cc78cf93d9611019ddcb628",
+		"0x4404ac8bd8f9618d27ad2f1485aa1b2cfd82482d",
+		"0x7457d5e02197480db681d3fdf256c7aca21bdc12",
+		GENERALUSER,
+	}
 
 	for _, usr := range usrs {
 		result := db.GetQl(usr)
-		if result != nil {
+		fmt.Printf("\n User: %s \n\n", usr)
+		if result["qt"] != nil {
 			qt := result["qt"].(string)
-			log.Println("ep, qt: ", result["ep"].(string), result["qt"].(string))
+			ep := result["ep"].(string)
+			// wa := result["Wk_negs"].([]string)
+			// fmt.Println("result: ", wa)
+			/* negs := result["negs"].(int)
+			steps := result["steps"].(int) */
 
-			ql := setQl(result["ep"].(string), qt)
+			// sr := l.Successratio{Steps: steps, Neg: negs, Wa: wa}
+
+			ql := setQl(ep, qt)
+			// ql.Sr = sr
+			log.Printf("\n User: %s Epsilon: %f \n Qtable: %v \n\n", usr, ql.Epsilon, ql.Qt)
 			bcm.set(User{ethaddress: usr}, *ql)
 		}
 	}
 }
+
+/*
+func UnmarshalJSON(b []byte) error {
+	// Try string first
+	var s string
+	if err := json.Unmarshal(b, &s); err == nil {
+		value, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			return err
+		}
+		*i = int(value)
+		return nil
+	}
+
+	// Fallback to number
+	return json.Unmarshal(b, (*int)(i))
+} */
 
 func setQl(ep, qt string) *l.QLearning {
 	ql := &l.QLearning{}
@@ -107,7 +139,7 @@ func (bcm *UserManagement) getQlearning(ea string) *l.QLearning {
 	bcm.mu.RUnlock()
 	log.Println("NEW USER:", ea)
 	ql := bcm.initUser(ea)
-	ql.Prediction = bcm.getGeneralPrediction(*ql)
+	ql.Qt = bcm.getGeneralQt()
 
 	return ql
 }
@@ -139,6 +171,11 @@ func (bcm *UserManagement) getGeneralPrediction(newUserQl l.QLearning) l.Action 
 	ql := bcm.getQlearning(GENERALUSER)
 	currentState := ql.GetState()
 	return ql.GetAction(currentState)
+}
+
+func (bcm *UserManagement) getGeneralQt() l.QTable {
+	ql := bcm.getQlearning(GENERALUSER)
+	return ql.Qt
 }
 
 func (bcm *UserManagement) SetGenQvals(qvsn float64, qvsc float64) {

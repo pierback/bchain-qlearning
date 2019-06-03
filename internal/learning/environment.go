@@ -66,7 +66,7 @@ func (str *ssid) isEduroam() bool {
 	return false
 }
 
-func TsBoundaries(ts uint) (int8, int8) {
+func TsBoundaries(ts uint) (int, int) {
 	switch ts {
 	case 0:
 		return 7, 9

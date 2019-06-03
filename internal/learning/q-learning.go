@@ -1,10 +1,11 @@
 package learning
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
+
+	en "github.com/pierback/bchain-qlearning/cmd/environment"
 )
 
 //Action type
@@ -69,17 +70,31 @@ func (q *QLearning) Initialize() {
 	q.EpsilonDecay = 0.9995
 
 	q.Qt = make(QTable)
+
+	q.State = NewState()
+}
+
+func (q *QLearning) isNewDay() bool {
+	curWd := CurrentWeekday(q.State)
+	if GetWeekday(q.State) != curWd {
+		return true
+	}
+	return false
 }
 
 //Learn one iteration of qlearning proccess
 func (q *QLearning) Learn(fb Action) {
-	log.Printf("Watched User Action:  %s <-> Prediction: %s \n", fb, q.Prediction)
 	//
 	// q.Epsilon = float64(1 / (q.Sr.steps + 1))
-	q.EvalPrediction(fb)
+	if q.isNewDay() {
+		q.State = NewState()
+	} else {
+		//no need to eval prediction if new day
+		//if not eval
+		q.EvalPrediction(fb)
+	}
 	q.MakePrediction()
-
-	fmt.Println("   ")
+	// fmt.Println("   ")
 }
 
 func (q *QLearning) EvalPrediction(fb Action) {
@@ -95,18 +110,22 @@ func (q *QLearning) EvalPrediction(fb Action) {
 	  qval := qsa + q.LearningRate*(reward+q.Gamma*_qsa-qsa) */
 
 	q.SetQ(q.Prediction, qval)
-	// log.Println("eval prediction: ", q.State, "user: ", fb, "ql: ", q.Prediction)
-
+	if *en.SimFlag < 1 {
+		// log.Printf("Make prediction: %s --> state: %s", q.Prediction, s.toString())
+		log.Println("eval prediction: ", q.State, "user: ", fb, "ql: ", q.Prediction)
+	}
 	q.State = newstate
 }
 
 func (q *QLearning) MakePrediction() {
 	s := q.GetState()
-
 	q.Prediction = q.EpsilonGreedy(s)
-
 	q.Epsilon *= q.EpsilonDecay
-	log.Printf("Make prediction: %s --> state: %s", q.Prediction, s.toString())
+
+	if *en.SimFlag < 1 {
+		// log.Printf("Watched User Action:  %s <-> Prediction: %s \n", fb, q.Prediction)
+		log.Printf("Make prediction: %s --> state: %s \n", q.Prediction, s.toString())
+	}
 }
 
 //GetAction returns action with highest qval on given state
@@ -163,8 +182,24 @@ func (q *QLearning) GetQ(a Action, s State) float64 {
 
 // SetQ sets qval of given state action pair
 func (q *QLearning) SetQ(a Action, qv float64) {
-	s := q.State.Get()
+
 	// bc.SetQValue(stateToString(s), fmt.Sprintf("%f", qv))
+	// q.Qt[s][a] = qv
+
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("SetQ panic")
+			q.State = NewState()
+			q.AddState(q.State)
+		}
+	}()
+
+	if q.State == nil {
+		q.State = NewState()
+	}
+
+	s := q.State.Get()
+	q.AddState(s)
 	q.Qt[s][a] = qv
 }
 
@@ -177,7 +212,7 @@ func (q *QLearning) GetState() State {
 	}()
 
 	if q.State == nil {
-		log.Println("No panic")
+		log.Println("state is nill")
 		q.State = NewState()
 	}
 
@@ -186,8 +221,20 @@ func (q *QLearning) GetState() State {
 	return s
 }
 
-func (q *QLearning) SetNewState(vs VirtualState, d int, sl int) State {
+func (q *QLearning) SetState(d int, sl int) {
+	// return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, sl)
+	q.State.New(GetCurDrinkCount(q.State), int(d), float64(sl))
+}
+
+func (q *QLearning) SetNewUsrtState(vs VirtualState, d int, sl int) State {
 	cnt := getCC(q.State)
+	// return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, sl)
+	return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, float64(sl))
+}
+
+func (q *QLearning) SetNewVirtState(vs VirtualState, d int, sl int) State {
+	cnt := getCC(q.State)
+	// return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, sl)
 	return vs.New(Drinkcount{CoffeeCount: cnt, WaterCount: 0, MateCount: 0}, d, float64(sl))
 }
 

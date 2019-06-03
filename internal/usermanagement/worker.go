@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	l "github.com/pierback/bchain-qlearning/internal/learning"
@@ -17,34 +18,59 @@ var dbFile *os.File
 func StartWorker() {
 
 	defer dbFile.Close()
-	fmt.Printf("\nWorker started \n")
+	fmt.Printf("\nWorker started \n\n")
 	initBm()
 
-	run()
-
-	<-nextTick()
-	run()
-
-	for range time.Tick(3 * time.Hour) {
-		// for range time.Tick(30 * time.Second) {
-		run()
-		dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-		if err != nil {
-			log.Fatal(err)
+	ticker := nextTick()
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				ticker.Stop()
+				run()
+				ticker = nextTick()
+				dbFile, err := os.OpenFile("logs", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer dbFile.Close()
+				wrt := io.MultiWriter(os.Stdout, dbFile)
+				log.SetOutput(wrt)
+			}
 		}
-		defer dbFile.Close()
-		wrt := io.MultiWriter(os.Stdout, dbFile)
-		log.SetOutput(wrt)
-	}
+		log.Println("stopped")
+	}()
+
 }
 
-func nextTick() <-chan time.Time {
+func nextTick() time.Ticker {
+	var lowerBoundary int
 	curH := time.Now().Hour()
 	curts := l.GetCurrentTimeSlot(curH)
-	_, lb := l.TsBoundaries(uint(curts))
+	day := time.Now().Day()
+
+	//get lower boundary of next relevant timeslot
+	if curts+1 > 3 {
+		_, lowerBoundary = l.TsBoundaries(4) //is always 6
+
+		//next tick next monday at 7
+		if time.Now().Weekday() == time.Friday {
+			day = time.Now().AddDate(0, 0, 3).Day()
+		} else if time.Now().Weekday() == time.Saturday {
+			day = time.Now().AddDate(0, 0, 2).Day()
+		} else if time.Now().Hour() < 7 { //ticker started after 00:00
+			day = time.Now().Day()
+		} else { //ticker started after curts+1
+			day = time.Now().AddDate(0, 0, 1).Day()
+		}
+	} else {
+		_, lowerBoundary = l.TsBoundaries(uint(curts))
+	}
+	hour := lowerBoundary + 1
 
 	nextTick := time.Date(time.Now().Year(), time.Now().Month(),
-		time.Now().Day(), int(lb+1), int(0), int(0), int(0), time.Local)
+		day, hour, int(0), int(0), int(0), time.Local)
+
 	diff := nextTick.Sub(time.Now())
 	d := diff.Round(diff)
 	h := d / time.Hour
@@ -52,11 +78,9 @@ func nextTick() <-chan time.Time {
 	m := d / time.Minute
 
 	diffStr := fmt.Sprintf("%02dh %02dmin", h, m)
-	fmt.Printf("nextTick at: %02d:%02d:%02d in %s\n", nextTick.Hour(), nextTick.Minute(), nextTick.Second(), diffStr)
+	fmt.Printf("firstTick at: %02d:%02d:%02d in %s\n", nextTick.Hour(), nextTick.Minute(), nextTick.Second(), diffStr)
 
-	fmt.Printf("time.Tick(diff) %s\n", diff)
-
-	return time.Tick(diff)
+	return *time.NewTicker(diff)
 }
 
 func run() {
@@ -69,18 +93,18 @@ func run() {
 	var qvalsN, qvalsC float64
 
 	for usr, ql := range bcm.users {
-		log.Println("next urs", usr)
 		ql.Learn(actn)
 		qvalsN += ql.GetQ(l.Nothing, ql.GetState())
 		qvalsC += ql.GetQ(l.Coffee, ql.GetState())
 
-		go saveToDb(usr.ethaddress, ql)
-
-		log.Printf("User %s Steps: %d/ Neg: %d \n", usr, ql.Sr.Steps, ql.Sr.Neg)
-
+		log.Printf("User %s Steps: %d/ Neg: %d \n\n", usr, ql.Sr.Steps, ql.Sr.Neg)
 		if time.Now().Weekday() == time.Friday && time.Now().Hour() == 20 {
 			ql.Sr.Wa = append(ql.Sr.Wa, ql.Sr.Neg)
+			go saveToDb(usr.ethaddress, ql)
 			ql.Sr.Neg = 0
+			log.Printf("\n\n QTABLE %v \n\n", ql.Qt)
+		} else {
+			go saveToDb(usr.ethaddress, ql)
 		}
 	}
 	bcm.SetGenQvals(qvalsN, qvalsC)
@@ -89,16 +113,17 @@ func run() {
 func saveToDb(usr string, ql l.QLearning) {
 	qt := l.MapToString(ql.Qt)
 	ep := fmt.Sprintf("%f", ql.Epsilon)
-	db.SaveQl(usr, qt, ep, ql.Sr.Neg, ql.Sr.Wa)
+	db.SaveQl(strings.ToLower(usr), qt, ep, ql.Sr.Neg, ql.Sr.Wa, ql.Sr.Steps)
 }
 
 //Learn triggers learning func of qlearning
-func Learn(ethAdrs string, at string) {
+func Learn(ethAdrs string, at string, wd time.Weekday, curHour int) {
 	log.Printf("Learn ethAdrs: %s \n", ethAdrs)
 	actn := l.GetAction(at)
 	if actn == l.Coffee || actn == l.Nothing {
 		bcm.mu.RLock()
 		q := bcm.getQlearning(ethAdrs)
+		q.SetState(int(wd), curHour)
 		q.Learn(actn)
 		bcm.set(User{ethAdrs}, *q)
 	}
