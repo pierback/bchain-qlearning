@@ -113,7 +113,7 @@ func run() {
 func saveToDb(usr string, ql l.QLearning) {
 	qt := l.MapToString(ql.Qt)
 	ep := fmt.Sprintf("%f", ql.Epsilon)
-	db.SaveQl(strings.ToLower(usr), qt, ep, ql.Sr.Neg, ql.Sr.Wa)
+	db.SaveQl(strings.ToLower(usr), qt, ep, ql.Sr.Neg, ql.Sr.Wa, ql.Sr.Steps)
 }
 
 //Learn triggers learning func of qlearning

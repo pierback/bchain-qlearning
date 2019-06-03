@@ -63,16 +63,41 @@ func initPrevQl() {
 
 	for _, usr := range usrs {
 		result := db.GetQl(usr)
-		if result != nil {
+		fmt.Printf("\n User: %s \n\n", usr)
+		if result["qt"] != nil {
 			qt := result["qt"].(string)
 			ep := result["ep"].(string)
+			// wa := result["Wk_negs"].([]string)
+			// fmt.Println("result: ", wa)
+			/* negs := result["negs"].(int)
+			steps := result["steps"].(int) */
+
+			// sr := l.Successratio{Steps: steps, Neg: negs, Wa: wa}
 
 			ql := setQl(ep, qt)
+			// ql.Sr = sr
 			log.Printf("\n User: %s Epsilon: %f \n Qtable: %v \n\n", usr, ql.Epsilon, ql.Qt)
 			bcm.set(User{ethaddress: usr}, *ql)
 		}
 	}
 }
+
+/*
+func UnmarshalJSON(b []byte) error {
+	// Try string first
+	var s string
+	if err := json.Unmarshal(b, &s); err == nil {
+		value, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			return err
+		}
+		*i = int(value)
+		return nil
+	}
+
+	// Fallback to number
+	return json.Unmarshal(b, (*int)(i))
+} */
 
 func setQl(ep, qt string) *l.QLearning {
 	ql := &l.QLearning{}

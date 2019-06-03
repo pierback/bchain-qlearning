@@ -1,8 +1,10 @@
 package usermanagement
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -63,7 +65,7 @@ func (su *SimulatedUser) Start(q *l.QLearning) {
 	var wts [][]float64
 	vs := l.VirtualState{}
 
-	var wa []int
+	var wa, st []int
 	rand.Seed(time.Now().UnixNano())
 	seed := rand.Int63n(11164)
 
@@ -98,16 +100,23 @@ func (su *SimulatedUser) Start(q *l.QLearning) {
 			}
 		}
 		wa = append(wa, q.Sr.Neg)
+		st = append(st, q.Sr.Steps)
 		// log.Println("Negs: ", wa)
 		// log.Println("q.Sr.neg: ", q.Sr.neg)
 		// log.Println(" ")
 		q.Sr.Neg = 0
+		q.Sr.Steps = 0
 	}
 
 	// writeJsonFile(MapToString(q.Qt))
 
 	fmt.Printf("\n\nQ-Table %v \n", q.Qt)
-	fmt.Printf("\n\nsuccessratio %v\n\n", wa)
+	wass, _ := json.Marshal(wa)
+	stepss, _ := json.Marshal(st)
+
+	fmt.Printf("\n\nsuccessratio %v\n\n", strings.Trim(string(wass), "[]"))
+	// fmt.Printf("\n\nstepss %v\n\n", strings.Trim(string(stepss), "[]"))
+	_ = stepss
 }
 
 //UserMock mocks user behavior

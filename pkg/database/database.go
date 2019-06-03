@@ -39,6 +39,7 @@ type qlvals struct {
 	Epsilon string `json:"ep"`
 	Negs    int    `json:"negs"`
 	Wa      []int  `json:"Wk_negs"`
+	Steps   int    `json:"steps"`
 }
 
 var (
@@ -51,8 +52,8 @@ func StartDB() {
 }
 
 //SaveQl saves qt and current epsilon val
-func SaveQl(usr string, qt []byte, ep string, ng int, wa []int) {
-	qlvs := &qlvals{Qtable: string(qt[:]), Epsilon: ep, Negs: ng, Wa: wa}
+func SaveQl(usr string, qt []byte, ep string, ng int, wa []int, steps int) {
+	qlvs := &qlvals{Qtable: string(qt[:]), Epsilon: ep, Negs: ng, Wa: wa, Steps: steps}
 
 	_, filename, _, _ := runtime.Caller(0)
 	bvglJSON := createSCJson(qlvs)
